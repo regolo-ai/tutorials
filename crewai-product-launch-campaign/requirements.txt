@@ -1,0 +1,5 @@
+crewai==0.80.0
+crewai-tools>=0.14.0
+flask==3.0.0
+python-dotenv==1.0.0
+setuptools>=65.5.1

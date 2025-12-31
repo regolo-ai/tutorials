@@ -1,0 +1,87 @@
+{
+  "name": "crewAI Product Launch Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "launch-product",
+        "method": "POST"
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:5000/kickoff",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {}
+      },
+      "name": "Kickoff Crew",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "amount": 30,
+        "unit": "seconds"
+      },
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "url": "=http://localhost:5000/status/{{ $json.job_id }}",
+        "method": "GET"
+      },
+      "name": "Check Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.status }}",
+              "value2": "completed"
+            }
+          ]
+        }
+      },
+      "name": "IF Completed",
+      "type": "n8n-nodes-base.if",
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "channel": "#product-launches",
+        "text": "=🚀 Product Launch Ready: {{ $('Kickoff Crew').item.json.inputs.product_name }}\n\nCampaign materials:\n{{ $json.result }}"
+      },
+      "name": "Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "position": [1250, 200]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{ "node": "Kickoff Crew", "type": "main", "index": 0 }]]
+    },
+    "Kickoff Crew": {
+      "main": [[{ "node": "Wait", "type": "main", "index": 0 }]]
+    },
+    "Wait": {
+      "main": [[{ "node": "Check Status", "type": "main", "index": 0 }]]
+    },
+    "Check Status": {
+      "main": [[{ "node": "IF Completed", "type": "main", "index": 0 }]]
+    },
+    "IF Completed": {
+      "main": [
+        [{ "node": "Slack Notification", "type": "main", "index": 0 }],
+        [{ "node": "Wait", "type": "main", "index": 0 }]
+      ]
+    }
+  }
+}
