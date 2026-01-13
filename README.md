@@ -11,7 +11,8 @@ Welcome to the **Regolo.ai** tutorials repository! This collection features hand
 
 | Tutorial | Description | Article Link |
 |----------|-------------|--------------|
-| **[CrewAI Product Launch Campaign](crewai-product-launch-campaign/)** | Learn how to build an AI-powered product launch campaign using CrewAI. | [Read Article](https://regolo.ai/article-link) |
+| **[CrewAI Product Launch Campaign](crewai-product-launch-campaign/)** | An automated product launch system powered by crewAI multi-agent framework and Regolo.ai LLM infrastructure. | [Read Article](https://regolo.ai/build-multi-agent-workflows-with-crewai-teams/) |
+| **[Cheshire Cat AI + Regolo: Enterprise AI Agent Setup](from-zero-to-hero-cheshire-cat-and-regolo/)** | Production-ready AI agent using open-source LLMs via OpenAI-compatible API. | [Read Article](https://regolo.ai/from-zero-to-an-enterprise-ready-ai-agent-with-cheshire-cat-and-regolo-a-practical-guide-using-only-open-source-llms/) |
 
 ### How to Use
 1. Clone this repository: `git clone https://github.com/yourusername/tutorials.git`
