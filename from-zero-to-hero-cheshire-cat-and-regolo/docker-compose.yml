@@ -1,0 +1,12 @@
+services:
+  cheshire-cat:
+    image: ghcr.io/cheshire-cat-ai/core:latest
+    container_name: cheshire-cat
+    ports:
+      - "1865:80"           # Cheshire Cat admin UI on localhost:1865
+    environment:
+      # Optional: pass the key as env, or paste it later in the UI
+      - REGOLO_API_KEY=${REGOLO_API_KEY}
+    volumes:
+      - ./cat-data:/app/.cheshire-cat
+    restart: unless-stopped

@@ -1,0 +1,8 @@
+# Regolo API client dependencies
+requests>=2.31.0
+
+# Optional: for enhanced functionality
+python-dotenv>=1.0.0
+
+# For Cheshire Cat plugin development (optional)
+# cheshire-cat-api>=1.6.0
