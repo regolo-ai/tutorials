@@ -1,0 +1,27 @@
+Production-Ready RAG Systems
+
+Retrieval Augmented Generation (RAG) is a powerful technique that combines information retrieval with natural language generation. By grounding LLM outputs in retrieved context, RAG systems can provide factual, up-to-date answers while reducing hallucination rates.
+
+Key Components
+
+A production RAG system requires several critical components working together: semantic chunking to preserve context, high-quality embeddings for retrieval, hybrid search combining dense and lexical methods, cross-encoder reranking for precision, and careful prompt engineering to reduce hallucinations.
+
+Semantic Chunking
+
+Traditional fixed-size chunking breaks text at arbitrary boundaries, losing important context. Semantic chunking instead respects document structure by splitting on paragraphs, sections, and sentences. This approach preserves meaning and improves retrieval quality by 15-20%.
+
+Hybrid Retrieval
+
+Dense vector search using embeddings captures semantic similarity but can miss exact keyword matches. BM25 lexical search excels at keywords but misses semantic meaning. Combining both approaches in hybrid retrieval boosts recall by 20%+ over either method alone.
+
+Reranking
+
+Initial retrieval often returns relevant-ish but not perfectly ordered results. Cross-encoder reranking evaluates query-document pairs jointly, providing much better relevance scoring than independent embeddings. This can boost precision@5 from 65% to 87%.
+
+Open-Source Models
+
+Modern open-source models like gte-Qwen2 for embeddings and Llama-3.3 for generation now match or exceed closed alternatives. gte-Qwen2-7B-instruct ranks #1 on MTEB benchmarks, outperforming OpenAI's text-embedding-3-large. Llama-3.3-70B-Instruct provides excellent reasoning with proper prompting.
+
+Cost and Performance
+
+Production RAG on open models hosted on infrastructure like Regolo can achieve 85%+ retrieval accuracy, sub-500ms latency, and costs 70%+ lower than closed API alternatives. Caching frequent queries with Redis further reduces costs and latency.

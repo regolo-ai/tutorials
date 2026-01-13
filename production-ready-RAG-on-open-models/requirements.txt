@@ -1,0 +1,23 @@
+# Production RAG Dependencies
+
+# Core
+requests>=2.31.0
+numpy>=1.24.0
+
+# Vector store and retrieval
+chromadb>=0.4.0
+rank-bm25>=0.2.2
+
+# Embeddings and reranking
+sentence-transformers>=2.2.0
+
+# Redis caching (optional but recommended)
+redis>=5.0.0
+
+# Utilities
+python-dotenv>=1.0.0
+
+# For production deployment
+gunicorn>=21.0.0
+fastapi>=0.104.0
+uvicorn>=0.24.0
