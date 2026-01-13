@@ -2,7 +2,7 @@
 
 **Production-ready AI agent using open-source LLMs via OpenAI-compatible API**
 
-This repository contains all the code from the guide ["From Zero to an Enterprise-Ready AI Agent with Cheshire Cat and Regolo"](https://regolo.ai) — ready to test and deploy.
+This repository contains all the code from the guide ["From Zero to an Enterprise-Ready AI Agent with Cheshire Cat and Regolo"](https://regolo.ai/from-zero-to-an-enterprise-ready-ai-agent-with-cheshire-cat-and-regolo-a-practical-guide-using-only-open-source-llms/) — ready to test and deploy.
 
 ---
 
@@ -401,7 +401,7 @@ Based on Llama-3.3-70B-Instruct pricing:
 
 Example: 100 conversations/day × 2000 tokens avg = ~$12-18/month
 
-Check latest pricing: [regolo.ai/pricing](https://regolo.ai)
+Check latest pricing: [https://regolo.ai/subscriptions](https://regolo.ai)
 
 ### Expected Latency
 
@@ -482,7 +482,7 @@ docker compose restart cheshire-cat
 
 **Built by developers, for developers** 🚀
 
-Questions? Reach out to support@regolo.ai or visit https://regolo.ai
+Questions? Reach out to our [Discord](https://discord.gg/gVcxQz7Y) or visit https://regolo.ai
 
 ---
 
