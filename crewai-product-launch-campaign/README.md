@@ -1,6 +1,6 @@
 # crewAI Product Launch - Multi-Agent Workflow
-
 An automated product launch system powered by crewAI multi-agent framework and Regolo.ai LLM infrastructure.
+Blog article reference: [https://regolo.ai/build-multi-agent-workflows-with-crewai-teams/](https://regolo.ai/build-multi-agent-workflows-with-crewai-teams/)
 
 ## Overview
 
@@ -221,7 +221,7 @@ Reduce task complexity or increase timeout in n8n Wait node.
 
 - [Regolo.ai | Sign Up for FREE Credits](https://regolo.ai)
 - [crewAI Documentation](https://docs.crewai.com)
-- [Growth Hacking Guide](https://regolo.ai/blog)
+- [Growth Hacking Guide](https://regolo.ai/labs)
 
 ## License
 
@@ -229,10 +229,9 @@ MIT License - feel free to use for commercial projects.
 
 ## Support
 
-- Email: support@regolo.ai
-- Community: [Regolo Discord](#)
+- Community: [Talk with us on Discord](https://discord.gg/gVcxQz7Y)
 - Issues: Open a GitHub issue
 
 ---
 
-Built with ❤️ by the Regolo team
+Built with ❤️ by the [Regolo team](https://regolo.ai)
