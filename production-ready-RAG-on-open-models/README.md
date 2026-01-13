@@ -87,8 +87,8 @@ docker run -d -p 6379:6379 redis:7-alpine
 ### Step 4: Run the Pipeline
 
 ```bash
-# Load environment
-export $(cat .env | xargs)
+# Load environment (filtering out comments)
+export $(grep -v '^#' .env | xargs)
 
 # Run complete pipeline with interactive mode
 python main.py
@@ -585,6 +585,8 @@ python -c "from production_rag import clear_cache; clear_cache()"
 # Rebuild index
 rm -rf rag_index/ && python main.py
 ```
+
+Here the [output](output.md)
 
 ---
 
