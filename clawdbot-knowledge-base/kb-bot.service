@@ -1,0 +1,29 @@
+[Unit]
+Description=Clawdbot Knowledge Base (Regolo GPU)
+After=network.target
+
+[Service]
+Type=simple
+User=your-username
+WorkingDirectory=./knowledge-base/examples
+Environment="PATH=./venv/bin"
+ExecStart=./venv/bin/python3 kb_bot.py
+
+# Restart policy
+Restart=always
+RestartSec=10
+
+# Logging
+StandardOutput=append:/./logs/systemd.log
+StandardError=append:./logs/systemd-error.log
+
+# Security hardening (optional but recommended)
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=./logs
+ReadWritePaths=./index
+
+[Install]
+WantedBy=multi-user.target

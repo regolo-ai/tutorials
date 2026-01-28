@@ -1,0 +1,28 @@
+# Core dependencies
+openai==1.12.0                  # Regolo API client (OpenAI-compatible)
+python-telegram-bot==20.7       # Telegram bot framework
+python-dotenv==1.0.0           # Environment variable management
+
+# ML & Data Processing
+numpy==1.26.3                   # Numerical operations
+scikit-learn==1.4.0            # TF-IDF, cosine similarity
+sentence-transformers==2.3.1    # Optional: local embeddings fallback
+
+# Document Processing
+PyPDF2==3.0.1                  # PDF text extraction
+markdown==3.5.2                # Markdown parsing
+beautifulsoup4==4.12.3         # HTML cleaning (if needed)
+
+# Utilities
+requests==2.31.0               # HTTP client
+croniter==2.0.1                # Cron expression parsing
+tqdm==4.66.1                   # Progress bars
+
+# Optional: Caching
+# redis==5.0.1                 # Redis client (uncomment if using cache)
+
+# Development & Testing (optional)
+pytest==7.4.4                  # Unit testing
+pytest-asyncio==0.23.3         # Async test support
+black==24.1.1                  # Code formatting
+flake8==7.0.0                  # Linting
