@@ -1,0 +1,44 @@
+services:
+  kb-bot:
+    build: .
+    container_name: clawdbot-kb
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./knowledge-base:/app/knowledge-base:ro  # Read-only mount for security
+      - ./index:/app/index                        # Persistent index
+      - ./logs:/app/logs                          # Persistent logs
+    networks:
+      - kb-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    # Optional: Add resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+        reservations:
+          memory: 2G
+
+networks:
+  kb-network:
+    driver: bridge
+
+# Optional: Add Redis for caching (uncomment if using ENABLE_CACHE=true)
+# redis:
+#   image: redis:7-alpine
+#   container_name: kb-redis
+#   restart: unless-stopped
+#   networks:
+#     - kb-network
+#   volumes:
+#     - redis-data:/data
+#   command: redis-server --appendonly yes
+
+# volumes:
+#   redis-data:
