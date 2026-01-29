@@ -1,6 +1,22 @@
 # crewAI Product Launch - Multi-Agent Workflow
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![Powered by Regolo](https://img.shields.io/badge/Powered%20by-Regolo%20GPU-green)](https://regolo.ai)
+
+
 An automated product launch system powered by crewAI multi-agent framework and Regolo.ai LLM infrastructure.
-Blog article reference: [https://regolo.ai/build-multi-agent-workflows-with-crewai-teams/](https://regolo.ai/build-multi-agent-workflows-with-crewai-teams/)
+Blog article reference: [Build Multi-Agent Workflows with crewAI](https://regolo.ai/build-multi-agent-workflows-with-crewai-teams/)
+
+--- 
+### 🎁 Get Started Free of Use for 30 Days
+
+Sign up for Regolo and get **30 days free and 70% off for next 3 months:**
+
+[Get Started](https://regolo.ai) · [**REGOLO FREE TRIAL**](https://regolo.ai/pricing)
+
+### Questions? Open an issue or join our [Discord](https://discord.gg/wHxwWCC8) 
+---
 
 ## Overview
 

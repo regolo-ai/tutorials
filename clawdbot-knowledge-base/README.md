@@ -4,8 +4,16 @@
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![Powered by Regolo](https://img.shields.io/badge/Powered%20by-Regolo%20GPU-green)](https://regolo.ai)
 
-Production-ready knowledge base bot using **Clawdbot** runtime and **Regolo EU-hosted GPUs** for embeddings, reranking, and generation. Built for enterprise teams that need GDPR-compliant, cost-effective AI retrieval.
+This repository contains all the code from the guide [Build an Internal Knowledge Bot with Clawdbot: Embeddings + Rerank + Chat in 30 Minutes](https://regolo.ai/build-an-internal-knowledge-bot-with-clawdbot-embeddings-rerank-chat-in-30-minutes/) — ready to test and deploy.
 
+--- 
+### 🎁 Get Started Free of Use for 30 Days
+
+Sign up for Regolo and get **30 days free and 70% off for next 3 months:**
+
+[Get Started](https://regolo.ai) · [**REGOLO FREE TRIAL**](https://regolo.ai/pricing)
+
+### Questions? Open an issue or join our [Discord](https://discord.gg/wHxwWCC8) 
 ---
 
 ## ✨ Features

@@ -1,6 +1,16 @@
-# Code list of Blog articles on Regolo.ai 
+# Code list of Articles on Regolo.ai 
+### 🎁 Get Started Free of Use for 30 Days
 
-Welcome to the **Regolo.ai** tutorials repository! This collection features hands-on code examples and in-depth guides for developers exploring cutting-edge technologies. Each folder contains a complete tutorial project, accompanied by a detailed blog article.
+Sign up for Regolo and get **30 days free and 70% off for next 3 months:**
+
+[Get Started](https://regolo.ai) · [**REGOLO FREE TRIAL**](https://regolo.ai/pricing)
+
+### Questions? Open an issue or join our [Discord](https://discord.gg/wHxwWCC8) 
+---
+
+Welcome to the **Regolo.ai** tutorials repository! 
+
+This collection features hands-on code examples and in-depth guides for developers exploring cutting-edge technologies. Each folder contains a complete tutorial project, accompanied by a detailed blog article.
 
 ## Why use Regolo.ai 
 - 100% powered by Green Energy 
