@@ -1,9 +1,20 @@
 # Cheshire Cat AI + Regolo: Enterprise AI Agent Setup
-
 **Production-ready AI agent using open-source LLMs via OpenAI-compatible API**
 
-This repository contains all the code from the guide ["From Zero to an Enterprise-Ready AI Agent with Cheshire Cat and Regolo"](https://regolo.ai/from-zero-to-an-enterprise-ready-ai-agent-with-cheshire-cat-and-regolo-a-practical-guide-using-only-open-source-llms/) — ready to test and deploy.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![Powered by Regolo](https://img.shields.io/badge/Powered%20by-Regolo%20GPU-green)](https://regolo.ai)
 
+This repository contains all the code from the guide [From Zero to an Enterprise-Ready AI Agent with Cheshire Cat and Regolo](https://regolo.ai/from-zero-to-an-enterprise-ready-ai-agent-with-cheshire-cat-and-regolo-a-practical-guide-using-only-open-source-llms/) — ready to test and deploy.
+
+--- 
+### 🎁 Get Started Free of Use for 30 Days
+
+Sign up for Regolo and get **30 days free and 70% off for next 3 months:**
+
+[Get Started](https://regolo.ai) · [**REGOLO FREE TRIAL**](https://regolo.ai/pricing)
+
+### Questions? Open an issue or join our [Discord](https://discord.gg/wHxwWCC8) 
 ---
 
 ## What This Is
