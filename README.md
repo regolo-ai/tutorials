@@ -5,7 +5,14 @@ Sign up for Regolo and get **30 days free and 70% off for next 3 months:**
 
 [Get Started](https://regolo.ai) · [**REGOLO FREE TRIAL**](https://regolo.ai/pricing)
 
-### Questions? Open an issue or join our [Discord](https://discord.gg/wHxwWCC8) 
+[Regolo Platform](https://regolo.ai)
+
+[Models Library](https://regolo.ai/models-library/)
+
+[Documentation & Guides](https://regolo.ai/docs)
+
+[Discord & Support](https://discord.gg/wHxwWCC8)
+
 ---
 
 Welcome to the **Regolo.ai** tutorials repository! 
