@@ -1,0 +1,7 @@
+services:
+  ptc-demo:
+    build: .
+    container_name: ptc-demo
+    env_file:
+      - .env
+    command: python main.py
