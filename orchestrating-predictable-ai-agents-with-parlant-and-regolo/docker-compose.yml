@@ -1,0 +1,7 @@
+services:
+  parlant-regolo-demo:
+    build: .
+    container_name: parlant-regolo-demo
+    env_file:
+      - .env
+    command: python main.py

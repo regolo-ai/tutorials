@@ -30,6 +30,7 @@ This collection features hands-on code examples and in-depth guides for develope
 |----------|-------------|--------------|
 | **[CrewAI Product Launch Campaign](crewai-product-launch-campaign/)** | An automated product launch system powered by crewAI multi-agent framework and Regolo.ai LLM infrastructure. | [Read Article](https://regolo.ai/build-multi-agent-workflows-with-crewai-teams/) |
 | **[Cheshire Cat AI + Regolo: Enterprise AI Agent Setup](from-zero-to-hero-cheshire-cat-and-regolo/)** | Production-ready AI agent using open-source LLMs via OpenAI-compatible API. | [Read Article](https://regolo.ai/from-zero-to-an-enterprise-ready-ai-agent-with-cheshire-cat-and-regolo-a-practical-guide-using-only-open-source-llms/) |
+| **[Orchestrating Predictable AI Agents with Parlant and Regolo](orchestrating-predictable-ai-agents-with-parlant-and-regolo/)** | Deterministic policy orchestration with a Parlant-style control layer and Regolo generation backend. | [Read Article](https://regolo.ai/orchestrating-predictable-ai-agents-with-parlant-and-regolo/) |
 
 ### How to Use
 1. Clone this repository: `git clone https://github.com/yourusername/tutorials.git`
