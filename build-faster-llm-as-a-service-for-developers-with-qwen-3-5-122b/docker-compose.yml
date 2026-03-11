@@ -1,0 +1,7 @@
+services:
+  qwen-llmaas-demo:
+    build: .
+    container_name: qwen-llmaas-demo
+    env_file:
+      - .env
+    command: python main.py
