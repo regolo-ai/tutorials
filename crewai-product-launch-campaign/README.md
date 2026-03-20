@@ -134,7 +134,7 @@ docker run -e REGOLO_API_KEY=your-key -p 5000:5000 crew-product-launch
 5. **IF Node**: Check if `status === "completed"`
 6. **Slack/Email**: Send results when complete
 
-See the full guide at: [TOOOOOOO REPLACEEEEEE | Build Multi-Agent Workflows: n8n + crewAI Teams](https://regolo.ai)
+See the full guide at: [Build Multi-Agent Workflows with crewAI](https://regolo.ai/build-multi-agent-workflows-with-crewai-teams/)
 
 ## Project Structure
 
