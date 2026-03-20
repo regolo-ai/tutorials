@@ -2,7 +2,7 @@
 
 **Complete RAG pipeline achieving 85%+ retrieval accuracy, <500ms latency, and 73% cost savings vs closed APIs**
 
-This repository contains all production-ready code from the guide ["Production-Ready RAG on Open Models: Chunking, Retrieval, Reranking & Evaluation"](https://regolo.ai) — ready to deploy and scale.
+This repository contains all production-ready code from the guide ["Production-Ready RAG on Open Models: Chunking, Retrieval, Reranking & Evaluation"](https://regolo.ai/production-ready-rag-on-open-models-chunking-retrieval-reranking-evaluation/) — ready to deploy and scale.
 
 ---
 
