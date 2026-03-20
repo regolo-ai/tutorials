@@ -1,5 +1,10 @@
 # Advanced RAG in 2026: Long Context Is Not Memory
 
+![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)
+![Runnable Code](https://img.shields.io/badge/Code-Runnable%20Examples-1F9D55)
+![GPU Ready](https://img.shields.io/badge/GPU-100%25%20Ready-0A84FF)
+![OpenAI Compatible](https://img.shields.io/badge/API-OpenAI%20Compatible-black)
+
 **A practical ticket-triage demo that routes support incidents to Regolo for structured enterprise analysis**
 
 This repository contains the code used in the article [Advanced RAG in 2026: Long Context Is Not Memory](https://regolo.ai/advanced-rag-in-2026-long-context-is-not-memory/).

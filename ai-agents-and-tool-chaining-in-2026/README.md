@@ -1,5 +1,10 @@
 # AI Agents and Tool Chaining in 2026
 
+![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)
+![Runnable Code](https://img.shields.io/badge/Code-Runnable%20Examples-1F9D55)
+![GPU Ready](https://img.shields.io/badge/GPU-100%25%20Ready-0A84FF)
+![OpenAI Compatible](https://img.shields.io/badge/API-OpenAI%20Compatible-black)
+
 This tutorial shows a small but complete contract-review workflow that chains multiple steps into one runnable script:
 
 1. Load configuration from a local `.env` file.
