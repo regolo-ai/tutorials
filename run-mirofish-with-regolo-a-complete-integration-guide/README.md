@@ -1,7 +1,6 @@
 # MiroFish × regolo.ai — Starter Kit
 
-Companion code for the step-by-step integration guide:  
-**→ URL_BLOG_POST**
+Companion code for the step-by-step integration guide: [Run MiroFish with regolo.ai: A Complete Integration Guide](https://regolo.ai/run-mirofish-with-regolo-ai-a-complete-integration-guide)
 
 Three scripts that let you verify, explore, and configure a [regolo.ai](https://regolo.ai) endpoint for [MiroFish](https://github.com/666ghj/MiroFish) — a multi-agent swarm intelligence engine for social simulation and prediction.
 
