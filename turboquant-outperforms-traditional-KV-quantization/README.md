@@ -1,6 +1,22 @@
-# TurboQuant KV benchmark
 
-This repository contains a lightweight benchmark to compare TurboQuant against traditional scalar KV quantization methods.
+
+# TurboQuant KV Benchmark
+
+Official benchmark to compare TurboQuant against traditional scalar key/value (KV) quantization methods for LLMs.
+
+**Reference article:**
+👉 [TurboQuant Benchmark: what to measure, what matters, and how to read the results](https://regolo.ai/turboquant-benchmark-what-to-measure-what-matters-and-how-to-read-the-results/)
+
+This repository provides a lightweight, reproducible script to evaluate:
+- reconstruction accuracy
+- bias and MSE on inner product
+- attention KL divergence
+- CPU time per vector
+
+TurboQuant is an optimized quantization technique for LLM KV caches, designed to maximize quality while maintaining efficiency and speed, as described in the article.
+
+---
+
 
 ## Setup
 
@@ -11,11 +27,13 @@ python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
+
 Alternatively:
 
 ```bash
 pip install .
 ```
+
 
 ## Run
 
@@ -23,21 +41,24 @@ pip install .
 python benchmark_kv_quantization.py
 ```
 
+
 Example with custom parameters:
 
 ```bash
 python benchmark_kv_quantization.py --dim 128 --n_vectors 2048 --csv results.csv
 ```
 
-## What it measures
 
-The benchmark reports:
+## Metrics evaluated
 
-- normalized reconstruction MSE
-- inner-product bias
-- normalized inner-product MSE
-- attention KL divergence
+The script reports:
+
+- Normalized reconstruction MSE
+- Inner product bias
+- Normalized inner product MSE
+- Attention KL divergence
 - CPU time per vector
+
 
 ## Dependencies
 
