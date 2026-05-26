@@ -1,0 +1,50 @@
+--- input_memory/_dream_report.md
++++ output_memory/_dream_report.md
+@@ -0,0 +1,5 @@
++# Dream Consolidation Report
++
++- Duplicate CWC 2026 facts were merged.
++- Chronological session notes were converted into topic files.
++- No factual conflicts were detected in the demo data.
+--- input_memory/_index.md
++++ output_memory/_index.md
+@@ -0,0 +1,5 @@
++# Consolidated Memory Index
++
++- `cwc_2026_knowledge.md`: Verified CWC 2026 announcements and references.
++- `event-logistics.md`: Event scheduling and logistics notes.
++- `_dream_report.md`: Consolidation summary and pruning notes.
+--- input_memory/cwc_2026_knowledge.md
++++ output_memory/cwc_2026_knowledge.md
+@@ -0,0 +1,7 @@
++# CWC 2026 Knowledge Base
++
++## Verified Facts
++- Multi-agent orchestration was announced at CWC 2026.
++- Dreaming is described as a background consolidation process.
++- Agent memory stores are part of the announced architecture.
++- Reference notes: https://example.com/notes/cma
+--- input_memory/event-logistics.md
++++ output_memory/event-logistics.md
+@@ -0,0 +1,3 @@
++# Event Logistics
++
++- Event scheduling should be tracked in this file.
+--- input_memory/sessions.md
++++ output_memory/sessions.md
+@@ -1,15 +0,0 @@
+-# Rough Notes
+-- Multi-agent orchestration was launched.
+-- There is a feature called dreaming.
+-- Reference URL: https://example.com/notes/cma
+-
+-- Session Note: User provided message: Show me what you know about the CWC 2026 conference.
+-
+-- Session Note: User provided message: Show me what you know about the CWC 2026 conference.
+-  - Context files loaded: sessions.md
+-
+-- Session Note: User provided message: Show me what you know about the CWC 2026 conference.
+-  - Context files loaded: sessions.md
+-
+-- Session Note: User provided message: Show me what you know about the CWC 2026 conference.
+-  - Context files loaded: sessions.md

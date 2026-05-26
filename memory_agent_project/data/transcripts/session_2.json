@@ -1,0 +1,7 @@
+{
+    "session_id": "ses_02",
+    "conversation": [
+        {"role": "user", "content": "Make sure you remember that CWC 2026 had announcements on dreaming and agent memory stores. Put the notes link as https://example.com/notes/cma. Also note event scheduling is managed in event-logistics.md."},
+        {"role": "assistant", "content": "Recorded. I see we have some duplicate points, which I will flag for our consolidation routine."}
+    ]
+}

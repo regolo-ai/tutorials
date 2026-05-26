@@ -1,0 +1,7 @@
+{
+    "session_id": "ses_01",
+    "conversation": [
+        {"role": "user", "content": "I attended CWC 2026. Anthropic launched multi-agent orchestration, memory stores, and dreaming. Please make a note of this. Use reference notes link: https://example.com/notes/cma"},
+        {"role": "assistant", "content": "Understood. I have recorded these conference launch details to my persistent storage."}
+    ]
+}
