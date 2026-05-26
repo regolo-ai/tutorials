@@ -1,0 +1,5 @@
+INVENTORY FORECASTING RULES:
+1. Always calculate target stock for the forecast horizon.
+2. Formula: Forecasted_Demand = Base_Sales_Velocity * Horizon_Days * Promo_Multiplier.
+3. For "Promo Months", the Promo_Multiplier is exactly 3.1x.
+4. Outputs must be formatted in clean JSON: {"sku": "SKU-XXX", "forecasted_demand": Y}.
