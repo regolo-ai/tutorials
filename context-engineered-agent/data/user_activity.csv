@@ -1,0 +1,17 @@
+event_id,user_id,event_type,activity_score,revenue
+1,USR_1001,login,2,0
+2,USR_9201,login,3,0
+3,USR_1001,transaction,8,120.50
+4,USR_3410,page_view,1,0
+5,USR_9201,transaction,14,249.99
+6,USR_2210,login,2,0
+7,USR_9201,page_view,4,0
+8,USR_3410,transaction,6,89.00
+9,USR_1001,page_view,2,0
+10,USR_9201,transaction,12,310.25
+11,USR_2210,page_view,1,0
+12,USR_2210,transaction,7,75.00
+13,USR_3410,login,2,0
+14,USR_1001,transaction,5,44.25
+15,USR_9201,login,3,0
+16,USR_9201,transaction,11,180.00
