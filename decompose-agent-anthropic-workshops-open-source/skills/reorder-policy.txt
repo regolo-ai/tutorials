@@ -1,0 +1,4 @@
+REORDER POLICY RULES:
+1. Trigger a reorder flag when current Stock is strictly below the ReorderPoint.
+2. The target replenishment quantity should restore stock levels to exactly 2x the ReorderPoint.
+3. Formula: Order_Qty = (2 * ReorderPoint) - Current_Stock.
