@@ -22,6 +22,8 @@ Sign up for Regolo and get **30 days free and 70% off for next 3 months:**
 
 [Discord & Support](https://discord.gg/wHxwWCC8)
 
+[YouTube Channel](https://www.youtube.com/@regoloai)
+
 ---
 
 Welcome to the **Regolo.ai** tutorials repository.

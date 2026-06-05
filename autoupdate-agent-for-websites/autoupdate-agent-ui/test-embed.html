@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regolo AI - Test Embed</title>
+    <style>
+        body, html { 
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: sans-serif; 
+            background-color: #000000;
+            background-image: url('./public/background.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: white;
+        }
+        
+        .header {
+            padding: 24px 40px;
+            display: flex;
+            align-items: flex-start;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .logo {
+            height: 32px;
+            /* Placeholder del logo di Regolo, sostituibile con l'URL esatto se disponibile */
+            content: url('https://regolo.ai/regolo_logo_white.svg'); 
+        }
+
+        /* Hack in caso l'URL esatto del logo SVG fallisca, mostro testo */
+        .logo-fallback {
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: -0.5px;
+            color: white;
+        }
+
+        .hero {
+            max-width: 800px;
+            margin: 100px auto 0;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 4rem;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            color: #000000;
+        }
+        h1.title{
+            font-size: 4rem;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            color: #ffffff;
+        }
+
+        p.subtitle {
+            font-size: 1.25rem;
+            color: #a0aec0;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+    </style>
+    <!-- 1. Carica il CSS generato dalla build -->
+    <link rel="stylesheet" href="./dist/chat-widget.css">
+</head>
+<body>
+    <header class="header">
+        <img src="./public/logo_negative.png" alt="Regolo AI Logo" style="height: 32px;">
+    </header>
+
+    <main class="hero">
+        <h1 class="title">Run AI Apps with Privacy that Deserve Trust</h1>
+        <p class="subtitle">Zero Data Retention in EU Data Center, powered by 100% green carbon-free energy.</p>
+    </main>
+
+    <!-- 2. Carica il JS generato dalla build -->
+    <script type="module" src="./dist/chat-widget.js"></script>
+</body>
+</html>

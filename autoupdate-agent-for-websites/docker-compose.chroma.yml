@@ -1,0 +1,13 @@
+services:
+  chroma:
+    image: ghcr.io/chroma-core/chroma:latest
+    container_name: ${CHROMA_CONTAINER_NAME:-autoupdate-agent-chroma}
+    environment:
+      - IS_PERSISTENT=TRUE
+      - PERSIST_DIRECTORY=/chroma/chroma
+    ports:
+      - "8000:8000"
+    volumes:
+      # Modificato per usare la cartella /data dove Chroma salva effettivamente i dati
+      - ./chroma_db_data:/data
+    restart: unless-stopped
