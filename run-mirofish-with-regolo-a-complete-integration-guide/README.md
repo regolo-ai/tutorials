@@ -1,4 +1,16 @@
+<div align="center">
+  <img src="https://regolo.ai/wp-content/uploads/2026/06/Regolo_logo_positive.png" alt="Regolo.ai Logo" width="300" />
+</div>
+
 # MiroFish × regolo.ai — Starter Kit
+
+<div align="center">
+  <img src="https://img.shields.io/badge/build-passing-brightgreen.svg" alt="Build passing" />
+  <img src="https://img.shields.io/badge/python-3.10+-blue.svg?logo=python&logoColor=white" alt="Python 3.10+" />
+  <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" />
+</div>
+
+<br />
 
 Companion code for the step-by-step integration guide: [Run MiroFish with regolo.ai: A Complete Integration Guide](https://regolo.ai/run-mirofish-with-regolo-ai-a-complete-integration-guide)
 

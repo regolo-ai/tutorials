@@ -1,6 +1,18 @@
 
 
+<div align="center">
+  <img src="https://regolo.ai/wp-content/uploads/2026/06/Regolo_logo_positive.png" alt="Regolo.ai Logo" width="300" />
+</div>
+
 # TurboQuant KV Benchmark
+
+<div align="center">
+  <img src="https://img.shields.io/badge/build-passing-brightgreen.svg" alt="Build passing" />
+  <img src="https://img.shields.io/badge/python-3.10+-blue.svg?logo=python&logoColor=white" alt="Python 3.10+" />
+  <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" />
+</div>
+
+<br />
 
 Official benchmark to compare TurboQuant against traditional scalar key/value (KV) quantization methods for LLMs.
 
@@ -72,18 +84,12 @@ The script reports:
 
 ---
 
-### 🎁 Get Started Free of Use for 30 Days
-
-Sign up for Regolo and get **30 days free and 70% off for next 3 months:**
-
-[Get Started](https://regolo.ai) · [**REGOLO FREE TRIAL**](https://regolo.ai/pricing)
-
-[Regolo Platform](https://regolo.ai)
-
-[Models Library](https://regolo.ai/models-library/)
-
-[Documentation & Guides](https://regolo.ai/docs)
-
-[YouTube Channel](https://www.youtube.com/@regoloai)
-
-[Discord & Support](https://discord.gg/wHxwWCC8)
+> [!IMPORTANT]  
+> ## 🎁 Special Offer: 30 Days Free Trial
+> 
+> To power your AI agent, you need an API key. Sign up for Regolo today and get **30 days completely free**, plus a massive **70% discount for the following 3 months!**
+> 
+> 🚀 **[CLICK HERE TO GET STARTED AND CLAIM YOUR FREE TRIAL](https://regolo.ai/pricing)** 🚀
+> 
+> ---
+> **Explore Regolo:** [Platform](https://regolo.ai) | [Models Library](https://regolo.ai/models-library/) | [Documentation & Guides](https://regolo.ai/docs) | [YouTube](https://www.youtube.com/@regoloai) | [Discord](https://discord.gg/wHxwWCC8)

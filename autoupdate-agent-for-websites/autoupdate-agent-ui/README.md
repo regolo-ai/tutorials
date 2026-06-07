@@ -1,4 +1,16 @@
+<div align="center">
+  <img src="https://regolo.ai/wp-content/uploads/2026/06/Regolo_logo_positive.png" alt="Regolo.ai Logo" width="300" />
+</div>
+
 # React + TypeScript + Vite
+
+<div align="center">
+  <img src="https://img.shields.io/badge/build-passing-brightgreen.svg" alt="Build passing" />
+  <img src="https://img.shields.io/badge/python-3.10+-blue.svg?logo=python&logoColor=white" alt="Python 3.10+" />
+  <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" />
+</div>
+
+<br />
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 

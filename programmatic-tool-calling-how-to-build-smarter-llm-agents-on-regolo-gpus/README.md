@@ -1,4 +1,16 @@
+<div align="center">
+  <img src="https://regolo.ai/wp-content/uploads/2026/06/Regolo_logo_positive.png" alt="Regolo.ai Logo" width="300" />
+</div>
+
 # Programmatic Tool Calling: How to Build Smarter LLM Agents on Regolo GPUs
+
+<div align="center">
+  <img src="https://img.shields.io/badge/build-passing-brightgreen.svg" alt="Build passing" />
+  <img src="https://img.shields.io/badge/python-3.10+-blue.svg?logo=python&logoColor=white" alt="Python 3.10+" />
+  <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" />
+</div>
+
+<br />
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)
 ![Runnable Code](https://img.shields.io/badge/Code-Runnable%20Examples-1F9D55)
