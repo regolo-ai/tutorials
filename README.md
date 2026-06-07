@@ -4,21 +4,7 @@
 
 # Regolo Labs: Production AI Playbooks
 
-<div align="center">
-  <img src="https://img.shields.io/badge/build-passing-brightgreen.svg" alt="Build passing" />
-  <img src="https://img.shields.io/badge/python-3.10+-blue.svg?logo=python&logoColor=white" alt="Python 3.10+" />
-  <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" />
-</div>
-
-<br />
-
-![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)
-![Runnable Code](https://img.shields.io/badge/Code-Runnable%20Examples-1F9D55)
-![GPU Ready](https://img.shields.io/badge/GPU-100%25%20Ready-0A84FF)
-![OpenAI Compatible](https://img.shields.io/badge/API-OpenAI%20Compatible-black)
-
-Runnable playbooks for building sharp, production-ready AI workflows with Regolo.
-Each folder includes code, setup notes, and a companion article.
+Runnable playbooks for building sharp, production-ready AI workflows with Regolo API - each folder includes code, setup notes, and a companion article.
 
 > [!IMPORTANT]  
 > ## 🎁 Special Offer: 30 Days Free Trial
@@ -36,23 +22,12 @@ Welcome to the **Regolo.ai** tutorials repository.
 This collection focuses on practical, runnable AI examples for developers and product teams.
 Each tutorial is designed to be easy to follow, easy to run, and easy to adapt.
 
-## What You Get
-- Ready-to-run AI blueprints
-- Practical implementation notes
-- OpenAI-compatible Regolo integrations
-- Examples focused on real workflows, not toy demos
-
-## Why teams use these tutorials
-- Faster setup with minimal moving parts
-- Code structured for real-world usage
-- Clear article-to-code mapping
-- Regolo-hosted workflows with a production-friendly API
-
-## Focus Areas
-- Multi-agent systems for launch automation and campaign execution
-- Enterprise support and operations workflows
-- RAG pipelines with retrieval, reranking, and evaluation
-- Predictable orchestration for policy-constrained AI behavior
+### How to Use
+1. Clone this repository: `git clone https://github.com/regolo-ai/tutorials.git`
+2. Navigate to the desired tutorial folder.
+3. Follow the instructions in the folder's README.md. 
+4. Get a free API key from Regolo to run the code: [Sign Up for Free Trial](https://regolo.ai/pricing).
+5. Run the code and see the results in minutes.
 
 ## Tutorials
 
@@ -78,22 +53,6 @@ Each tutorial is designed to be easy to follow, easy to run, and easy to adapt.
 | **[Context Engineered Agent](context-engineered-agent/)** | Compact demo of context engineering for long-horizon agents: just-in-time data ingestion, active compaction, structured external memory, and sub-agent isolation — all without prompt stuffing. | `Python` · `Runnable` · `Ollama Compatible` | [Read Article](https://regolo.ai/context-engineering-tutorial-build-lightweight-local-ai-agents-in-python/) |
 | **[Stateful Agent Memory & Dreaming Pipeline](dreaming_agents_that_remember/)** | Three-layer memory architecture inspired by Anthropic's memory system. Decouples live runtime execution from background contextual database consolidation. Supports Ollama and Regolo backends. | `Python` · `Runnable` · `Agent Memory` | [Read Article](https://regolo.ai/implementing-stateful-ai-agents-how-to-build-anthropics-memory-store-and-dreaming-architecture-in-python/) |
 | **[StockPilot — Decomposed AI Agent (Anthropic Workshop Style)](decompose-agent-anthropic-workshops-open-source/)** | Inventory management agent that routes queries to specialized subagents and code-execution tools. Implements the decomposed agent pattern with skill-specific context injection and verifiable results. | `Python` · `Runnable` · `GPU 100% Ready` | — |
-
-### How to Use
-1. Clone this repository: `git clone https://github.com/yourusername/tutorials.git`
-2. Navigate to the desired tutorial folder.
-3. Follow the instructions in the folder's README.md.
-4. Check out the full article for detailed explanations.
-
-### Fast Start
-1. Pick one tutorial and configure `.env`.
-2. Run the local setup from that folder README.
-3. Launch your first production-ready AI feature.
-
-### Startup Playbook
-1. Start with the use case closest to revenue or cost reduction.
-2. Deploy a pilot in one team, measure response quality and throughput.
-3. Expand to additional workflows once baseline KPIs are stable.
 
 ## Contributing
 Feel free to contribute by adding new tutorials or improving existing ones. Please follow the contribution guidelines.

@@ -7,15 +7,13 @@
 <div align="center">
   <img src="https://img.shields.io/badge/build-passing-brightgreen.svg" alt="Build passing" />
   <img src="https://img.shields.io/badge/python-3.10+-blue.svg?logo=python&logoColor=white" alt="Python 3.10+" />
+  <img src="https://img.shields.io/badge/Code-Runnable_Examples-2ea44f.svg" alt="Code: Runnable Examples" />
+  <img src="https://img.shields.io/badge/GPU-100%25_Ready-0078D4.svg" alt="GPU 100% Ready" />
+  <img src="https://img.shields.io/badge/API-OpenAI_Compatible-313236.svg" alt="API OpenAI Compatible" />
   <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" />
 </div>
 
 <br />
-
-![Python](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white)
-![Runnable Code](https://img.shields.io/badge/Code-Runnable%20Examples-1F9D55)
-![GPU Ready](https://img.shields.io/badge/GPU-100%25%20Ready-0A84FF)
-![OpenAI Compatible](https://img.shields.io/badge/API-OpenAI%20Compatible-black)
 
 This repository contains the code and methodology used to run a live, direct comparison between two of the most discussed AI agent frameworks of 2026: **OpenClaw** and **Hermes Agent**. 
 
@@ -113,3 +111,9 @@ Example output based on 20 events:
 ## Related Article
 
 - [Privacy-First AI in Europe: Zero-Retention, Sovereignty, and the New Risks We Cannot Ignore](https://regolo.ai/privacy-first-ai-in-europe-zero-retention-sovereignty-and-the-new-risks-we-cannot-ignore/)
+### How to Use
+1. Clone this repository: `git clone https://github.com/regolo-ai/tutorials.git`
+2. Navigate to the desired tutorial folder.
+3. Follow the instructions in the folder's README.md. 
+4. Get a free API key from Regolo to run the code: [Sign Up for Free Trial](https://regolo.ai/pricing).
+5. Run the code and see the results in minutes.
