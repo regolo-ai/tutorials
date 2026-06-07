@@ -7,6 +7,9 @@
 <div align="center">
   <img src="https://img.shields.io/badge/build-passing-brightgreen.svg" alt="Build passing" />
   <img src="https://img.shields.io/badge/python-3.10+-blue.svg?logo=python&logoColor=white" alt="Python 3.10+" />
+  <img src="https://img.shields.io/badge/Code-Runnable_Examples-2ea44f.svg" alt="Code: Runnable Examples" />
+  <img src="https://img.shields.io/badge/GPU-100%25_Ready-0078D4.svg" alt="GPU 100% Ready" />
+  <img src="https://img.shields.io/badge/API-OpenAI_Compatible-313236.svg" alt="API OpenAI Compatible" />
   <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" />
 </div>
 
@@ -110,3 +113,10 @@ Poi inserisci questo snippet nell'HTML (preferibilmente prima della chiusura del
 Lo script si occuperà automaticamente di creare il container `#helpdesk-widget-container` alla fine del `<body>` e di montarvi l'applicazione React.
 
 > **Nota per il CSS**: Ricorda di adattare l'interfaccia (in `App.tsx` o `index.css`) in modo che l'app non occupi l'intero schermo del sito padre, ma appaia invece come un pannello flottante (es. applicando `position: fixed; bottom: 20px; right: 20px; z-index: 9999;` al contenitore principale).
+
+### How to Use
+1. Clone this repository: `git clone https://github.com/regolo-ai/tutorials.git`
+2. Navigate to the desired tutorial folder.
+3. Follow the instructions in the folder's README.md. 
+4. Get a free API key from Regolo to run the code: [Sign Up for Free Trial](https://regolo.ai/pricing).
+5. Run the code and see the results in minutes.

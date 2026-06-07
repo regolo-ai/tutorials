@@ -7,15 +7,13 @@
 <div align="center">
   <img src="https://img.shields.io/badge/build-passing-brightgreen.svg" alt="Build passing" />
   <img src="https://img.shields.io/badge/python-3.10+-blue.svg?logo=python&logoColor=white" alt="Python 3.10+" />
+  <img src="https://img.shields.io/badge/Code-Runnable_Examples-2ea44f.svg" alt="Code: Runnable Examples" />
+  <img src="https://img.shields.io/badge/GPU-100%25_Ready-0078D4.svg" alt="GPU 100% Ready" />
+  <img src="https://img.shields.io/badge/API-OpenAI_Compatible-313236.svg" alt="API OpenAI Compatible" />
   <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" />
 </div>
 
 <br />
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![Ollama Compatible](https://img.shields.io/badge/Ollama-Compatible-black)](https://ollama.com)
-[![Runnable Code](https://img.shields.io/badge/Code-Runnable%20Examples-1F9D55)](https://github.com)
 
 This repository contains all the code from the article [Context Engineering Tutorial: Build Lightweight Local AI Agents in Python](https://regolo.ai/context-engineering-tutorial-build-lightweight-local-ai-agents-in-python/).
 
@@ -223,3 +221,9 @@ Run this agent against cloud GPU inference instead of a local Ollama server — 
 [Get Started](https://regolo.ai) · [**Free Trial**](https://regolo.ai/pricing)
 
 Questions? [Open an issue](https://github.com/Regolo-AI/tutorials/issues) or join our [Discord](https://discord.gg/wHxwWCC8).
+### How to Use
+1. Clone this repository: `git clone https://github.com/regolo-ai/tutorials.git`
+2. Navigate to the desired tutorial folder.
+3. Follow the instructions in the folder's README.md. 
+4. Get a free API key from Regolo to run the code: [Sign Up for Free Trial](https://regolo.ai/pricing).
+5. Run the code and see the results in minutes.

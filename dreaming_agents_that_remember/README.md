@@ -7,14 +7,13 @@
 <div align="center">
   <img src="https://img.shields.io/badge/build-passing-brightgreen.svg" alt="Build passing" />
   <img src="https://img.shields.io/badge/python-3.10+-blue.svg?logo=python&logoColor=white" alt="Python 3.10+" />
+  <img src="https://img.shields.io/badge/Code-Runnable_Examples-2ea44f.svg" alt="Code: Runnable Examples" />
+  <img src="https://img.shields.io/badge/GPU-100%25_Ready-0078D4.svg" alt="GPU 100% Ready" />
+  <img src="https://img.shields.io/badge/API-OpenAI_Compatible-313236.svg" alt="API OpenAI Compatible" />
   <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" />
 </div>
 
 <br />
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![Powered by Regolo](https://img.shields.io/badge/Powered%20by-Regolo%20GPU-green)](https://regolo.ai)
 
 This repository contains all the code from the article [Implementing Stateful AI Agents: How to Build Anthropic's Memory Store and Dreaming Architecture in Python](https://regolo.ai/implementing-stateful-ai-agents-how-to-build-anthropics-memory-store-and-dreaming-architecture-in-python/) — ready to run locally or on cloud GPU.
 
@@ -235,3 +234,9 @@ cp .env.example .env
 - [Regolo.ai](https://regolo.ai) — European OpenAI-compatible GPU inference
 - [Free API key](https://regolo.ai/pricing) — Pay as You Go, no commitment
 - [Anthropic memory patterns](https://www.anthropic.com/research/building-effective-agents) — the original research this project is inspired by
+### How to Use
+1. Clone this repository: `git clone https://github.com/regolo-ai/tutorials.git`
+2. Navigate to the desired tutorial folder.
+3. Follow the instructions in the folder's README.md. 
+4. Get a free API key from Regolo to run the code: [Sign Up for Free Trial](https://regolo.ai/pricing).
+5. Run the code and see the results in minutes.
