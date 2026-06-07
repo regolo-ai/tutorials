@@ -1,4 +1,16 @@
+<div align="center">
+  <img src="https://regolo.ai/wp-content/uploads/2026/06/Regolo_logo_positive.png" alt="Regolo.ai Logo" width="300" />
+</div>
+
 # Regolo Labs: Production AI Playbooks
+
+<div align="center">
+  <img src="https://img.shields.io/badge/build-passing-brightgreen.svg" alt="Build passing" />
+  <img src="https://img.shields.io/badge/python-3.10+-blue.svg?logo=python&logoColor=white" alt="Python 3.10+" />
+  <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" />
+</div>
+
+<br />
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)
 ![Runnable Code](https://img.shields.io/badge/Code-Runnable%20Examples-1F9D55)
@@ -8,22 +20,15 @@
 Runnable playbooks for building sharp, production-ready AI workflows with Regolo.
 Each folder includes code, setup notes, and a companion article.
 
-### 🎁 Get Started Free of Use for 30 Days
-
-Sign up for Regolo and get **30 days free and 70% off for next 3 months:**
-
-[Get Started](https://regolo.ai) · [**REGOLO FREE TRIAL**](https://regolo.ai/pricing)
-
-[Regolo Platform](https://regolo.ai)
-
-[Models Library](https://regolo.ai/models-library/)
-
-[Documentation & Guides](https://regolo.ai/docs)
-
-[Discord & Support](https://discord.gg/wHxwWCC8)
-
-[YouTube Channel](https://www.youtube.com/@regoloai)
-
+> [!IMPORTANT]  
+> ## 🎁 Special Offer: 30 Days Free Trial
+> 
+> To power your AI agent, you need an API key. Sign up for Regolo today and get **30 days completely free**, plus a massive **70% discount for the following 3 months!**
+> 
+> 🚀 **[CLICK HERE TO GET STARTED AND CLAIM YOUR FREE TRIAL](https://regolo.ai/pricing)** 🚀
+> 
+> ---
+> **Explore Regolo:** [Platform](https://regolo.ai) | [Models Library](https://regolo.ai/models-library/) | [Documentation & Guides](https://regolo.ai/docs) | [YouTube](https://www.youtube.com/@regoloai) | [Discord](https://discord.gg/wHxwWCC8)
 ---
 
 Welcome to the **Regolo.ai** tutorials repository.

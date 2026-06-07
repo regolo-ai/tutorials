@@ -1,24 +1,40 @@
-# 🤖 Auto Update Agent for any Websites (powered by Regolo.ai)
+<div align="center">
+  <img src="https://regolo.ai/wp-content/uploads/2026/06/Regolo_logo_positive.png" alt="Regolo.ai Logo" width="300" />
+</div>
+
+# RAG chatbot widget for websites, auto-updated by sitemap, with ChromaDB + LangChain
+
+<div align="center">
+  <img src="https://img.shields.io/badge/build-passing-brightgreen.svg" alt="Build passing" />
+  <img src="https://img.shields.io/badge/python-3.10+-blue.svg?logo=python&logoColor=white" alt="Python 3.10+" />
+  <img src="https://img.shields.io/badge/FastAPI-005571?style=flat&logo=fastapi" alt="FastAPI" />
+  <img src="https://img.shields.io/badge/React-18+-61DAFB.svg?style=flat&logo=react&logoColor=white" alt="React" />
+  <img src="https://img.shields.io/badge/Docker-Ready-2496ED.svg?style=flat&logo=docker&logoColor=white" alt="Docker Ready" />
+  <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" />
+</div>
+
+<br />
 
 **Imagine having a tireless, super-smart support agent on your website that knows every detail of your business, 24/7.** 
 
 This project is a complete, ready-to-use Artificial Intelligence chatbot that you can easily embed on your website (for your customers) or use internally (for your employees). You just provide your company documents (PDFs, text files, or even link it to your website), and the AI will answer questions instantly and accurately based *only* on your data.
 
-### 🎁 Get Started Free of Use for 30 Days
+<div align="center">
+  <a href="https://www.youtube.com/watch?v=QoJkmWUjaYc" target="_blank">
+    <img src="https://img.youtube.com/vi/QoJkmWUjaYc/maxresdefault.jpg" alt="Auto-Updating RAG Chatbot Tutorial" width="800" style="border-radius: 8px;" />
+  </a>
+  <p><em>🎥 <a href="https://www.youtube.com/watch?v=QoJkmWUjaYc" target="_blank">Click to watch the full step-by-step video tutorial on YouTube</a></em></p>
+</div>
 
-Sign up for Regolo and get **30 days free and 70% off for next 3 months:**
-
-[Get Started](https://regolo.ai) · [**REGOLO FREE TRIAL**](https://regolo.ai/pricing)
-
-[Regolo Platform](https://regolo.ai)
-
-[Models Library](https://regolo.ai/models-library/)
-
-[Documentation & Guides](https://regolo.ai/docs)
-
-[YouTube Channel](https://www.youtube.com/@regoloai)
-
-[Discord & Support](https://discord.gg/wHxwWCC8)
+> [!IMPORTANT]  
+> ## Sign Up and get 30 Days Free Trial
+> 
+> To power your AI agent, you need an API key. Sign up for Regolo today and get **30 days completely free**, plus a massive **70% discount for the following 3 months!**
+> 
+> 🚀 **[CLICK HERE TO GET STARTED AND CLAIM YOUR FREE TRIAL](https://regolo.ai/pricing)** 🚀
+> 
+> ---
+> **Explore Regolo:** [Platform](https://regolo.ai) | [Models Library](https://regolo.ai/models-library/) | [Documentation & Guides](https://regolo.ai/docs) | [YouTube](https://www.youtube.com/@regoloai) | [Discord](https://discord.gg/wHxwWCC8)
 
 ## 🌟 Why use this instead of Intercom or Zendesk?
 
