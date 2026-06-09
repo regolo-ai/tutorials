@@ -17,6 +17,7 @@
 
 A hands-on implementation of **decomposed AI agents** inspired by Anthropic's workshop patterns.  
 StockPilot is an inventory management agent that routes queries to specialized subagents and code-execution tools — with full support for both local Ollama and cloud Regolo GPU inference.
+Complete guide and tutorial in this article: [https://regolo.ai/how-to-decompose-complex-llm-agents-with-open-source-models-a-step-by-step-tutorial/](https://regolo.ai/how-to-decompose-complex-llm-agents-with-open-source-models-a-step-by-step-tutorial/)
 
 ---
 
