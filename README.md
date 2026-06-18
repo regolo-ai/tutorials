@@ -7,11 +7,11 @@
 Runnable playbooks for building sharp, production-ready AI workflows with Regolo API - each folder includes code, setup notes, and a companion article.
 
 > [!IMPORTANT]  
-> ## 🎁 Special Offer: 30 Days Free Trial
+> ## Sign Up and get 30 Days Free Trial
 > 
 > To power your AI agent, you need an API key. Sign up for Regolo today and get **30 days completely free**, plus a massive **70% discount for the following 3 months!**
 > 
-> 🚀 **[CLICK HERE TO GET STARTED AND CLAIM YOUR FREE TRIAL](https://regolo.ai/pricing)** 🚀
+> 🚀 **[CLICK HERE TO GET STARTED YOUR FREE TRIAL](https://regolo.ai/pricing)** 🚀
 > 
 > ---
 > **Explore Regolo:** [Platform](https://regolo.ai) | [Models Library](https://regolo.ai/models-library/) | [Documentation & Guides](https://regolo.ai/docs) | [YouTube](https://www.youtube.com/@regoloai) | [Discord](https://discord.gg/wHxwWCC8)
