@@ -1,102 +1,54 @@
-# fastest-rag-crewai
+<div align="center">
+  <img src="https://regolo.ai/wp-content/uploads/2026/06/Regolo_logo_positive.png" alt="Regolo.ai Logo" width="300" />
+</div>
 
-A minimal, tested reference implementation showing how to combine **CrewAI** with
-**binary quantization** to build a memory-efficient RAG system.
+# How to Make RAG 32x Memory‑Efficient with Binary Quantization
 
-## What this demonstrates
+This tutorial demonstrates how to reduce the memory footprint of a retrieval‑augmented generation (RAG) pipeline by 32× using binary quantization, while retaining retrieval accuracy through float‑32 re‑ranking.
 
-- Converting float32 embeddings into packed binary vectors (1 bit/dim) with FAISS.
-- A `BinaryVectorStore` that runs Hamming-distance search and optionally reranks
-  top candidates using float32 cosine similarity for accuracy recovery.
-- A two-agent CrewAI pipeline: a **Retrieval Specialist** agent (binary index tool)
-  and an **Answer Synthesizer** agent that grounds its answer in retrieved context.
-- A reproducible benchmark comparing float32 exact search vs binary search
-  (with/without rerank) on memory footprint, latency, and recall@10.
+> **Article**: <https://regolo.ai/how-to-make-rag-32x-memory-efficient-with-binary-quantization/> 
 
-## Architecture
-
-```
-Documents -> Embedding Model -> float32 vectors
-                                     |
-                          binary_quantize() [1 bit/dim]
-                                     |
-                        FAISS IndexBinaryFlat (Hamming)
-                                     |
-                 Retrieval Specialist Agent (CrewAI tool)
-                                     |
-                    Answer Synthesizer Agent (CrewAI LLM)
-                                     |
-                              Grounded answer
-```
-
-## Project structure
-
-```
-fastest-rag-crewai/
-├── crew.py                     # CrewAI pipeline entrypoint
-├── requirements.txt
-├── src/
-│   ├── quantization.py         # binary_quantize, hamming_topk, memory_footprint
-│   └── vectorstore.py          # BinaryVectorStore (FAISS binary index + rerank)
-├── benchmarks/
-│   └── run_benchmark.py        # reproducible benchmark script
-└── data/
-    └── corpus.txt              # sample corpus for quick testing
-```
-
-## Setup
+## 🚀 Quick Start
 
 ```bash
-python -m venv .venv && source .venv/bin/activate
+# 1️⃣ Clone the repository and change to this folder
+git clone https://github.com/regolo-ai/tutorials.git && cd tutorials/how-to-make-rag-32x-efficient
+
+# 2️⃣ Install dependencies
 pip install -r requirements.txt
-```
 
-Set your LLM provider key for CrewAI (e.g. `OPENAI_API_KEY`, `GROQ_API_KEY`) as
-required by the model you plug into `build_crew(..., llm=...)`.
-
-## Run the RAG pipeline
-
-```bash
+# 3️⃣ Run the demo
 python crew.py "What are common diabetes treatment approaches?"
 ```
 
-This loads `data/corpus.txt`, embeds it with `sentence-transformers`
-(`BAAI/bge-small-en-v1.5`), builds a binary-quantized FAISS index, and runs the
-CrewAI crew (retrieval agent -> answering agent).
+The script will:
+1. Load your .env configuration for embeddings and LLM.
+2. Encode a small sample corpus using the chosen embedding model.
+3. Build a binary‑quantized FAISS index.
+4. Retrieve top‑5 chunks, re‑rank them, and generate a concise answer.
 
-## Run the benchmark
+## 📚 What You’ll Learn
 
-```bash
-python benchmarks/run_benchmark.py
-```
+- **Binary quantization**: Convert float‑32 embeddings to 1‑bit per dimension, cutting memory usage 32×.
+- **FAISS binary index**: Leverage Hamming distance search for fast retrieval.
+- **Re‑ranking**: Restore accuracy with a float‑32 dot‑product over the top‑k candidates.
+- **OpenAI‑compatible provider flexibility**: Switch between Regolo, OpenAI, Groq, Ollama, or local transformers purely via `.env`.
+- **CrewAI integration**: Chain retrieval and synthesis agents in a single, sequential workflow.
 
-### Results (8,000 synthetic documents, 384-dim embeddings, 200 queries, k=10)
+## ✅ Prerequisites
 
-| Method | Memory | Reduction | Avg latency | Recall@10 |
-|---|---|---|---|---|
-| Float32 Flat (exact) | 12,288,000 bytes | 1x | 0.21 ms | 100% |
-| Binary Quantized (no rerank) | 384,000 bytes | 32x | 0.03 ms | 10.6% |
-| Binary + Rerank (oversample=100) | 384,000 bytes | 32x | 0.10 ms | 14.8% |
-| Binary + Rerank (oversample=500) | 384,000 bytes | 32x | ~0.20 ms | 27.4% |
-| Binary + Rerank (oversample=1000) | 384,000 bytes | 32x | ~0.35 ms | 37.6% |
+- `python >=3.13` or `3.12`
+- A valid clipboard‑style API key in `.env` (`OPENAI_API_KEY`, `GROQ_API_KEY`, or `OPENAI_API_KEY`)
+- Optional: Ollama running locally for offline inference
 
-**Key takeaway:** binary quantization delivers the theoretical 32x memory
-reduction exactly as expected, and search is ~8x faster than float32 exact
-search at k=10. Raw binary-only recall is low on this embedding distribution;
-in production, always pair binary search with a float32 rerank stage over an
-oversampled candidate set, and tune the oversample size against your recall
-target. Recall depends heavily on the embedding model's separability under a
-zero-threshold sign quantization — production embedding models (e.g. BGE,
-OpenAI, Cohere) trained with quantization-aware objectives will recall
-meaningfully better than the generic TF-IDF+SVD vectors used in this synthetic
-benchmark.
+## 🛠️ Configuring with `.env`
 
-## Notes on production use
+Copy the provided `how-to-make-rag-32x-efficient/.env.example` to `how-to-make-rag-32x-efficient/.env` and fill in the API key.
 
-- Real embedding models (BGE, Cohere embed v3, OpenAI text-embedding-3) are
-  better suited to sign-based binary quantization than generic TF-IDF/SVD
-  vectors used here for a fast, dependency-light benchmark.
-- For very large corpora, keep only the oversampled candidate float32 vectors
-  in memory (e.g. memory-mapped), not the full float32 corpus.
-- Milvus, Azure AI Search, and Qdrant all support native binary vector types
-  and Hamming-distance indexes for this pattern in production.
+## 📄 License
+
+This tutorial is licensed under the MIT license. See the repository root for details.
+
+---
+
+*Powered by [Regolo.ai](https://regolo.ai)*
