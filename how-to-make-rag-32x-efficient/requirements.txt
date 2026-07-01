@@ -1,0 +1,6 @@
+crewai>=0.60.0
+sentence-transformers>=2.7.0
+faiss-cpu>=1.8.0
+numpy>=1.26.0
+pandas>=2.2.0
+scikit-learn>=1.4.0

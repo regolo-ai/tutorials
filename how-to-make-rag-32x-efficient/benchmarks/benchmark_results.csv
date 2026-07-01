@@ -1,0 +1,8 @@
+method,memory_bytes,avg_latency_ms,recall_at_10,memory_reduction_x
+Float32 Flat (exact),12288000,0.07198452949523926,1.0,1.0
+Binary Quantized (no rerank),384000,0.013870000839233398,0.109,32.0
+Binary + Rerank (oversample=50),384000,0.03821372985839844,0.136,32.0
+Binary + Rerank (oversample=100),384000,0.04643440246582031,0.161,32.0
+Binary + Rerank (oversample=200),384000,0.07842063903808594,0.1985,32.0
+Binary + Rerank (oversample=500),384000,0.17813920974731445,0.284,32.0
+Binary + Rerank (oversample=1000),384000,0.29250621795654297,0.391,32.0
