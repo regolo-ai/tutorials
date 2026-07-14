@@ -90,7 +90,241 @@ Set your Regolo API key in [`opencode.json`](opencode.json) (replace `sk-YOUR_RE
   "provider": {
     "opencode": {
       "regolo": {
-        "api_key": "sk-YOUR_REGOLO_API_KEY"
+        "npm" : "@ai-sdk/openai-compatible",
+        "name": "regolo",
+        "options": {
+          "baseURL": "https://api.regolo.ai/v1",
+          "timeout": 12000000,
+          "chunkTimeout": 600000,
+          "simulateStreaming": true,
+          "setCacheKey" : true,
+          "headers": {
+            "Authorization" : "Bearer sk-YOUR_REGOLO_API_KEY"
+          }
+        }
+      },
+      "models": {
+        "brick-v1-beta": {
+          "id": "brick-v1-beta",
+          "name": "brick-v1-beta",
+          "tools": true,
+          "cost": { "input": 0.5, "output": 2.0 },
+          "limit": { "context": 128000, "output": 128000 },
+          "options": {
+            "parallel_tool_calls": true,
+            "tool_choice": "auto",
+            "temperature": 0.7
+          }
+        },
+        "qwen3.5-9b": {
+          "id": "qwen3.5-9b",
+          "name": "qwen3.5-9b",
+          "tools": true,
+          "cost": { "input": 0.1, "output": 0.4 },
+          "limit": { "context": 120000, "output": 120000 },
+          "options": {
+            "parallel_tool_calls": true,
+            "tool_choice": "auto",
+            "temperature": 0.7
+          }
+        },
+        "qwen3.5-122b": {
+          "id": "qwen3.5-122b",
+          "name": "qwen3.5-122b",
+          "tools": true,
+          "cost": { "input": 1.0, "output": 4.2 },
+          "limit": { "context": 120000, "output": 120000 },
+          "options": {
+            "parallel_tool_calls": true,
+            "tool_choice": "auto",
+            "temperature": 0.7
+          }
+        },
+        "qwen3-coder-next": {
+          "id": "qwen3-coder-next",
+          "name": "qwen3-coder-next",
+          "reasoning": true,
+          "tool_call": true,
+          "tools": true,
+          "limit": { "context": 240000, "output": 120000 },
+          "cost": { "input": 0.5, "output": 2.0 },
+          "options": {
+            "parallel_tool_calls": true,
+            "tool_choice": "auto",
+            "temperature": 0.5,
+            "top_p": 0.95,
+            "top_k": 40,
+            "repetition_penalty": 1.05
+          }
+        },
+        "gemma4-31b": {
+          "id": "gemma4-31b",
+          "name": "gemma4-31b",
+          "tools": true,
+          "cost": { "input": 0.4, "output": 2.1 },
+          "modalities": { "input": ["text", "image"], "output": ["text"] },
+          "limit": { "context": 100000, "output": 100000 },
+          "options": {
+            "parallel_tool_calls": true,
+            "tool_choice": "auto",
+            "temperature": 0.7
+          }
+        },
+        "mistral-small-4-119b": {
+          "id": "mistral-small-4-119b",
+          "name": "mistral-small-4-119b",
+          "tools": true,
+          "cost": { "input": 0.5, "output": 2.1 },
+          "modalities": { "input": ["text", "image"], "output": ["text"] },
+          "limit": { "context": 120000, "output": 120000 },
+          "options": {
+            "parallel_tool_calls": true,
+            "tool_choice": "auto",
+            "temperature": 0.7
+          }
+        },
+        "qwen3.6-27b": {
+          "id": "qwen3.6-27b",
+          "name": "qwen3.6-27b",
+          "tools": true,
+          "cost": { "input": 0.5, "output": 2.1 },
+          "modalities": { "input": ["text", "image"], "output": ["text"] },
+          "limit": { "context": 120000, "output": 120000 },
+          "options": {
+            "parallel_tool_calls": true,
+            "tool_choice": "auto",
+            "temperature": 0.7
+          }
+        },
+        "glm5.2-beta": {
+          "id": "glm5.2-beta",
+          "name": "glm5.2-beta",
+          "tools": true,
+          "cost": { "input": 0.5, "output": 2.0 },
+          "limit": { "context": 120000, "output": 120000 },
+          "options": {
+            "parallel_tool_calls": true,
+            "tool_choice": "auto",
+            "temperature": 0.7
+          }
+        },
+        "gpt-oss-120b": {
+          "id": "gpt-oss-120b",
+          "name": "gpt-oss-120b",
+          "tools": true,
+          "cost": { "input": 0.8, "output": 3.2 },
+          "limit": { "context": 120000, "output": 120000 },
+          "options": {
+            "parallel_tool_calls": true,
+            "tool_choice": "auto",
+            "temperature": 0.7
+          }
+        },
+        "gpt-oss-20b": {
+          "id": "gpt-oss-20b",
+          "name": "gpt-oss-20b",
+          "tools": true,
+          "cost": { "input": 0.2, "output": 0.8 },
+          "limit": { "context": 120000, "output": 120000 },
+          "options": {
+            "parallel_tool_calls": true,
+            "tool_choice": "auto",
+            "temperature": 0.7
+          }
+        },
+        "Llama-3.3-70B-Instruct": {
+          "id": "Llama-3.3-70B-Instruct",
+          "name": "Llama-3.3-70B-Instruct",
+          "tools": true,
+          "cost": { "input": 0.5, "output": 2.0 },
+          "limit": { "context": 120000, "output": 120000 },
+          "options": {
+            "parallel_tool_calls": true,
+            "tool_choice": "auto",
+            "temperature": 0.7
+          }
+        },
+        "apertus-70b": {
+          "id": "apertus-70b",
+          "name": "apertus-70b",
+          "tools": true,
+          "cost": { "input": 0.5, "output": 2.0 },
+          "limit": { "context": 120000, "output": 120000 },
+          "options": {
+            "parallel_tool_calls": true,
+            "tool_choice": "auto",
+            "temperature": 0.7
+          }
+        }
+      },
+      "agent": {
+        "orchestrator": {
+          "mode": "primary",
+          "model": "regolo/brick-v1-beta",
+          "description": "Master orchestrator - delega task ai specialisti",
+          "prompt": "{file:~/.opencode/agents/orchestrator.md}",
+          "permission": {
+            "task": {
+              "*": "deny",
+              "planner": "allow",
+              "coder": "allow",
+              "researcher": "allow",
+              "reviewer": "allow",
+              "devops": "allow",
+              "explore": "allow"
+            },
+            "edit": "deny",
+            "bash": "ask"
+          }
+        },
+        "planner": {
+          "mode": "subagent",
+          "hidden": true,
+          "model": "regolo/qwen3.5-122b",
+          "description": "Architettura, pianificazione, reasoning profondo",
+          "prompt": "{file:~/.opencode/agents/planner.md}",
+          "permission": { "edit": "deny", "bash": "deny" }
+        },
+        "coder": {
+          "mode": "subagent",
+          "hidden": true,
+          "model": "regolo/qwen3-coder-next",
+          "description": "Implementazione codice, bug fix, feature",
+          "prompt": "{file:~/.opencode/agents/coder.md}",
+          "permission": { "edit": "allow", "bash": "ask" }
+        },
+        "researcher": {
+          "mode": "subagent",
+          "hidden": true,
+          "model": "regolo/gemma4-31b",
+          "description": "Ricerca API, documentazione, dependencies",
+          "prompt": "{file:~/.opencode/agents/researcher.md}",
+          "permission": { "edit": "deny", "bash": "ask", "webfetch": "allow", "websearch": "allow" }
+        },
+        "reviewer": {
+          "mode": "subagent",
+          "hidden": true,
+          "model": "regolo/mistral-small-4-119b",
+          "description": "Code review, security audit, quality check",
+          "prompt": "{file:~/.opencode/agents/reviewer.md}",
+          "permission": { "edit": "deny", "bash": "deny" }
+        },
+        "devops": {
+          "mode": "subagent",
+          "hidden": true,
+          "model": "regolo/qwen3.6-27b",
+          "description": "Infrastruttura, CI/CD, Docker, deployment",
+          "prompt": "{file:~/.opencode/agents/devops.md}",
+          "permission": { "edit": "allow", "bash": "ask" }
+        },
+        "explore": {
+          "mode": "subagent",
+          "hidden": true,
+          "model": "regolo/qwen3.5-9b",
+          "description": "Fast codebase exploration and file search",
+          "prompt": "{file:~/.opencode/agents/explore.md}",
+          "permission": { "edit": "deny", "bash": "deny" }
+        }
       }
     }
   }
