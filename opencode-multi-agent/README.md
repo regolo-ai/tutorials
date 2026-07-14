@@ -2,7 +2,9 @@
   <img src="https://regolo.ai/wp-content/uploads/2026/06/Regolo_logo_positive.png" alt="Regolo.ai Logo" width="300" />
 </div>
 
-# opencode Multi-Agent Configuration for Regolo AI
+<div align="center">
+  <h1>opencode Multi-Agent Configuration for Regolo</h1>
+</div>
 
 <div align="center">
   <img src="https://img.shields.io/badge/build-passing-brightgreen.svg" alt="Build passing" />
