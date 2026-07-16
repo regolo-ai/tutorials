@@ -1,0 +1,37 @@
+[
+  {
+    "id": "optional-display-name",
+    "issue": "POST /users returns 500 when display_name is omitted",
+    "required_tests": "tests/test_users.py"
+  },
+  {
+    "id": "duplicate-email",
+    "issue": "Duplicate email must return HTTP 409, not HTTP 500",
+    "required_tests": "tests/test_users.py"
+  },
+  {
+    "id": "invalid-email",
+    "issue": "Invalid emails must return HTTP 422 with no database write",
+    "required_tests": "tests/test_users.py"
+  },
+  {
+    "id": "missing-password",
+    "issue": "POST /users returns 500 when password is omitted",
+    "required_tests": "tests/test_users.py"
+  },
+  {
+    "id": "invalid-password-type",
+    "issue": "Non-string password must raise ValidationError instead of crashing",
+    "required_tests": "tests/test_users.py"
+  },
+  {
+    "id": "invalid-age-type",
+    "issue": "Non-numeric age must raise ValidationError instead of crashing",
+    "required_tests": "tests/test_users.py"
+  },
+  {
+    "id": "invalid-username-type",
+    "issue": "Non-string username must raise ValidationError instead of crashing",
+    "required_tests": "tests/test_users.py"
+  }
+]

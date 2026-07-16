@@ -1,0 +1,6 @@
+langchain>=1.0.0
+langgraph>=0.2.0
+langchain-openai>=0.2.0
+pytest>=8.0.0
+pytest-benchmark>=5.1.0
+ruff>=0.6.0
