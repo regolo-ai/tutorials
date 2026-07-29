@@ -1,0 +1,23 @@
+services:
+  searxng:
+    image: searxng/searxng:latest
+    environment:
+      - SEARXNG_BASE_URL=http://localhost:8080/
+      - INSTANCE_NAME=regolo-private-search
+    ports:
+      - "8080:8080"
+    volumes:
+      - searxng-data:/etc/searxng
+
+  api:
+    build: .
+    env_file: .env
+    environment:
+      - SEARXNG_URL=http://searxng:8080
+    depends_on:
+      - searxng
+    ports:
+      - "8000:8000"
+
+volumes:
+  searxng-data:
