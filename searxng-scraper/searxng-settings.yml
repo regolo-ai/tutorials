@@ -1,0 +1,19 @@
+use_default_settings: true
+
+server:
+  bind_address: "0.0.0.0"
+  port: 8080
+  secret_key: "8fbc923a41bc7856d10e9f823a4b9102c83d749a"
+  public_url: "http://localhost:8080/"
+
+search:
+  safe_search: 0
+  autocomplete: ""
+
+engines:
+  - name: duckduckgo
+    engine: duckduckgo
+    shortcut: ddg
+  - name: wikipedia
+    engine: wikipedia
+    shortcut: wp
