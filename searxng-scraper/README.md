@@ -17,7 +17,7 @@
 
 Production-oriented starter for private web research agents powered by **SearXNG**, concurrent **6-worker subagent query expansion**, **spatial context chunking**, and **Regolo.ai OpenAI-compatible inference (`brick-v1-beta`)**.
 
-This repository contains the code from the companion article [Building a Private AI Research Agent with SearXNG and Regolo.ai](article.md).
+This repository contains the code from the companion article [Self-Hosted Web Search for AI Agents: Replace Tavily, Cut Costs 80%, and Keep Every Token Private](https://regolo.ai/self-hosted-web-search-for-ai-agents-replace-tavily-cut-costs-80-and-keep-every-token-private/).
 
 ---
 
