@@ -85,7 +85,7 @@ cd tutorials/searxng-scraper
 cp .env.example .env
 ```
 
-Edit `.env` with your Regolo API key:
+Edit `.env` with your Regolo API key – Get your free API key, sign up at https://regolo.ai/signup :
 
 ```env
 REGOLO_API_KEY=your-regolo-api-key
