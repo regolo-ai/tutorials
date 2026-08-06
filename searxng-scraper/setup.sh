@@ -29,20 +29,33 @@ print_menu() {
 setup_environment() {
     echo -e "${GREEN}[SETUP] Starting environment setup...${NC}"
     
-    echo -e "${YELLOW}[SETUP] Checking existing SearXNG container...${NC}"
-    if [ "$(docker ps -a -q -f name=searxng)" ]; then
-        echo -e "${YELLOW}[SETUP] Removing existing 'searxng' container...${NC}"
-        docker rm -f searxng
+    echo -e "${YELLOW}[SETUP] Checking existing SearXNG container / port 8080...${NC}"
+    containers=$(docker ps -a -q --filter "ancestor=searxng/searxng:latest" --filter "ancestor=searxng/searxng" --filter "name=searxng")
+    if [ -n "$containers" ]; then
+        echo -e "${YELLOW}[SETUP] Removing existing SearXNG containers...${NC}"
+        docker rm -f $containers 2>/dev/null || true
+    fi
+    port_container=$(docker ps -a -q --filter "publish=8080")
+    if [ -n "$port_container" ]; then
+        echo -e "${YELLOW}[SETUP] Freeing port 8080...${NC}"
+        docker rm -f $port_container 2>/dev/null || true
     fi
 
     echo -e "${YELLOW}[SETUP] Pulling SearXNG Docker image...${NC}"
     docker pull searxng/searxng:latest
     
     echo -e "${YELLOW}[SETUP] Starting SearXNG container...${NC}"
-    docker run -d --name searxng -p 8080:8080 -v /Users/alexgenovese/Desktop/scraper\ SEARXNG/searxng-settings.yml:/etc/searxng/settings.yml:ro searxng/searxng:latest
+    DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+    docker run -d --name searxng -p 8080:8080 -v "$DIR/searxng-settings.yml:/etc/searxng/settings.yml:ro" searxng/searxng:latest
     
     echo -e "${YELLOW}[SETUP] Waiting for SearXNG to be ready...${NC}"
-    sleep 4
+    for i in {1..15}; do
+        if [ "$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/)" = "200" ]; then
+            echo -e "${GREEN}[SETUP] SearXNG is ready!${NC}"
+            break
+        fi
+        sleep 1
+    done
     
     echo -e "${YELLOW}[SETUP] Creating Python virtual environment...${NC}"
     python3 -m venv .venv

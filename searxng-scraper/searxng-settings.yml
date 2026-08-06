@@ -5,15 +5,45 @@ server:
   port: 8080
   secret_key: "8fbc923a41bc7856d10e9f823a4b9102c83d749a"
   public_url: "http://localhost:8080/"
+  limiter: false
 
 search:
   safe_search: 0
   autocomplete: ""
+  formats:
+    - html
+    - json
+
+outgoing:
+  request_timeout: 6.0
+  user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 
 engines:
   - name: duckduckgo
     engine: duckduckgo
     shortcut: ddg
+    categories: [general]
+  - name: qwant
+    engine: qwant
+    shortcut: qw
+    categories: [general]
   - name: wikipedia
     engine: wikipedia
     shortcut: wp
+    categories: [general]
+  - name: wikidata
+    engine: wikidata
+    shortcut: wd
+    categories: [general]
+  - name: arxiv
+    engine: arxiv
+    shortcut: ar
+    categories: [general]
+  - name: github
+    engine: github
+    shortcut: gh
+    categories: [general]
+
+
+
+

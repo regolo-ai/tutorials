@@ -74,77 +74,97 @@ async def research_endpoint(req: ResearchRequest):
         f"{req.query} security vulnerabilities risks"
     ]
 
-    async def fetch_searxng_query(client, q):
+    async def fetch_searxng_query(client, q, delay=0.0):
+        if delay > 0:
+            await asyncio.sleep(delay)
         try:
             resp = await client.get(
                 f"{searxng_url}/search",
                 params={"q": q, "format": "json"}
             )
-            resp.raise_for_status()
-            data = resp.json()
-            return data.get("results", [])
+            if resp.status_code == 200:
+                data = resp.json()
+                res_list = data.get("results", [])
+                if res_list:
+                    return res_list
         except Exception:
-            try:
-                html_resp = await client.get(
-                    f"{searxng_url}/search",
-                    params={"q": q}
-                )
-                from html.parser import HTMLParser
-                class SearXNGHTMLParser(HTMLParser):
-                    def __init__(self):
-                        super().__init__()
-                        self.results = []
+            pass
+
+        try:
+            resp = await client.get(
+                f"{searxng_url}/search",
+                params={"q": q, "format": "json", "categories": "general,science,it"}
+            )
+            if resp.status_code == 200:
+                data = resp.json()
+                res_list = data.get("results", [])
+                if res_list:
+                    return res_list
+        except Exception:
+            pass
+
+        try:
+            html_resp = await client.get(
+                f"{searxng_url}/search",
+                params={"q": q}
+            )
+            from html.parser import HTMLParser
+            class SearXNGHTMLParser(HTMLParser):
+                def __init__(self):
+                    super().__init__()
+                    self.results = []
+                    self.current_href = ""
+                    self.current_title = ""
+                    self.current_snippet = ""
+                    self.in_article = False
+                    self.in_title = False
+                    self.in_snippet = False
+                def handle_starttag(self, tag, attrs):
+                    if tag == 'article':
+                        self.in_article = True
                         self.current_href = ""
                         self.current_title = ""
                         self.current_snippet = ""
-                        self.in_article = False
-                        self.in_title = False
-                        self.in_snippet = False
-                    def handle_starttag(self, tag, attrs):
-                        if tag == 'article':
-                            self.in_article = True
-                            self.current_href = ""
-                            self.current_title = ""
-                            self.current_snippet = ""
-                        if self.in_article:
-                            if tag == 'a':
-                                for attr, val in attrs:
-                                    if attr == 'href' and not self.current_href:
-                                        self.current_href = val
-                                    if attr == 'class' and 'url_header' in val:
-                                        self.in_title = True
-                            if tag == 'p':
-                                for attr, val in attrs:
-                                    if attr == 'class' and 'content' in val:
-                                        self.in_snippet = True
-                    def handle_data(self, data):
-                        if self.in_article:
-                            if self.in_title:
-                                self.current_title += data
-                            elif self.in_snippet:
-                                self.current_snippet += data
-                    def handle_endtag(self, tag):
-                        if tag == 'article':
-                            self.in_article = False
-                            if self.current_href:
-                                self.results.append({
-                                    "title": self.current_title.strip() or "Source",
-                                    "url": self.current_href,
-                                    "content": self.current_snippet.strip()
-                                })
+                    if self.in_article:
                         if tag == 'a':
-                            self.in_title = False
+                            for attr, val in attrs:
+                                if attr == 'href' and not self.current_href:
+                                    self.current_href = val
+                        if tag == 'h3':
+                            self.in_title = True
                         if tag == 'p':
-                            self.in_snippet = False
-                parser = SearXNGHTMLParser()
-                parser.feed(html_resp.text)
-                return parser.results
-            except Exception:
-                return []
+                            for attr, val in attrs:
+                                if attr == 'class' and val and 'content' in val:
+                                    self.in_snippet = True
+                def handle_data(self, data):
+                    if self.in_article:
+                        if self.in_title:
+                            self.current_title += data
+                        elif self.in_snippet:
+                            self.current_snippet += data
+                def handle_endtag(self, tag):
+                    if tag == 'article':
+                        self.in_article = False
+                        if self.current_href:
+                            self.results.append({
+                                "title": self.current_title.strip() or "Source",
+                                "url": self.current_href,
+                                "content": self.current_snippet.strip()
+                            })
+                    if tag == 'h3':
+                        self.in_title = False
+                    if tag == 'p':
+                        self.in_snippet = False
+            parser = SearXNGHTMLParser()
+            parser.feed(html_resp.text)
+            return parser.results
+        except Exception:
+            return []
 
     import asyncio
-    async with httpx.AsyncClient(timeout=10.0, headers={"User-Agent": "Mozilla/5.0"}) as client:
-        tasks = [fetch_searxng_query(client, sq) for sq in sub_queries]
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"}
+    async with httpx.AsyncClient(timeout=15.0, headers=headers) as client:
+        tasks = [fetch_searxng_query(client, sq, delay=i*0.3) for i, sq in enumerate(sub_queries)]
         sub_results_list = await asyncio.gather(*tasks)
 
     # Deduplicate results by URL
@@ -161,7 +181,7 @@ async def research_endpoint(req: ResearchRequest):
 
     all_chunks = []
     seen_chunks = set() # Deduplicate by (source_url, spatial_index)
-    async with httpx.AsyncClient(timeout=10.0, headers={"User-Agent": "Mozilla/5.0"}) as client:
+    async with httpx.AsyncClient(timeout=10.0, headers=headers, follow_redirects=True) as client:
         for item in results:
             url = item.get("url")
             title = item.get("title", "Unknown Source")
