@@ -7,7 +7,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - searxng-data:/etc/searxng
+      - ./searxng-settings.yml:/etc/searxng/settings.yml:ro
 
   api:
     build: .
@@ -19,5 +19,3 @@ services:
     ports:
       - "8000:8000"
 
-volumes:
-  searxng-data:
