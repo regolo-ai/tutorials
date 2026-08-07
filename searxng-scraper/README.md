@@ -29,12 +29,13 @@ Regolo Private Search Starter is an advanced asynchronous Python application des
 
 ## Key Features
 
-1. **6-Worker Subagent Fleet**: Automatically expands research queries into 6 specialized facets (Primary Discovery, Technical Specs, Regulatory Compliance, Market & Trend Analysis, Academic Research, and Security/Vulnerabilities) executed concurrently via `asyncio.gather`.
-2. **Robust Fault-Tolerant Search**: Queries SearXNG JSON API with an automatic HTML scraping fallback parser (`HTMLParser`) and strict `User-Agent` headers.
-3. **Spatial Context Chunking**: Splits web content into 300-word context blocks, calculating factual density scores (based on numbers, uppercase terms, version numbers, and technical tokens).
-4. **Deduplication**: Eliminates redundancy by deduplicating search results by URL and chunks by `(source_url, spatial_index)`.
-5. **Regolo.ai Grounded Synthesis & Sentiment Analysis**: Integrates with Regolo's `brick-v1-beta` model to generate citation-backed summaries (`[Source N]`) and per-result sentiment scores (`-1.0` to `1.0`) with inferred insights.
-6. **Fantastic CLI TUI**: Interactive terminal interface with live per-second elapsed timers and subagent creation logs.
+1. **Intent-Driven 6-Worker Subagent Fleet**: Automatically classifies query intent (`HOWTO_PROCEDURE`, `PRODUCT_TECH_ENTITY`, `ACADEMIC_RESEARCH`, `COMPARISON_EVALUATION`, or `GENERAL_KNOWLEDGE`) and orchestrates 6 specialized, on-topic search angles without off-topic keyword drift.
+2. **Category-Aware SearXNG Search**: Routes subagents to specialized SearXNG search categories (`general`, `science`, `it`) with automatic HTML scraping fallback parser (`HTMLParser`) and staggered request dispatch to prevent rate limiting.
+3. **Topic Relevance Filtering**: Filters retrieved search results to ensure titles and snippets contain query keywords before chunking and synthesis.
+4. **Spatial Context Chunking**: Splits web content into 300-word context blocks, calculating factual density scores (based on numbers, uppercase terms, version numbers, and technical tokens).
+5. **Deduplication**: Eliminates redundancy by deduplicating search results by URL and chunks by `(source_url, spatial_index)`.
+6. **Regolo.ai Grounded Synthesis & Sentiment Analysis**: Integrates with Regolo's `brick-v1-beta` model to generate citation-backed summaries (`[Source N]`) and per-result sentiment scores (`-1.0` to `1.0`) with inferred insights.
+7. **Fantastic CLI TUI**: Interactive terminal interface with live per-second elapsed timers and subagent creation logs.
 
 ---
 

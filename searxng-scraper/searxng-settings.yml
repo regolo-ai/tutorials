@@ -15,34 +15,26 @@ search:
     - json
 
 outgoing:
-  request_timeout: 6.0
+  request_timeout: 3.0
   user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 
 engines:
   - name: duckduckgo
     engine: duckduckgo
     shortcut: ddg
-    categories: [general]
   - name: qwant
     engine: qwant
     shortcut: qw
-    categories: [general]
   - name: wikipedia
     engine: wikipedia
     shortcut: wp
-    categories: [general]
   - name: wikidata
     engine: wikidata
     shortcut: wd
-    categories: [general]
   - name: arxiv
     engine: arxiv
     shortcut: ar
-    categories: [general]
-  - name: github
-    engine: github
-    shortcut: gh
-    categories: [general]
+
 
 
 
