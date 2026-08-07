@@ -56,6 +56,286 @@ class ResearchRequest(BaseModel):
     max_results: Optional[int] = 6
     summarize: Optional[bool] = False
 
+def classify_intent(query: str) -> str:
+    """Classifies query into intent archetypes: HOWTO_PROCEDURE, PRODUCT_TECH_ENTITY, ACADEMIC_RESEARCH, COMPARISON_EVALUATION, GENERAL_KNOWLEDGE."""
+    q = query.lower().strip()
+    
+    # Check for How-To / Procedural / DIY / Maintenance
+    howto_triggers = ["come ", "how to", "cambiare", "sostituire", "ricetta", "tutorial", "riparare", "installare", "install ", "setup ", "montare", "smontare", "pulire", "fai da te"]
+    if any(trigger in q for trigger in howto_triggers):
+        return "HOWTO_PROCEDURE"
+        
+    # Check for Academic / Scientific
+    academic_triggers = ["paper", "arxiv", "theorem", "research", "algorithm", "dataset", "study", "analysis of", "benchmark", "quantistic", "neural network"]
+    if any(trigger in q for trigger in academic_triggers):
+        return "ACADEMIC_RESEARCH"
+        
+    # Check for Comparison
+    comparison_triggers = [" vs ", " versus ", "differenza tra", "differenze", "migliore tra", "comparison", "compared to", "alternativa a", "alternative to"]
+    if any(trigger in q for trigger in comparison_triggers):
+        return "COMPARISON_EVALUATION"
+        
+    # Check for Tech Product / Entity / Service / Software
+    tech_triggers = [".ai", ".io", ".com", "what is", "cos'è", "cos è", "chi è", "che cos'è", "platform", "framework", "software", "api", "model", "llm", "sdk", "app"]
+    if any(trigger in q for trigger in tech_triggers):
+        return "PRODUCT_TECH_ENTITY"
+        
+    return "GENERAL_KNOWLEDGE"
+
+def build_orchestrated_subagents(query: str) -> List[dict]:
+    """Orchestrates 6 intent-driven subagents with tailored search keywords and SearXNG category routes."""
+    clean_q = query.strip()
+    intent = classify_intent(clean_q)
+    
+    if intent == "HOWTO_PROCEDURE":
+        return [
+            {
+                "id": 1,
+                "role": "Primary Discovery Agent",
+                "query": clean_q,
+                "category": "general",
+                "description": f"Direct procedure search for '{clean_q}'"
+            },
+            {
+                "id": 2,
+                "role": "Step-by-Step Tutorial Agent",
+                "query": f"{clean_q} guida passo passo tutorial",
+                "category": "general",
+                "description": "Step-by-step tutorial and procedure walkthrough"
+            },
+            {
+                "id": 3,
+                "role": "Fluid & Technical Specs Agent",
+                "query": f"{clean_q} specifiche quantita viscosita materiale",
+                "category": "general",
+                "description": "Fluid volumes, viscosity, and technical specifications"
+            },
+            {
+                "id": 4,
+                "role": "Tools & Equipment Agent",
+                "query": f"{clean_q} attrezzi chiave filtro occorrente",
+                "category": "general",
+                "description": "Required tools, socket sizes, and equipment"
+            },
+            {
+                "id": 5,
+                "role": "Common Pitfalls & Warnings Agent",
+                "query": f"{clean_q} errori comuni problemi consigli",
+                "category": "general",
+                "description": "Common mistakes, safety precautions, and troubleshooting"
+            },
+            {
+                "id": 6,
+                "role": "Maintenance Interval & Cost Agent",
+                "query": f"{clean_q} intervallo chilometri costo fai da te",
+                "category": "general",
+                "description": "Cost estimation, service intervals, and DIY tips"
+            }
+        ]
+        
+    elif intent == "PRODUCT_TECH_ENTITY":
+        return [
+            {
+                "id": 1,
+                "role": "Primary Entity Discovery Agent",
+                "query": clean_q,
+                "category": "general",
+                "description": f"Primary identity and landing pages for '{clean_q}'"
+            },
+            {
+                "id": 2,
+                "role": "Architecture & Core Features Agent",
+                "query": f"{clean_q} architecture features core capabilities",
+                "category": "general",
+                "description": "Technical architecture, features, and core models"
+            },
+            {
+                "id": 3,
+                "role": "API & Developer Integration Agent",
+                "query": f"{clean_q} API integration tutorial SDK use cases",
+                "category": "general",
+                "description": "Developer integration, API compatibility, and SDKs"
+            },
+            {
+                "id": 4,
+                "role": "Data Sovereignty & Compliance Agent",
+                "query": f"{clean_q} zero data retention privacy GDPR EU hosted",
+                "category": "general",
+                "description": "Security posture, zero data retention, and compliance"
+            },
+            {
+                "id": 5,
+                "role": "Documentation & Repository Agent",
+                "query": f"{clean_q} github documentation tutorials",
+                "category": "it,general",
+                "description": "Official documentation and open-source code repositories"
+            },
+            {
+                "id": 6,
+                "role": "Company & Background Agent",
+                "query": f"{clean_q} company overview background review",
+                "category": "general",
+                "description": "Company history, parent group, and market positioning"
+            }
+        ]
+        
+    elif intent == "ACADEMIC_RESEARCH":
+        return [
+            {
+                "id": 1,
+                "role": "Primary Research Discovery Agent",
+                "query": clean_q,
+                "category": "general,science",
+                "description": f"Primary literature search for '{clean_q}'"
+            },
+            {
+                "id": 2,
+                "role": "ArXiv & Whitepaper Agent",
+                "query": f"{clean_q} arxiv paper whitepaper pdf",
+                "category": "science,general",
+                "description": "ArXiv preprints and formal academic whitepapers"
+            },
+            {
+                "id": 3,
+                "role": "Mathematical & Algorithmic Specs Agent",
+                "query": f"{clean_q} mathematical formulation algorithm benchmark",
+                "category": "science,general",
+                "description": "Mathematical models, algorithms, and benchmarks"
+            },
+            {
+                "id": 4,
+                "role": "Open Source Implementation Agent",
+                "query": f"{clean_q} github code implementation dataset",
+                "category": "it,general",
+                "description": "Code repositories, model weights, and datasets"
+            },
+            {
+                "id": 5,
+                "role": "State-of-the-Art Advances Agent",
+                "query": f"{clean_q} state of the art recent breakthroughs",
+                "category": "science,general",
+                "description": "Recent advancements and competitive SOTA baselines"
+            },
+            {
+                "id": 6,
+                "role": "Literature Survey & Review Agent",
+                "query": f"{clean_q} literature review survey meta-analysis",
+                "category": "science,general",
+                "description": "Comprehensive literature reviews and surveys"
+            }
+        ]
+        
+    elif intent == "COMPARISON_EVALUATION":
+        return [
+            {
+                "id": 1,
+                "role": "Primary Comparison Discovery Agent",
+                "query": clean_q,
+                "category": "general",
+                "description": f"Direct comparison for '{clean_q}'"
+            },
+            {
+                "id": 2,
+                "role": "Trade-offs & Pros-Cons Agent",
+                "query": f"{clean_q} pros cons trade-offs comparison",
+                "category": "general",
+                "description": "Advantages, disadvantages, and technical trade-offs"
+            },
+            {
+                "id": 3,
+                "role": "Performance & Benchmark Agent",
+                "query": f"{clean_q} performance benchmark latency throughput",
+                "category": "general",
+                "description": "Empirical benchmarks, speed, and resource metrics"
+            },
+            {
+                "id": 4,
+                "role": "User Experience & Reviews Agent",
+                "query": f"{clean_q} review opinion user feedback reddit",
+                "category": "general",
+                "description": "Developer feedback and community reviews"
+            },
+            {
+                "id": 5,
+                "role": "Best Practices & Decision Matrix Agent",
+                "query": f"{clean_q} when to use selection criteria best practices",
+                "category": "general",
+                "description": "Selection guidelines and architectural decision criteria"
+            },
+            {
+                "id": 6,
+                "role": "Pricing & Total Cost Agent",
+                "query": f"{clean_q} cost pricing licensing TCO",
+                "category": "general",
+                "description": "Licensing models, pricing structures, and total cost"
+            }
+        ]
+        
+    else:  # GENERAL_KNOWLEDGE
+        return [
+            {
+                "id": 1,
+                "role": "Primary Discovery Agent",
+                "query": clean_q,
+                "category": "general",
+                "description": f"Direct search for '{clean_q}'"
+            },
+            {
+                "id": 2,
+                "role": "In-Depth Overview Agent",
+                "query": f'"{clean_q}"',
+                "category": "general",
+                "description": f"Exact phrase match for '{clean_q}'"
+            },
+            {
+                "id": 3,
+                "role": "Detailed Explanation Agent",
+                "query": f"{clean_q} spiegazione dettagliata guida",
+                "category": "general",
+                "description": "Detailed structural breakdown and explanation"
+            },
+            {
+                "id": 4,
+                "role": "Practical Examples & Context Agent",
+                "query": f"{clean_q} esempi pratici contesto",
+                "category": "general",
+                "description": "Real-world context, applications, and examples"
+            },
+            {
+                "id": 5,
+                "role": "Key Facts & Analysis Agent",
+                "query": f"{clean_q} punti chiave sintesi informazioni",
+                "category": "general",
+                "description": "Key takeaways, facts, and analytical summary"
+            },
+            {
+                "id": 6,
+                "role": "Official Reference & FAQ Agent",
+                "query": f"{clean_q} fonte ufficiale FAQ risposte",
+                "category": "general",
+                "description": "Official references, guides, and common questions"
+            }
+        ]
+
+def is_relevant_result(item: dict, query: str) -> bool:
+    """Ensures search results contain meaningful keywords from the user query to prevent drift."""
+    stop_words = {"what", "is", "a", "an", "the", "how", "to", "in", "on", "of", "for", "and", "or", "with", "quali", "sono", "il", "la", "le", "i", "gli", "un", "una", "del", "della", "di", "che", "chi", "come", "per", "su", "con"}
+    words = [w.lower().strip("?,!.:;\"'") for w in query.split() if len(w) > 2]
+    keywords = [w for w in words if w not in stop_words]
+    
+    if not keywords:
+        return True
+        
+    title = item.get("title", "").lower()
+    snippet = item.get("content", "").lower()
+    url = item.get("url", "").lower()
+    combined = f"{title} {snippet} {url}"
+    
+    matches = sum(1 for kw in keywords if kw in combined)
+    if len(keywords) <= 2:
+        return matches >= 1
+    return matches >= (len(keywords) // 2)
+
 @app.get("/health")
 def health_check():
     return {"status": "ok"}
@@ -64,23 +344,17 @@ def health_check():
 async def research_endpoint(req: ResearchRequest):
     searxng_url = os.getenv("SEARXNG_URL", "http://localhost:8080")
     
-    # Sub-agent query expansion (6 specialized subagents)
-    sub_queries = [
-        req.query,
-        f"{req.query} technical specifications",
-        f"{req.query} regulatory compliance",
-        f"{req.query} market trends adoption",
-        f"{req.query} research papers whitepaper",
-        f"{req.query} security vulnerabilities risks"
-    ]
-
-    async def fetch_searxng_query(client, q, delay=0.0):
+    fleet = build_orchestrated_subagents(req.query)
+    
+    async def fetch_searxng_query(client, agent, delay=0.0):
+        q = agent["query"]
+        cat = agent.get("category", "general")
         if delay > 0:
             await asyncio.sleep(delay)
         try:
             resp = await client.get(
                 f"{searxng_url}/search",
-                params={"q": q, "format": "json"}
+                params={"q": q, "format": "json", "categories": cat}
             )
             if resp.status_code == 200:
                 data = resp.json()
@@ -93,7 +367,7 @@ async def research_endpoint(req: ResearchRequest):
         try:
             resp = await client.get(
                 f"{searxng_url}/search",
-                params={"q": q, "format": "json", "categories": "general,science,it"}
+                params={"q": q, "format": "json"}
             )
             if resp.status_code == 200:
                 data = resp.json()
@@ -164,16 +438,16 @@ async def research_endpoint(req: ResearchRequest):
     import asyncio
     headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"}
     async with httpx.AsyncClient(timeout=15.0, headers=headers) as client:
-        tasks = [fetch_searxng_query(client, sq, delay=i*0.3) for i, sq in enumerate(sub_queries)]
+        tasks = [fetch_searxng_query(client, agent, delay=i*0.3) for i, agent in enumerate(fleet)]
         sub_results_list = await asyncio.gather(*tasks)
 
-    # Deduplicate results by URL
+    # Deduplicate results by URL and filter for topic relevance
     seen_urls = set()
     unique_results = []
     for sub_results in sub_results_list:
         for item in sub_results:
             url = item.get("url")
-            if url and url not in seen_urls:
+            if url and url not in seen_urls and is_relevant_result(item, req.query):
                 seen_urls.add(url)
                 unique_results.append(item)
 
@@ -209,7 +483,7 @@ async def research_endpoint(req: ResearchRequest):
     all_chunks.sort(key=lambda x: x["density_score"], reverse=True)
     top_chunks = all_chunks[:6]
 
-    print(f"[METRICS LOG] query='{req.query}' sub_queries={len(sub_queries)} total_results={len(unique_results)} total_chunks={len(all_chunks)}")
+    print(f"[METRICS LOG] query='{req.query}' sub_queries={len(fleet)} total_results={len(unique_results)} total_chunks={len(all_chunks)}")
 
     answer = None
     if req.summarize:
@@ -304,19 +578,11 @@ if __name__ == "__main__":
             print("  └────────────────────────────────────────────────────────┘")
             print(f"\033[0m")
             print(f"[*] Target Query: '{args.query}'")
-            print(f"[*] Spawning Subagent Fleet (6 specialized workers)...")
-            time.sleep(0.3)
-            print(f"    \033[36m[SUBAGENT-1]\033[0m Created [Role: Primary Discovery Agent | Target: '{args.query}']")
-            time.sleep(0.3)
-            print(f"    \033[36m[SUBAGENT-2]\033[0m Created [Role: Technical Specs Agent | Target: '{args.query} technical specifications']")
-            time.sleep(0.3)
-            print(f"    \033[36m[SUBAGENT-3]\033[0m Created [Role: Regulatory Compliance Agent | Target: '{args.query} regulatory compliance']")
-            time.sleep(0.3)
-            print(f"    \033[36m[SUBAGENT-4]\033[0m Created [Role: Market & Trend Analysis Agent | Target: '{args.query} market trends adoption']")
-            time.sleep(0.3)
-            print(f"    \033[36m[SUBAGENT-5]\033[0m Created [Role: Academic / Research Papers Agent | Target: '{args.query} research papers whitepaper']")
-            time.sleep(0.3)
-            print(f"    \033[36m[SUBAGENT-6]\033[0m Created [Role: Security & Vulnerability Agent | Target: '{args.query} security vulnerabilities risks']")
+            fleet = build_orchestrated_subagents(args.query)
+            print(f"[*] Spawning Subagent Fleet ({len(fleet)} specialized workers)...")
+            for agent in fleet:
+                time.sleep(0.15)
+                print(f"    \033[36m[SUBAGENT-{agent['id']}]\033[0m Created [Role: {agent['role']} | Target: '{agent['query']}']")
             print("\n[*] Launching concurrent web execution against SearXNG...")
 
             start_time = time.time()
