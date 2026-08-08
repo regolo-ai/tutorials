@@ -83,7 +83,7 @@ def classify_intent(query: str) -> str:
     return "GENERAL_KNOWLEDGE"
 
 def build_orchestrated_subagents(query: str) -> List[dict]:
-    """Orchestrates 6 intent-driven subagents with tailored search keywords and SearXNG category routes."""
+    """Orchestrates 6 intent-driven subagents with tailored search keywords in English and SearXNG category routes."""
     clean_q = query.strip()
     intent = classify_intent(clean_q)
     
@@ -99,35 +99,35 @@ def build_orchestrated_subagents(query: str) -> List[dict]:
             {
                 "id": 2,
                 "role": "Step-by-Step Tutorial Agent",
-                "query": f"{clean_q} guida passo passo tutorial",
+                "query": f"{clean_q} step-by-step tutorial guide",
                 "category": "general",
                 "description": "Step-by-step tutorial and procedure walkthrough"
             },
             {
                 "id": 3,
                 "role": "Fluid & Technical Specs Agent",
-                "query": f"{clean_q} specifiche quantita viscosita materiale",
+                "query": f"{clean_q} technical specifications requirements",
                 "category": "general",
                 "description": "Fluid volumes, viscosity, and technical specifications"
             },
             {
                 "id": 4,
                 "role": "Tools & Equipment Agent",
-                "query": f"{clean_q} attrezzi chiave filtro occorrente",
+                "query": f"{clean_q} tools equipment required",
                 "category": "general",
                 "description": "Required tools, socket sizes, and equipment"
             },
             {
                 "id": 5,
                 "role": "Common Pitfalls & Warnings Agent",
-                "query": f"{clean_q} errori comuni problemi consigli",
+                "query": f"{clean_q} common mistakes troubleshooting tips",
                 "category": "general",
                 "description": "Common mistakes, safety precautions, and troubleshooting"
             },
             {
                 "id": 6,
                 "role": "Maintenance Interval & Cost Agent",
-                "query": f"{clean_q} intervallo chilometri costo fai da te",
+                "query": f"{clean_q} maintenance interval cost DIY",
                 "category": "general",
                 "description": "Cost estimation, service intervals, and DIY tips"
             }
@@ -290,38 +290,44 @@ def build_orchestrated_subagents(query: str) -> List[dict]:
             {
                 "id": 3,
                 "role": "Detailed Explanation Agent",
-                "query": f"{clean_q} spiegazione dettagliata guida",
+                "query": f"{clean_q} detailed explanation guide",
                 "category": "general",
                 "description": "Detailed structural breakdown and explanation"
             },
             {
                 "id": 4,
                 "role": "Practical Examples & Context Agent",
-                "query": f"{clean_q} esempi pratici contesto",
+                "query": f"{clean_q} practical examples use cases",
                 "category": "general",
                 "description": "Real-world context, applications, and examples"
             },
             {
                 "id": 5,
                 "role": "Key Facts & Analysis Agent",
-                "query": f"{clean_q} punti chiave sintesi informazioni",
+                "query": f"{clean_q} key facts summary analysis",
                 "category": "general",
                 "description": "Key takeaways, facts, and analytical summary"
             },
             {
                 "id": 6,
                 "role": "Official Reference & FAQ Agent",
-                "query": f"{clean_q} fonte ufficiale FAQ risposte",
+                "query": f"{clean_q} official reference FAQ answers",
                 "category": "general",
                 "description": "Official references, guides, and common questions"
             }
         ]
 
 def is_relevant_result(item: dict, query: str) -> bool:
-    """Ensures search results contain meaningful keywords from the user query to prevent drift."""
-    stop_words = {"what", "is", "a", "an", "the", "how", "to", "in", "on", "of", "for", "and", "or", "with", "quali", "sono", "il", "la", "le", "i", "gli", "un", "una", "del", "della", "di", "che", "chi", "come", "per", "su", "con"}
-    words = [w.lower().strip("?,!.:;\"'") for w in query.split() if len(w) > 2]
-    keywords = [w for w in words if w not in stop_words]
+    """Ensures search results contain meaningful entity keywords from the user query to prevent drift."""
+    stop_words = {
+        "what", "is", "a", "an", "the", "how", "to", "in", "on", "of", "for", "and", "or", "with",
+        "quali", "sono", "il", "la", "le", "i", "gli", "un", "una", "del", "della", "di", "che", "chi", "come", "per", "su", "con",
+        "io", "com", "net", "org", "www", "http", "https"
+    }
+    
+    # Extract clean keyword tokens
+    raw_words = query.lower().replace(".", " ").replace("-", " ").replace("_", " ").replace("?", " ").replace("!", " ").split()
+    keywords = [w.strip("?,!.:;\"'") for w in raw_words if len(w) > 1 and w not in stop_words]
     
     if not keywords:
         return True
@@ -329,12 +335,12 @@ def is_relevant_result(item: dict, query: str) -> bool:
     title = item.get("title", "").lower()
     snippet = item.get("content", "").lower()
     url = item.get("url", "").lower()
-    combined = f"{title} {snippet} {url}"
+    combined = f"{title} {snippet} {url}".replace(".", " ").replace("-", " ").replace("_", " ")
     
     matches = sum(1 for kw in keywords if kw in combined)
     if len(keywords) <= 2:
         return matches >= 1
-    return matches >= (len(keywords) // 2)
+    return matches >= 2
 
 @app.get("/health")
 def health_check():
@@ -479,8 +485,29 @@ async def research_endpoint(req: ResearchRequest):
                     seen_chunks.add(chunk_key)
                     all_chunks.append(ch)
 
-    # Sort chunks by density score descending to prioritize high factual signal
-    all_chunks.sort(key=lambda x: x["density_score"], reverse=True)
+    # Sort chunks by composite score (factual density + exact brand/domain match boost)
+    clean_q = req.query.lower().replace("what is ", "").replace("cos'è ", "").replace("cos e ", "").replace("?", "").strip()
+    clean_dash = clean_q.replace(".", "-")
+    clean_space = clean_q.replace(".", " ")
+
+    raw_words = req.query.lower().replace(".", " ").replace("-", " ").replace("_", " ").replace("?", " ").replace("!", " ").split()
+    entity_keywords = [w.strip("?,!.:;\"'") for w in raw_words if len(w) > 2 and w not in {"what", "is", "a", "an", "the", "how", "to", "in", "on", "of", "for", "and", "or", "with"}]
+    primary_entity = max(entity_keywords, key=len) if entity_keywords else None
+
+    for ch in all_chunks:
+        title = ch.get("source_title", "").lower()
+        url = ch.get("source_url", "").lower()
+        combined_text = f"{title} {url}"
+        
+        boost = 0.0
+        if clean_q and (clean_q in combined_text or clean_dash in combined_text or clean_space in combined_text):
+            boost = 0.50
+        elif primary_entity and primary_entity in combined_text:
+            boost = 0.10
+            
+        ch["composite_score"] = ch["density_score"] + boost
+
+    all_chunks.sort(key=lambda x: x["composite_score"], reverse=True)
     top_chunks = all_chunks[:6]
 
     print(f"[METRICS LOG] query='{req.query}' sub_queries={len(fleet)} total_results={len(unique_results)} total_chunks={len(all_chunks)}")
