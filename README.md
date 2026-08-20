@@ -2,9 +2,22 @@
   <img src="https://regolo.ai/wp-content/uploads/2026/06/Regolo_logo_positive.png" alt="Regolo.ai Logo" width="300" />
 </div>
 
-# Regolo Labs: Production AI Playbooks
+<div align="center">
+  <h1>Regolo Labs: Production AI Playbooks</h1>
+</div>
 
-Runnable playbooks for building sharp, production-ready AI workflows with Regolo API - each folder includes code, setup notes, and a companion article.
+<div align="center">
+  <img src="https://img.shields.io/badge/build-passing-brightgreen.svg" alt="Build passing" />
+  <img src="https://img.shields.io/badge/python-3.10+-blue.svg?logo=python&logoColor=white" alt="Python 3.10+" />
+  <img src="https://img.shields.io/badge/Code-Runnable_Examples-2ea44f.svg" alt="Code: Runnable Examples" />
+  <img src="https://img.shields.io/badge/GPU-100%25_Ready-0078D4.svg" alt="GPU 100% Ready" />
+  <img src="https://img.shields.io/badge/API-OpenAI_Compatible-313236.svg" alt="API OpenAI Compatible" />
+  <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" />
+</div>
+
+<br />
+
+Runnable playbooks for building sharp, production-ready AI workflows with Regolo API — each folder includes code, setup notes, and a companion article.
 
 > [!IMPORTANT]  
 > ## Sign Up and get 30 Days Free Trial
@@ -15,6 +28,7 @@ Runnable playbooks for building sharp, production-ready AI workflows with Regolo
 > 
 > ---
 > **Explore Regolo:** [Platform](https://regolo.ai) | [Models Library](https://regolo.ai/models-library/) | [Documentation & Guides](https://regolo.ai/docs) | [YouTube](https://www.youtube.com/@regoloai) | [Discord](https://discord.gg/wHxwWCC8)
+
 ---
 
 Welcome to the **Regolo.ai** tutorials repository.
@@ -23,6 +37,7 @@ This collection focuses on practical, runnable AI examples for developers and pr
 Each tutorial is designed to be easy to follow, easy to run, and easy to adapt.
 
 ### How to Use
+
 1. Clone this repository: `git clone https://github.com/regolo-ai/tutorials.git`
 2. Navigate to the desired tutorial folder.
 3. Follow the instructions in the folder's README.md. 
@@ -33,6 +48,7 @@ Each tutorial is designed to be easy to follow, easy to run, and easy to adapt.
 
 | Tutorial | Description | Labels | Article Link |
 |----------|-------------|--------|--------------|
+| **[Closed-Loop: Self-Correcting AI Code Reviewer](closed-loop/)** | Self-correcting AI code reviews with dual-gate verification, Qdrant semantic memory, cross-encoder reranking, and persistent skill accumulation. | `Python` · `Runnable` · `GPU 100% Ready` | [Read Article](https://regolo.ai/how-to-build-a-closed-loop-ai-agent-that-catches-its-own-hallucinations/) |
 | **[Clawdbot Knowledge Base](clawdbot-knowledge-base/)** | Internal knowledge bot with hybrid retrieval (embeddings + BM25 + reranker) and Telegram interface. | `Python` · `Runnable` · `GPU 100% Ready` | [Read Article](https://regolo.ai/build-an-internal-knowledge-bot-with-clawdbot-embeddings-rerank-chat-in-30-minutes/) |
 | **[CrewAI Product Launch Campaign](crewai-product-launch-campaign/)** | Automated product launch system with crewAI multi-agent workflow and Regolo infrastructure. | `Python` · `Runnable` · `GPU 100% Ready` | [Read Article](https://regolo.ai/build-multi-agent-workflows-with-crewai-teams/) |
 | **[Cheshire Cat AI + Regolo: Enterprise AI Agent Setup](from-zero-to-hero-cheshire-cat-and-regolo/)** | Enterprise-ready AI agent setup via OpenAI-compatible API and open models. | `Python` · `Runnable` · `GPU 100% Ready` | [Read Article](https://regolo.ai/from-zero-to-an-enterprise-ready-ai-agent-with-cheshire-cat-and-regolo-a-practical-guide-using-only-open-source-llms/) |
@@ -56,11 +72,22 @@ Each tutorial is designed to be easy to follow, easy to run, and easy to adapt.
 | **[SearXNG Private Research Scraper](searxng-scraper/)** | Private web research agent fleet with SearXNG search backend, intent-orchestrated 6-worker subagent query expansion, topic relevance filtering, spatial chunking, and Regolo.ai grounded synthesis. | `Python` · `Runnable` · `GPU 100% Ready` | [Read Article](article.md) |
 
 ## Contributing
+
 Feel free to contribute by adding new tutorials or improving existing ones. Please follow the contribution guidelines.
 
-## 📄 License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+## Links
 
----
+- [Regolo.ai](https://regolo.ai) — European OpenAI-compatible GPU inference
+- [Free API key](https://regolo.ai/pricing) — Pay as You Go, no commitment
+- [Models Library](https://regolo.ai/models-library/)
+- [Documentation](https://regolo.ai/docs)
+- [YouTube](https://www.youtube.com/@regoloai)
+- [Discord](https://discord.gg/wHxwWCC8)
 
-*Powered by [Regolo.ai](https://regolo.ai)* 
+## License
+
+MIT — see [LICENSE](LICENSE) for details.
+
+## Powered By
+
+- [Regolo.ai](https://regolo.ai) — Zero Data Retention in EU Data Center, powered by 100% green carbon-free energy. OpenAI-compatible LLM API.
