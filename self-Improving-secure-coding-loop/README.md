@@ -1,12 +1,26 @@
-# ⚡ Self-Improving Secure Coding Loop
-### Open SWE + Deepsec + Cognee + Regolo (GLM-5.2)
+<div align="center">
+  <img src="https://regolo.ai/wp-content/uploads/2026/06/Regolo_logo_positive.png" alt="Regolo.ai Logo" width="300" />
+</div>
 
-> **Autonomous, memory-augmented secure software engineering agent.**  
-> Ingests GitHub issues, plans remediations with human approval, fixes code in isolated sandboxes, executes automated SAST/AST security gates, and builds an organizational Knowledge Graph so the system gets smarter with every Pull Request.
+<div align="center">
+  <h1>Self-Improving Secure Coding Loop</h1>
+  <p><strong>Open SWE + Deepsec + Cognee + Regolo (GLM-5.2)</strong></p>
+</div>
 
----
+<div align="center">
+  <img src="https://img.shields.io/badge/build-passing-brightgreen.svg" alt="Build passing" />
+  <img src="https://img.shields.io/badge/python-3.10+-blue.svg?logo=python&logoColor=white" alt="Python 3.10+" />
+  <img src="https://img.shields.io/badge/Code-Runnable_Examples-2ea44f.svg" alt="Code: Runnable Examples" />
+  <img src="https://img.shields.io/badge/GPU-100%25_Ready-0078D4.svg" alt="GPU 100% Ready" />
+  <img src="https://img.shields.io/badge/API-OpenAI_Compatible-313236.svg" alt="API OpenAI Compatible" />
+  <img src="https://img.shields.io/badge/License-Apache_2.0-blue.svg" alt="License: Apache 2.0" />
+</div>
 
-## 🎯 Value Proposition: Why This Project Matters
+<br />
+
+Autonomous, memory-augmented secure software engineering agent. Ingests GitHub issues, plans remediations with human approval, fixes code in isolated sandboxes, executes automated SAST/AST security gates, and builds an organizational Knowledge Graph so the system gets smarter with every Pull Request.
+
+## Why This Project Matters
 
 Most AI coding pipelines today suffer from three critical flaws:
 1. **Stateless Blindness:** Coding agents repeat the exact same architectural mistakes and security vulnerabilities across sessions because standard LLM integrations have no persistent engineering memory.
@@ -14,27 +28,26 @@ Most AI coding pipelines today suffer from three critical flaws:
 3. **Runaway Inference Costs:** Burning expensive frontier models across every single pipeline step (triage, planning, syntax formatting, test running, scanning) drives infrastructure costs through the roof.
 
 ```
-┌────────────────────────────────────────────────────────────────────────────────────────┐
-│                                 THE CLOSED-LOOP ADVANTAGE                              │
-│                                                                                        │
-│   Open SWE (Produce) ➔ Deepsec (Verify) ➔ Cognee (Remember) ➔ Brick (Govern)          │
-│                                                                                        │
-│   • 0% Repeat Vulnerabilities: Cognee remembers past CWEs & PR decisions               │
-│   • 100% Verified Fixes: Deepsec revalidates patches before PR creation                │
-│   • ~85% Cost Reduction: Regolo.ai OpenAI-Compatible API powered by GLM-5.2            │
-│   • Human-in-the-Loop: Explicit plan approval gate & verifiable PR evidence             │
-└────────────────────────────────────────────────────────────────────────────────────────┘
++----------------------------------------------------------------------------------------+
+|                                 THE CLOSED-LOOP ADVANTAGE                              |
+|                                                                                        |
+|   Open SWE (Produce) ➔ Deepsec (Verify) ➔ Cognee (Remember) ➔ Brick (Govern)          |
+|                                                                                        |
+|   • 0% Repeat Vulnerabilities: Cognee remembers past CWEs & PR decisions               |
+|   • 100% Verified Fixes: Deepsec revalidates patches before PR creation                |
+|   • ~85% Cost Reduction: Regolo.ai OpenAI-Compatible API powered by GLM-5.2            |
+|   • Human-in-the-Loop: Explicit plan approval gate & verifiable PR evidence             |
++----------------------------------------------------------------------------------------+
 ```
 
 ### Concrete ROI Delivered to Teams:
+
 - **Instant Security Remediation:** Automatically converts reported vulnerabilities (SQLi, SSRF, IDOR, RCE, XSS, etc.) into tested, production-grade Pull Requests with zero manual code editing required.
 - **Enterprise Engineering Memory (Cognee):** Builds an interlinked Knowledge Graph linking `Issue ➔ Vulnerability ➔ Defensive Fix ➔ Test Outcome ➔ Human Decision`. When a developer touches an authentication module 6 months later, the agent automatically enforces past security decisions.
 - **Zero-Trust Independent Quality Gate (Deepsec):** The security scanner operates independently from the code generator. It doesn't assume the fix worked; it re-scans the repository in an isolated sandbox to certify that findings dropped to 0 and all tests pass.
-- **Drastic Cost Optimization via Regolo.ai:** By leveraging **GLM-5.2** over Regolo's OpenAI-compatible endpoint (`https://api.regolo.ai/v1`), teams get high-capacity reasoning and agentic tool usage at **~$0.60 / $1.80 per 1M tokens** instead of **$3.00 / $15.00+ per 1M tokens** on proprietary single-frontier endpoints.
+- **Drastic Cost Optimization via Regolo:** By leveraging **GLM-5.2** over Regolo's OpenAI-compatible endpoint (`https://api.regolo.ai/v1`), teams get high-capacity reasoning and agentic tool usage at **~$0.60 / $1.80 per 1M tokens** instead of **$3.00 / $15.00+ per 1M tokens** on proprietary single-frontier endpoints.
 
----
-
-## 🏗️ Architecture & Workflow
+## Architecture & Workflow
 
 ```
                [ 📁 Target Repository / GitHub Issue ]
@@ -85,9 +98,7 @@ Most AI coding pipelines today suffer from three critical flaws:
                     └───────────────────────────┘
 ```
 
----
-
-## 📦 Pre-Packaged Demo Target Repositories
+## Pre-Packaged Demo Target Repositories
 
 The project includes **7 realistic vulnerable microservices** in `sample_repos/` ready for immediate demo execution:
 
@@ -101,39 +112,43 @@ The project includes **7 realistic vulnerable microservices** in `sample_repos/`
 | **6. Crypto Wallet Service** | FastAPI / Crypto | `CWE-798` (Hardcoded Master Key), `CWE-338` (Weak PRNG `random.randint`) | Private key leak & predictable custodial deposit addresses |
 | **7. User Profile API** | FastAPI / HTML | `CWE-79` (Stored XSS in Card), `CWE-915` (Mass Assignment in Update) | Browser session hijacking & unauthorized privilege escalation |
 
----
-
-## ⚡ Quickstart
+## Quick Start
 
 ### 1. Requirements & Setup
+
 Ensure Python 3.10+ is installed:
+
 ```bash
-git clone <repo-url>
-cd "video/1 - Build a Self-Improving Secure Coding Loop Open SWE + Deepsec + Cognee + Regolo"
+git clone https://github.com/regolo-ai/tutorials.git
+cd tutorials/self-Improving-secure-coding-loop
 ./setup.sh
 ```
 
 ### 2. Configure Environment (`.env`)
+
 Insert your Regolo API key (get one from [https://regolo.ai](https://regolo.ai)):
+
 ```env
 REGOLO_API_KEY=your_regolo_api_key_here
 REGOLO_BASE_URL=https://api.regolo.ai/v1
 REGOLO_MODEL=GLM-5.2
 ```
+
 *(Note: If no API key is provided, the tool automatically uses high-fidelity offline simulation mode so you can test and record videos seamlessly).*
 
 ### 3. Launch the Interactive TUI
+
 ```bash
 ./run.sh
 ```
+
 or:
+
 ```bash
 python3 main.py
 ```
 
----
-
-## 🖥️ Interactive TUI Walkthrough
+## Interactive TUI Walkthrough
 
 When you start `./run.sh`, the cinematic Terminal User Interface launches:
 
@@ -146,6 +161,7 @@ When you start `./run.sh`, the cinematic Terminal User Interface launches:
 ```
 
 ### Main Menu Options:
+
 - **`[1] 🚀 Run Full Closed Loop`**: Select any target repository, watch the initial Deepsec scan table, view Cognee memory recall, review the Open SWE step-by-step plan, interact with the **Human Approval Gate**, inspect the unified Git diff, verify the Deepsec revalidation score, update the Knowledge Graph, view the live cost comparison table, and generate `PR_EVIDENCE.md`.
 - **`[2] 🐳 Manage Docker Services`**: Background service orchestrator. Checks Docker daemon, auto-pulls missing images (Qdrant Vector DB & Cognee backend), starts stopped containers, and **dynamically discovers free ports incrementally** (e.g. `6333 ➔ 6334 ➔ 6335`) if default ports are occupied.
 - **`[3] 🔍 Deepsec Security Scan Only`**: Perform a standalone vulnerability audit on any local folder.
@@ -154,19 +170,16 @@ When you start `./run.sh`, the cinematic Terminal User Interface launches:
 - **`[6] 🧪 Run Automated Test Suite`**: Execute the test suite with `pytest`.
 - **`[7] ❌ Exit`**.
 
----
-
-## 🐳 Automated Docker Service Orchestration & Port Discovery
+## Automated Docker Service Orchestration & Port Discovery
 
 The system includes a self-healing Docker manager (`core/docker_manager.py`) to manage local stateful backends:
+
 1. **Container Check:** Checks if `closed-loop-qdrant` or `closed-loop-cognee` are already running.
 2. **Auto-Start:** If a container exists but is stopped, it starts it immediately without rebuilding.
 3. **Auto-Pull & Launch:** If missing, it downloads the official images (`qdrant/qdrant:latest`, `cognee/cognee:main`).
 4. **Incremental Port Allocation:** If default ports (`6333`, `8800`) are occupied by existing services on the host machine, the port scanner checks ports incrementally (`6333 ➔ 6334 ...` and `8800 ➔ 8801 ...`) and binds the container to the first open TCP port, updating connection URLs automatically.
 
----
-
-## 📊 Telemetry & Cost Efficiency Scoreboard
+## Telemetry & Cost Efficiency Scoreboard
 
 Brick Governance tracks every token and provides an automated comparison between **Single Frontier Models** vs. **Regolo GLM-5.2**:
 
@@ -180,9 +193,7 @@ Brick Governance tracks every token and provides an automated comparison between
 | **Cognee Graph Update** | GLM-5.2 | 490 / 240 | 0.36s | $0.00073 | $0.00507 | **-85.6%** |
 | **TOTALS** | — | **~6,070 tokens** | **~2.4s** | **$0.0059** | **$0.0410** | **~85.6% Savings** |
 
----
-
-## 🧪 Verification & Testing
+## Verification & Testing
 
 To run the complete automated test suite verifying all modules and all 7 sample vulnerability repositories:
 
@@ -197,7 +208,28 @@ All 12 test cases will run and confirm:
 4. Deepsec vulnerability detection and revalidation gates
 5. Full closed-loop execution across all 7 vulnerability microservices.
 
----
+## How to Use
 
-## 🛡️ License
+1. Clone this repository: `git clone https://github.com/regolo-ai/tutorials.git`
+2. Navigate to the tutorial folder: `cd tutorials/self-Improving-secure-coding-loop`
+3. Follow the instructions in this README.
+4. Get a free API key from Regolo to run the code: [Sign Up for Free Trial](https://regolo.ai/pricing).
+5. Run the code and see the results in minutes.
+
+## Links
+
+- [Regolo.ai](https://regolo.ai) — European OpenAI-compatible GPU inference
+- [Free API key](https://regolo.ai/pricing) — Pay as You Go, no commitment
+- [Models Library](https://regolo.ai/models-library/)
+- [Documentation](https://regolo.ai/docs)
+- [Discord](https://discord.gg/wHxwWCC8)
+
+## License
+
 Apache-2.0 License. Built for secure engineering automation using Regolo.ai, Open SWE, Deepsec, Cognee, and Brick.
+
+## Powered By
+
+- [Regolo.ai](https://regolo.ai) — OpenAI-compatible LLM API (GLM-5.2)
+- [Cognee](https://www.cognee.ai) — Memory & Knowledge Graph engine
+- [Qdrant](https://qdrant.tech) — Vector database for semantic search
