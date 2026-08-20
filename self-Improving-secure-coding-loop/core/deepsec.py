@@ -218,7 +218,7 @@ class DeepsecSecurityHarness:
 
         revalidation_passed = len(post_scan["findings"]) == 0
 
-        # Run revalidation completion on Regolo GLM-5.2
+        # Run revalidation completion on Regolo 
         reval_sys = "You are Deepsec Revalidation Gate. Evaluate security remediation and sign-off on PR gate."
         reval_user = f"""
 Initial Findings Resolved: {resolved_ids}

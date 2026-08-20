@@ -1,5 +1,5 @@
 """Brick Governance, Policy Enforcement & Telemetry Engine.
-Tracks tokens, latencies, estimated costs, and compares Regolo GLM-5.2 vs Single Frontier models.
+Tracks tokens, latencies, estimated costs, and compares Regolo vs Single Frontier models.
 """
 
 import json
@@ -22,7 +22,7 @@ def record_telemetry_event(
     """Log an execution stage in Brick telemetry store."""
     total_tokens = prompt_tokens + completion_tokens
 
-    # Calculate Regolo GLM-5.2 cost
+    # Calculate Regolo cost
     glm_prices = config.PRICING_ESTIMATION["regolo_glm52"]
     cost_regolo = (
         (prompt_tokens / 1_000_000.0) * glm_prices["prompt_cost_per_1m"]

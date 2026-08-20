@@ -181,9 +181,9 @@ The system includes a self-healing Docker manager (`core/docker_manager.py`) to 
 
 ## Telemetry & Cost Efficiency Scoreboard
 
-Brick Governance tracks every token and provides an automated comparison between **Single Frontier Models** vs. **Regolo GLM-5.2**:
+Brick Governance tracks every token and provides an automated comparison between **Single Frontier Models** vs. **Regolo**:
 
-| Pipeline Stage | Model / Engine | Tokens (Prompt / Completion) | Latency | Regolo GLM-5.2 Cost | Frontier Baseline Cost | Cost Savings |
+| Pipeline Stage | Model / Engine | Tokens (Prompt / Completion) | Latency | Regolo Cost | Frontier Baseline Cost | Cost Savings |
 |---|---|---|---|---|---|---|
 | **Classify & Triage** | GLM-5.2 | 340 / 120 | 0.35s | $0.00042 | $0.00282 | **-85.1%** |
 | **Cognee Memory & Plan** | GLM-5.2 | 620 / 310 | 0.42s | $0.00093 | $0.00651 | **-85.7%** |

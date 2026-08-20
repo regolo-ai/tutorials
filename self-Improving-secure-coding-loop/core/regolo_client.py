@@ -47,7 +47,7 @@ class RegoloClient:
         temperature: Optional[float] = None,
         max_tokens: Optional[float] = None,
     ) -> Dict[str, Any]:
-        """Execute a chat completion on Regolo GLM-5.2 with telemetry logging."""
+        """Execute a chat completion on Regolo with telemetry logging."""
         cfg = config.STAGE_CONFIGS.get(stage, {
             "model": self.model,
             "max_tokens": 2048,

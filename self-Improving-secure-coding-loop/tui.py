@@ -1,13 +1,13 @@
 """Interactive Terminal User Interface (TUI) for Closed-Loop Secure Coding Agent.
 Provides visual terminal experience for video demonstration of:
-Open SWE (Produce) -> Deepsec (Verify) -> Cognee (Remember) -> Brick (Govern) with GLM-5.2 on Regolo.ai.
+Open SWE (Produce) -> Deepsec (Verify) -> Cognee (Remember) -> Brick (Govern) with GLM-5.2 on Regolo.
 """
 
 import os
 import sys
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 from rich.align import Align
 from rich.box import DOUBLE, ROUNDED, SIMPLE
@@ -38,14 +38,24 @@ from core.sandbox import SandboxEnvironment
 
 console = Console()
 
+REGOLO_ASCII = """
+██████╗ ███████╗ ██████╗  ██████╗ ██╗      ██████╗ 
+██╔══██╗██╔════╝██╔════╝ ██╔═══██╗██║     ██╔═══██╗
+██████╔╝█████╗  ██║  ███╗██║   ██║██║     ██║   ██║
+██╔══██╗██╔══╝  ██║   ██║██║   ██║██║     ██║   ██║
+██║  ██║███████╗╚██████╔╝╚██████╔╝███████╗╚██████╔╝
+╚═╝  ╚═╝╚══════╝ ╚═════╝  ╚═════╝ ╚══════╝ ╚═════╝ 
+""".strip("\n")
+
 
 def print_banner():
     """Print top-level branded banner."""
     console.clear()
     banner_text = Text()
+    banner_text.append(f"{REGOLO_ASCII}\n\n", style="bold green")
     banner_text.append("⚡ SELF-IMPROVING SECURE CODING LOOP ⚡\n", style="bold cyan")
     banner_text.append("Open SWE (Produce)  ➔  Deepsec (Verify)  ➔  Cognee (Remember)  ➔  Brick (Govern)\n", style="bold white")
-    banner_text.append(f"Inference: Regolo.ai (OpenAI-Compatible)  •  Model: {config.REGOLO_MODEL}  •  Status: Active", style="dim green")
+    banner_text.append(f"Inference: Regolo  •  Model: {config.REGOLO_MODEL}  •  Status: Active", style="dim green")
 
     console.print(
         Panel(
@@ -269,16 +279,16 @@ def run_full_closed_loop_flow():
 
 
 def display_telemetry_comparison():
-    """Display the Single Frontier Model vs Regolo GLM-5.2 comparison table requested in README.md."""
+    """Display the Single Frontier Model vs Regolo comparison table requested in README.md."""
     telemetry = get_telemetry_summary()
     events = telemetry["events"]
 
-    table = Table(box=ROUNDED, border_style="gold1", header_style="bold cyan", title="Brick Telemetry: Single Frontier Model vs Regolo GLM-5.2 Routed Workflow")
+    table = Table(box=ROUNDED, border_style="gold1", header_style="bold cyan", title="Brick Telemetry: Single Frontier Model vs Regolo Routed Workflow")
     table.add_column("Pipeline Stage", style="bold white", width=22)
     table.add_column("Model / Engine", style="dim", width=18)
     table.add_column("Tokens (P / C)", style="yellow", width=16)
     table.add_column("Latency", style="dim cyan", width=10)
-    table.add_column("Regolo GLM-5.2", style="bold green", width=16)
+    table.add_column("Regolo", style="bold green", width=16)
     table.add_column("Frontier Baseline", style="dim red", width=18)
     table.add_column("Cost Savings", style="bold gold1", width=14)
 
@@ -297,7 +307,7 @@ def display_telemetry_comparison():
 
     summary_panel = Text()
     summary_panel.append(f"Total Tokens Processed: {telemetry['total_tokens']:,}   |   ", style="bold white")
-    summary_panel.append(f"Regolo GLM-5.2 Cost: ${telemetry['total_regolo_cost_usd']:.4f}   |   ", style="bold green")
+    summary_panel.append(f"Regolo Cost: ${telemetry['total_regolo_cost_usd']:.4f}   |   ", style="bold green")
     summary_panel.append(f"Frontier Cost: ${telemetry['total_frontier_cost_usd']:.4f}   |   ", style="dim red")
     summary_panel.append(f"Total Savings: {telemetry['savings_percentage']}%", style="bold gold1")
 
@@ -439,9 +449,9 @@ def _export_pr_evidence(
 - **Pattern Learned**: {learning['pattern_learned']}
 - **Human Approval**: `{learning['human_decision']}`
 
-## Brick Telemetry & Cost Efficiency (Regolo GLM-5.2 vs Frontier)
+## Brick Telemetry & Cost Efficiency (Regolo vs Frontier)
 - **Total Tokens**: {telemetry['total_tokens']:,}
-- **Regolo GLM-5.2 Cost**: ${telemetry['total_regolo_cost_usd']:.4f}
+- **Regolo Cost**: ${telemetry['total_regolo_cost_usd']:.4f}
 - **Frontier Baseline Cost**: ${telemetry['total_frontier_cost_usd']:.4f}
 - **Cost Reduction**: **{telemetry['savings_percentage']}% savings**
 
