@@ -7,7 +7,7 @@ cd "$SCRIPT_DIR" || exit 1
 
 echo "============================================================"
 echo " Setting up Closed-Loop Secure Coding Agent environment"
-echo " Open SWE + Deepsec + Cognee + Regolo (GLM-5.2)"
+echo " Open SWE + Deepsec + Cognee + Brick (brick-complexity-pro)"
 echo "============================================================"
 
 # Ensure .env exists
