@@ -4,18 +4,27 @@ and builds an interconnected knowledge graph so future coding tasks learn from p
 """
 
 import json
+import logging
+import re
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Set
 
 import config
 
+logger = logging.getLogger(__name__)
+
 
 class CogneeMemoryGraph:
-    """Persistent Graph & Vector Memory store for engineering agents."""
+    """Persistent Graph & Knowledge Memory store for engineering agents."""
 
-    def __init__(self, db_path: Optional[Path] = None):
+    def __init__(
+        self,
+        db_path: Optional[Path] = None,
+        client: Optional[Any] = None,
+    ):
         self.db_path = db_path or config.COGNEE_DB_PATH
+        self.client = client
         self.nodes: Dict[str, Dict[str, Any]] = {}
         self.edges: List[Dict[str, Any]] = []
         self._load_database()
@@ -29,8 +38,8 @@ class CogneeMemoryGraph:
                     self.nodes = data.get("nodes", {})
                     self.edges = data.get("edges", [])
                     return
-            except Exception:
-                pass
+            except Exception as e:
+                logger.warning(f"Could not load cognee database: {e}")
         self._seed_default_memory()
 
     def _save_database(self):
@@ -38,8 +47,8 @@ class CogneeMemoryGraph:
         try:
             with open(self.db_path, "w", encoding="utf-8") as f:
                 json.dump({"nodes": self.nodes, "edges": self.edges}, f, indent=2)
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(f"Could not save cognee database: {e}")
 
     def _seed_default_memory(self):
         """Seed initial engineering graph memory with historical learnings."""
@@ -130,57 +139,56 @@ class CogneeMemoryGraph:
         ]
         self._save_database()
 
-    def query_relevant_patterns(self, issue_description: str, file_names: List[str]) -> List[Dict[str, Any]]:
-        """Query memory graph for previous architectural patterns, rules, and fixes relevant to the issue."""
-        matched = []
-        issue_lower = issue_description.lower()
-        files_joined = " ".join(file_names).lower()
+    def query_relevant_patterns(
+        self,
+        issue_description: str,
+        file_names: List[str],
+    ) -> List[Dict[str, Any]]:
+        """Dynamically query memory graph for previous patterns, rules, and fixes relevant to the issue."""
+        query_text = f"{issue_description} {' '.join(file_names)}".lower()
 
-        keywords_map = {
-            "sql": "RULE-01",
-            "injection": "RULE-01",
-            "jwt": "RULE-02",
-            "token": "RULE-02",
-            "auth": "RULE-02",
-            "algorithm": "RULE-02",
-            "ssrf": "RULE-03",
-            "webhook": "RULE-03",
-            "url": "RULE-03",
-            "command": "RULE-04",
-            "ping": "RULE-04",
-            "subprocess": "RULE-04",
-            "shell": "RULE-04",
-            "traversal": "RULE-05",
-            "path": "RULE-05",
-            "download": "RULE-05",
-            "upload": "RULE-05",
-            "eval": "RULE-06",
-            "pickle": "RULE-06",
-            "formula": "RULE-06",
-            "analytics": "RULE-06",
-            "wallet": "RULE-07",
-            "crypto": "RULE-07",
-            "secret": "RULE-07",
-            "random": "RULE-07",
-            "profile": "RULE-08",
-            "xss": "RULE-08",
-            "assignment": "RULE-08",
-        }
+        # Extract potential CWE references from query
+        cwes_in_query = set(re.findall(r"cwe-\d+", query_text))
 
-        matched_ids = set()
-        for kw, rule_id in keywords_map.items():
-            if (kw in issue_lower or kw in files_joined) and rule_id in self.nodes:
-                matched_ids.add(rule_id)
+        # Extract words (alphanumeric tokens >= 3 chars)
+        query_tokens = set(re.findall(r"[a-z0-9_]{3,}", query_text))
 
-        # If no specific keyword matched, return top rules
-        if not matched_ids:
-            for k in list(self.nodes.keys())[:2]:
-                matched_ids.add(k)
+        scored_nodes = []
+        for nid, node in self.nodes.items():
+            score = 0.0
+            node_cwe = str(node.get("cwe", "")).lower()
+            node_name = str(node.get("name", node.get("title", ""))).lower()
+            node_desc = str(node.get("description", node.get("pattern_learned", ""))).lower()
 
-        for nid in matched_ids:
-            matched.append(self.nodes[nid])
+            # 1. Exact CWE match: highest priority
+            for cwe in cwes_in_query:
+                if cwe in node_cwe:
+                    score += 10.0
 
-        return matched
+            # 2. Token overlap with Name
+            name_tokens = set(re.findall(r"[a-z0-9_]{3,}", node_name))
+            score += len(query_tokens.intersection(name_tokens)) * 2.0
+
+            # 3. Token overlap with Description
+            desc_tokens = set(re.findall(r"[a-z0-9_]{3,}", node_desc))
+            score += len(query_tokens.intersection(desc_tokens)) * 1.0
+
+            # 4. File overlap
+            for fn in file_names:
+                if fn.lower() in node_desc or fn.lower() in node_name:
+                    score += 3.0
+
+            if score > 0:
+                scored_nodes.append((score, node))
+
+        # Sort by relevance score descending
+        scored_nodes.sort(key=lambda x: x[0], reverse=True)
+
+        if scored_nodes:
+            return [node for _, node in scored_nodes[:4]]
+
+        # Default fallback: return top rules
+        return list(self.nodes.values())[:2]
 
     def record_learning(
         self,

@@ -1,6 +1,6 @@
 """Interactive Terminal User Interface (TUI) for Closed-Loop Secure Coding Agent.
-Provides visual terminal experience for video demonstration of:
-Open SWE (Produce) -> Deepsec (Verify) -> Cognee (Remember) -> Brick (Govern) with GLM-5.2 on Regolo.
+Provides visual terminal experience for:
+Open SWE (Produce) -> Deepsec (Verify) -> Cognee (Remember) -> Brick (Govern) with dynamic multi-model routing on Regolo.ai.
 """
 
 import os
@@ -23,6 +23,7 @@ from rich.tree import Tree
 
 import config
 from core.brick_governance import clear_telemetry, get_telemetry_summary
+from core.brick_router import BrickRouter, RoutingDecision
 from core.cognee_memory import CogneeMemoryGraph
 from core.deepsec import DeepsecSecurityHarness
 from core.docker_manager import (
@@ -38,24 +39,14 @@ from core.sandbox import SandboxEnvironment
 
 console = Console()
 
-REGOLO_ASCII = """
-██████╗ ███████╗ ██████╗  ██████╗ ██╗      ██████╗ 
-██╔══██╗██╔════╝██╔════╝ ██╔═══██╗██║     ██╔═══██╗
-██████╔╝█████╗  ██║  ███╗██║   ██║██║     ██║   ██║
-██╔══██╗██╔══╝  ██║   ██║██║   ██║██║     ██║   ██║
-██║  ██║███████╗╚██████╔╝╚██████╔╝███████╗╚██████╔╝
-╚═╝  ╚═╝╚══════╝ ╚═════╝  ╚═════╝ ╚══════╝ ╚═════╝ 
-""".strip("\n")
-
 
 def print_banner():
     """Print top-level branded banner."""
     console.clear()
     banner_text = Text()
-    banner_text.append(f"{REGOLO_ASCII}\n\n", style="bold green")
     banner_text.append("⚡ SELF-IMPROVING SECURE CODING LOOP ⚡\n", style="bold cyan")
     banner_text.append("Open SWE (Produce)  ➔  Deepsec (Verify)  ➔  Cognee (Remember)  ➔  Brick (Govern)\n", style="bold white")
-    banner_text.append(f"Inference: Regolo  •  Model: {config.REGOLO_MODEL}  •  Status: Active", style="dim green")
+    banner_text.append(f"Inference: Regolo.ai (OpenAI-Compatible)  •  Router: Brick ({config.MODEL_BRICK_ROUTER})  •  Multi-Model Architecture", style="dim green")
 
     console.print(
         Panel(
@@ -67,8 +58,8 @@ def print_banner():
     )
 
 
-def select_target_repository() -> Tuple[str, str, str]:
-    """Interactive target repository and issue picker."""
+def select_target_repository(auto_mode: bool = False) -> Tuple[str, str, str]:
+    """Present interactive selection menu for demo repositories or custom path."""
     console.print("\n[bold yellow]📁 STEP 1: SELECT TARGET REPOSITORY TO SCAN & REMEDIATE[/bold yellow]")
 
     sample_targets = [
@@ -77,7 +68,7 @@ def select_target_repository() -> Tuple[str, str, str]:
             "name": "AuthService (FastAPI)",
             "path": str(config.SAMPLE_REPOS_DIR / "auth_service"),
             "issue_title": "Fix SQL Injection in /users/search & Insecure JWT Signature Verification",
-            "issue_body": "Security audit flagged CWE-89 (SQL Injection) in user search endpoint and CWE-287 (Algorithm Confusion & Signature Bypass) in token verification.",
+            "issue_body": "Critical vulnerability CWE-89 detected in search endpoint. Insecure jwt.decode allows algorithm confusion CWE-287. Fix both vulnerabilities and verify with tests.",
             "cwe": "CWE-89, CWE-287",
         },
         {
@@ -85,7 +76,7 @@ def select_target_repository() -> Tuple[str, str, str]:
             "name": "Webhook Gateway (Flask/FastAPI)",
             "path": str(config.SAMPLE_REPOS_DIR / "webhook_gateway"),
             "issue_title": "Mitigate Blind SSRF in /dispatch & Command Injection in /diagnostics/ping",
-            "issue_body": "External webhooks can access cloud metadata 169.254.169.254 (SSRF). Ping endpoint runs subprocess shell=True allowing remote command execution (CWE-78).",
+            "issue_body": "Requests allows fetching internal cloud metadata (CWE-918). Diagnostics endpoint executes os.system with user input (CWE-78). Apply strict IP allowlisting and safe subprocess execution.",
             "cwe": "CWE-918, CWE-78",
         },
         {
@@ -93,23 +84,23 @@ def select_target_repository() -> Tuple[str, str, str]:
             "name": "E-Commerce Cart (FastAPI)",
             "path": str(config.SAMPLE_REPOS_DIR / "ecommerce_cart"),
             "issue_title": "Resolve IDOR on /orders/{id} & Client-Controlled Price Tampering on Checkout",
-            "issue_body": "Any user can view arbitrary order records without ownership checks (IDOR CWE-639). Checkout endpoint trusts client-supplied unit prices.",
+            "issue_body": "Endpoint /orders/{id} does not verify order ownership (CWE-639). Checkout endpoint trusts client-submitted item price (CWE-20). Validate tenant ownership and recalculate server-side pricing.",
             "cwe": "CWE-639, CWE-20",
         },
         {
             "id": "4",
-            "name": "File Storage API",
+            "name": "File Storage API (FastAPI)",
             "path": str(config.SAMPLE_REPOS_DIR / "file_storage_service"),
             "issue_title": "Fix Path Traversal in /files/download & Unrestricted File Upload",
-            "issue_body": "Directory traversal via ../../ in filename parameter (CWE-22) and unrestricted executable file upload (CWE-434).",
+            "issue_body": "Download allows ../../ traversal reading host files (CWE-22). Upload endpoint accepts executable files and dangerous extensions (CWE-434). Implement safe path resolution and extension whitelisting.",
             "cwe": "CWE-22, CWE-434",
         },
         {
             "id": "5",
-            "name": "Analytics Engine",
+            "name": "Analytics Engine (FastAPI)",
             "path": str(config.SAMPLE_REPOS_DIR / "analytics_query_engine"),
             "issue_title": "Eliminate eval() RCE in Formula Parser & Unsafe pickle Deserialization",
-            "issue_body": "Arbitrary Python code execution through eval() (CWE-94) and arbitrary object loading via pickle.loads (CWE-502).",
+            "issue_body": "Custom formula parser executes arbitrary code via eval() (CWE-94). Cache loader uses pickle.loads on unauthenticated data (CWE-502). Replace eval with AST evaluator and use JSON serialization.",
             "cwe": "CWE-94, CWE-502",
         },
         {
@@ -117,7 +108,7 @@ def select_target_repository() -> Tuple[str, str, str]:
             "name": "Crypto Wallet Service",
             "path": str(config.SAMPLE_REPOS_DIR / "crypto_wallet_service"),
             "issue_title": "Remove Hardcoded Private Key & Enforce CSPRNG for Address Generation",
-            "issue_body": "Hardcoded master private key (CWE-798) and predictable random.randint pseudo-random numbers used for keys (CWE-338).",
+            "issue_body": "Master key is hardcoded in source file (CWE-798). Deposit address generation uses insecure random.randint (CWE-338). Move key to environment variable and use secrets module.",
             "cwe": "CWE-798, CWE-338",
         },
         {
@@ -125,7 +116,7 @@ def select_target_repository() -> Tuple[str, str, str]:
             "name": "User Profile API",
             "path": str(config.SAMPLE_REPOS_DIR / "user_profile_api"),
             "issue_title": "Prevent Stored XSS in /profile/card & Block Mass Assignment Privilege Escalation",
-            "issue_body": "Unsanitized user bio HTML allows Stored XSS (CWE-79) and unconstrained profile dictionary update permits admin role escalation (CWE-915).",
+            "issue_body": "Card renderer returns raw unescaped HTML (CWE-79). Update endpoint permits setting is_admin=True via body dictionary (CWE-915). Sanitize HTML output and restrict update fields.",
             "cwe": "CWE-79, CWE-915",
         },
     ]
@@ -141,6 +132,11 @@ def select_target_repository() -> Tuple[str, str, str]:
     table.add_row("8", "Custom Directory Path", "User-specified", "Scan and remediate any local project directory")
 
     console.print(table)
+
+    if auto_mode:
+        selected = sample_targets[0]
+        console.print(f"[bold cyan]Auto-selected target:[/bold cyan] [bold green]1. {selected['name']}[/bold green]")
+        return selected["path"], selected["issue_title"], selected["issue_body"]
 
     choice = Prompt.ask(
         "[bold cyan]Select repository target[/bold cyan]",
@@ -158,45 +154,48 @@ def select_target_repository() -> Tuple[str, str, str]:
         return selected["path"], selected["issue_title"], selected["issue_body"]
 
 
-def run_full_closed_loop_flow():
+def run_full_closed_loop_flow(auto_mode: bool = False):
     """Execute the complete self-improving secure coding loop."""
     print_banner()
-    repo_path, issue_title, issue_body = select_target_repository()
+    repo_path, issue_title, issue_body = select_target_repository(auto_mode=auto_mode)
 
     console.print(f"\n[bold green]✔ Target Workspace:[/bold green] [cyan]{repo_path}[/cyan]")
     console.print(f"[bold green]✔ Issue:[/bold green] [white]{issue_title}[/white]\n")
 
     client = RegoloClient()
-    memory = CogneeMemoryGraph()
-    swe_agent = OpenSWEAgent(client=client, memory=memory)
-    deepsec = DeepsecSecurityHarness(client=client)
+    router = BrickRouter(client=client)
+    memory = CogneeMemoryGraph(client=client)
+    swe_agent = OpenSWEAgent(client=client, memory=memory, router=router)
+    deepsec = DeepsecSecurityHarness(client=client, router=router)
 
     # 1. Initialize Sandbox
     console.print(Panel("[bold yellow]1. ISOLATING WORKSPACE IN SECURE SANDBOX[/bold yellow]", border_style="yellow"))
     with console.status("[cyan]Creating sandboxed workspace environment...[/cyan]", spinner="dots"):
-        time.sleep(0.4)
         sandbox = SandboxEnvironment(source_repo_path=repo_path)
     console.print(f"  [green]✔ Sandbox initialized at:[/green] [dim]{sandbox.sandbox_path}[/dim]")
     console.print(f"  [green]✔ Files staged in sandbox:[/green] {sandbox.list_files()}\n")
 
     # 2. Initial Deepsec Vulnerability Scan
     console.print(Panel("[bold red]2. DEEPSEC SECURITY HARNESS: INITIAL AUDIT[/bold red]", border_style="red"))
-    with console.status(f"[red]Deepsec scanning codebase with Regolo ({config.MODEL_DEEPSEC_SCAN})...[/red]", spinner="bouncingBar"):
-        time.sleep(0.5)
+    with console.status("[red]Deepsec performing SAST & AST semantic audit...[/red]", spinner="bouncingBar"):
         initial_scan = deepsec.run_security_scan(sandbox)
 
+    _display_routing_badge("Deepsec Security Scan", initial_scan.get("routing", {}))
     _display_findings_table(initial_scan["findings"], title="Pre-Remediation Security Findings (Deepsec)")
     console.print(f"  [bold]Security Score:[/bold] [{ 'green' if initial_scan['security_score'] > 70 else 'red' }]{initial_scan['security_score']}/100[/]")
     console.print(f"  [bold]Gate Status:[/bold] [red]{initial_scan['gate_status']}[/red]\n")
 
     # 3. Cognee Memory Graph Query & Open SWE Planning
     console.print(Panel("[bold blue]3. COGNEE MEMORY RECALL & OPEN SWE PLANNING[/bold blue]", border_style="blue"))
-    with console.status(f"[blue]Open SWE querying Cognee memory & generating plan via {config.MODEL_OPEN_SWE_PLAN}...[/blue]", spinner="aesthetic"):
-        time.sleep(0.6)
+    with console.status("[blue]Open SWE querying Cognee memory & generating plan via Brick semantic router...[/blue]", spinner="aesthetic"):
         analysis_result = swe_agent.analyze_and_plan(sandbox, issue_title, issue_body)
 
     plan = analysis_result["plan"]
     memory_patterns = analysis_result["memory_patterns"]
+    routing_info = analysis_result.get("routing", {})
+
+    _display_routing_badge("Open SWE Triage", routing_info.get("classify", {}))
+    _display_routing_badge("Open SWE Architecture Plan", routing_info.get("plan", {}))
 
     # Display Cognee memory recall
     _display_memory_patterns(memory_patterns)
@@ -207,12 +206,16 @@ def run_full_closed_loop_flow():
     # 4. Human-In-The-Loop Approval Checkpoint
     console.print(Panel("[bold magenta]4. HUMAN-IN-THE-LOOP APPROVAL GATE (Brick Policy)[/bold magenta]", border_style="magenta"))
     console.print("[dim]Open SWE mandates explicit human approval before executing code alterations in sandbox.[/dim]")
-    
-    approval = Prompt.ask(
-        "\n[bold yellow]Human Decision[/bold yellow]",
-        choices=["Accept", "Modify", "Reject"],
-        default="Accept",
-    )
+
+    if auto_mode:
+        approval = "Accept"
+        console.print("\n[bold cyan]Auto-Decision:[/bold cyan] [bold green]Accept (Human-in-the-Loop Pre-Approved in --auto mode)[/bold green]")
+    else:
+        approval = Prompt.ask(
+            "\n[bold yellow]Human Decision[/bold yellow]",
+            choices=["Accept", "Modify", "Reject"],
+            default="Accept",
+        )
 
     if approval == "Reject":
         console.print("[bold red]❌ Plan Rejected by Human Reviewer. Terminating loop.[/bold red]")
@@ -225,10 +228,10 @@ def run_full_closed_loop_flow():
 
     # 5. Open SWE Execution & Tests
     console.print(Panel("[bold cyan]5. OPEN SWE: SANDBOX CODE REMEDIATION & TESTS[/bold cyan]", border_style="cyan"))
-    with console.status(f"[cyan]Open SWE applying defensive patches and running pytest with {config.MODEL_OPEN_SWE_EXECUTE}...[/cyan]", spinner="dots"):
-        time.sleep(0.6)
+    with console.status("[cyan]Open SWE synthesizing defensive patches and running pytest...[/cyan]", spinner="dots"):
         remediation_res = swe_agent.execute_remediation(sandbox, issue_title, plan)
 
+    _display_routing_badge("Open SWE Execution", remediation_res.get("routing", {}))
     console.print(f"  [green]✔ Remediation Summary:[/green] {remediation_res['remediation_summary']}")
     console.print(f"  [green]✔ Modified Files:[/green] {remediation_res['modified_files']}")
     console.print(f"  [green]✔ Pytest Execution:[/green] [{ 'green' if remediation_res['test_passed'] else 'red' }]{ 'ALL TESTS PASSED' if remediation_res['test_passed'] else 'TESTS FAILED' }[/]")
@@ -241,16 +244,15 @@ def run_full_closed_loop_flow():
 
     # 6. Deepsec Revalidation Gate
     console.print(Panel("[bold green]6. DEEPSEC REVALIDATION GATE & REGRESSION SCAN[/bold green]", border_style="green"))
-    with console.status(f"[green]Deepsec re-scanning sandbox with {config.MODEL_DEEPSEC_REVALIDATE}...[/green]", spinner="dots"):
-        time.sleep(0.5)
+    with console.status("[green]Deepsec verifying remediated sandbox...[/green]", spinner="dots"):
         revalidation = deepsec.revalidate_patch(sandbox, initial_scan["findings"])
 
+    _display_routing_badge("Deepsec Revalidation Gate", revalidation.get("routing", {}))
     _display_revalidation_panel(revalidation)
 
     # 7. Cognee Memory Update: Learn from this PR
     console.print(Panel("[bold purple]7. COGNEE: PERSISTING ENGINEERING MEMORY & KNOWLEDGE GRAPH[/bold purple]", border_style="purple"))
-    with console.status(f"[purple]Connecting new nodes in Cognee via {config.MODEL_COGNEE_EXTRACT}...[/purple]", spinner="dots"):
-        time.sleep(0.4)
+    with console.status("[purple]Connecting new knowledge nodes in Cognee graph...[/purple]", spinner="dots"):
         learned_pattern = f"Defensive pattern: Resolved {', '.join([f['cwe'] for f in initial_scan['findings']])} in {remediation_res['modified_files']} with verified unit tests."
         new_learning = memory.record_learning(
             issue_id=f"ISSUE-{int(time.time())}",
@@ -278,17 +280,32 @@ def run_full_closed_loop_flow():
     console.print(f"[dim]Pull Request Evidence Report generated at: [cyan]{pr_evidence_path}[/cyan][/dim]\n")
 
 
+def _display_routing_badge(stage_name: str, routing: Dict[str, Any]):
+    """Display concise Brick semantic routing decision badge."""
+    if not routing:
+        return
+    model = routing.get("selected_model", "Unknown")
+    score = routing.get("complexity_score", 5.0)
+    tier = routing.get("routing_tier", "BALANCED")
+    reason = routing.get("reasoning", "")
+    escalated = " [bold red](ESCALATED)[/bold red]" if routing.get("is_escalated") else ""
+
+    console.print(f"  [dim]↳ [bold cyan]Brick Router[/bold cyan] ➔ [bold white]{stage_name}[/bold white]: [bold green]{model}[/bold green]{escalated} | Tier: [yellow]{tier}[/yellow] | Complexity: [bold yellow]{score:.1f}/10[/bold yellow][/dim]")
+    if reason:
+        console.print(f"    [dim italic]{reason}[/dim italic]")
+
+
 def display_telemetry_comparison():
-    """Display the Single Frontier Model vs Regolo comparison table requested in README.md."""
+    """Display the Single Frontier Model vs Regolo Multi-Model Routed Workflow comparison table."""
     telemetry = get_telemetry_summary()
     events = telemetry["events"]
 
-    table = Table(box=ROUNDED, border_style="gold1", header_style="bold cyan", title="Brick Telemetry: Single Frontier Model vs Regolo Routed Workflow")
+    table = Table(box=ROUNDED, border_style="gold1", header_style="bold cyan", title="Brick Telemetry: Single Frontier Model vs Regolo.ai Multi-Model Routing")
     table.add_column("Pipeline Stage", style="bold white", width=22)
-    table.add_column("Model / Engine", style="dim", width=18)
+    table.add_column("Routed Model", style="bold green", width=24)
     table.add_column("Tokens (P / C)", style="yellow", width=16)
     table.add_column("Latency", style="dim cyan", width=10)
-    table.add_column("Regolo", style="bold green", width=16)
+    table.add_column("Regolo Cost", style="bold green", width=14)
     table.add_column("Frontier Baseline", style="dim red", width=18)
     table.add_column("Cost Savings", style="bold gold1", width=14)
 
@@ -307,8 +324,8 @@ def display_telemetry_comparison():
 
     summary_panel = Text()
     summary_panel.append(f"Total Tokens Processed: {telemetry['total_tokens']:,}   |   ", style="bold white")
-    summary_panel.append(f"Regolo Cost: ${telemetry['total_regolo_cost_usd']:.4f}   |   ", style="bold green")
-    summary_panel.append(f"Frontier Cost: ${telemetry['total_frontier_cost_usd']:.4f}   |   ", style="dim red")
+    summary_panel.append(f"Regolo Multi-Model Cost: ${telemetry['total_regolo_cost_usd']:.4f}   |   ", style="bold green")
+    summary_panel.append(f"Frontier Baseline Cost: ${telemetry['total_frontier_cost_usd']:.4f}   |   ", style="dim red")
     summary_panel.append(f"Total Savings: {telemetry['savings_percentage']}%", style="bold gold1")
 
     console.print(Panel(Align.center(summary_panel), box=ROUNDED, border_style="green"))
@@ -329,12 +346,12 @@ def _display_findings_table(findings: List[Dict[str, Any]], title: str):
     else:
         for f in findings:
             table.add_row(
-                f["id"],
-                f["severity"],
+                f.get("id", "SEC-UNK"),
+                f.get("severity", "HIGH"),
                 f"{f.get('cwe', '')}",
-                f["title"],
+                f.get("title", "Security Finding"),
                 f"{f.get('file', '')}:{f.get('line', '')}",
-                f["status"],
+                f.get("status", "VULNERABLE"),
             )
     console.print(table)
 
@@ -352,7 +369,7 @@ def _display_memory_patterns(patterns: List[Dict[str, Any]]):
 def _display_plan_panel(plan: Dict[str, Any]):
     """Render plan steps in a neat panel."""
     plan_text = Text()
-    plan_text.append(f"Plan ID: {plan.get('plan_id', 'PLAN-GLM52-01')}  •  Risk Rating: {plan.get('estimated_risk', 'MEDIUM')}\n\n", style="bold yellow")
+    plan_text.append(f"Plan ID: {plan.get('plan_id', 'PLAN-SWE-01')}  •  Risk Rating: {plan.get('estimated_risk', 'MEDIUM')}\n\n", style="bold yellow")
     
     steps = plan.get("steps", [])
     for s in steps:
@@ -422,7 +439,7 @@ def _export_pr_evidence(
 ## Summary
 - **Target Repository**: `{repo_path}`
 - **Resolved Issue**: {issue_title}
-- **Inference Engine**: Regolo.ai (`{config.REGOLO_MODEL}`)
+- **Inference Engine**: Regolo.ai (Dynamic Routing via `brick-complexity-pro`)
 - **Security Gate Status**: `{revalidation['gate_status']}` (Score: {revalidation['security_score']}/100)
 
 ## Security Vulnerabilities Addressed (Deepsec Initial Audit)
@@ -430,7 +447,7 @@ def _export_pr_evidence(
 |---|---|---|---|---|---|
 """
     for f in initial_scan["findings"]:
-        content += f"| {f['id']} | {f['severity']} | {f['cwe']} | {f['title']} | `{f['file']}:{f['line']}` | RESOLVED |\n"
+        content += f"| {f.get('id', 'SEC-UNK')} | {f.get('severity', 'HIGH')} | {f.get('cwe', '')} | {f.get('title', '')} | `{f.get('file', '')}:{f.get('line', '')}` | RESOLVED |\n"
 
     content += f"""
 ## Deepsec Revalidation Gate Evidence
@@ -449,13 +466,13 @@ def _export_pr_evidence(
 - **Pattern Learned**: {learning['pattern_learned']}
 - **Human Approval**: `{learning['human_decision']}`
 
-## Brick Telemetry & Cost Efficiency (Regolo vs Frontier)
+## Brick Telemetry & Cost Efficiency (Regolo Multi-Model Routing vs Frontier Baseline)
 - **Total Tokens**: {telemetry['total_tokens']:,}
-- **Regolo Cost**: ${telemetry['total_regolo_cost_usd']:.4f}
+- **Regolo Multi-Model Cost**: ${telemetry['total_regolo_cost_usd']:.4f}
 - **Frontier Baseline Cost**: ${telemetry['total_frontier_cost_usd']:.4f}
 - **Cost Reduction**: **{telemetry['savings_percentage']}% savings**
 
-*Generated by Closed-Loop Coding Agent (Open SWE + Deepsec + Cognee + Regolo)*
+*Generated by Closed-Loop Coding Agent (Open SWE + Deepsec + Cognee + Brick on Regolo.ai)*
 """
     output_path.write_text(content, encoding="utf-8")
 
