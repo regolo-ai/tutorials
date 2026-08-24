@@ -1,48 +1,40 @@
-# ⚡ Deep Agents: Autonomous Multi-Agent Tool Synthesis with Brick Semantic Routing
+<div align="center">
+  <img src="https://regolo.ai/wp-content/uploads/2026/06/Regolo_logo_positive.png" alt="Regolo.ai Logo" width="300" />
+</div>
 
-[![Python 3.9+](https://img.shields.io/badge/python-3.9+-00FF66.svg?style=flat&logo=python&logoColor=white)](https://www.python.org/)
-[![Regolo.ai](https://img.shields.io/badge/Inference-Regolo.ai-00FF66.svg?style=flat)](https://regolo.ai/)
-[![Router](https://img.shields.io/badge/Router-brick--complexity--pro-brightgreen.svg?style=flat)](https://regolo.ai/)
-[![Protocol](https://img.shields.io/badge/MCP-2024--11--05-blue.svg?style=flat)](https://modelcontextprotocol.io/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
+<div align="center">
+  <h1>Deep Agents: Autonomous Multi-Agent Tool Synthesis with Brick Semantic Routing</h1>
+</div>
 
-> **Autonomous multi-agent framework that dynamically generates execution plans (DAG) for custom repositories and goals, routing each sub-agent through Brick (`brick-complexity-pro`) on Regolo.ai to guarantee strict budget compliance, dynamic escalation/downscaling, and ~80% cost reduction.**
+<div align="center">
+  <img src="https://img.shields.io/badge/build-passing-brightgreen.svg" alt="Build passing" />
+  <img src="https://img.shields.io/badge/python-3.9+-blue.svg?logo=python&logoColor=white" alt="Python 3.9+" />
+  <img src="https://img.shields.io/badge/Code-Runnable_Examples-2ea44f.svg" alt="Code: Runnable Examples" />
+  <img src="https://img.shields.io/badge/GPU-100%25_Ready-0078D4.svg" alt="GPU 100% Ready" />
+  <img src="https://img.shields.io/badge/API-OpenAI_Compatible-313236.svg" alt="API OpenAI Compatible" />
+  <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" />
+</div>
 
----
+<br />
 
-## 📋 Table of Contents
-- [What is the Goal of this Project?](#what-is-the-goal-of-this-project)
-- [Key Architectural Highlights](#key-architectural-highlights)
-- [Technology Stack](#technology-stack)
-- [Project Architecture](#project-architecture)
-- [Getting Started](#getting-started)
-- [Project Structure](#project-structure)
-- [Key Features](#key-features)
-- [Development Workflow & Custom Repository Analysis](#development-workflow--custom-repository-analysis)
-- [YouTube Video Script & Storyboard](#youtube-video-script--storyboard)
-- [Coding Standards](#coding-standards)
-- [Testing](#testing)
-- [Contributing](#contributing)
-- [License](#license)
-
----
+Autonomous multi-agent framework that dynamically generates execution plans (DAG) for custom repositories and goals, routing each sub-agent through Brick (`brick-complexity-pro`) on Regolo.ai to guarantee strict budget compliance, dynamic escalation/downscaling, and ~80% cost reduction.
 
 ## What is the Goal of this Project?
 
 **Regolo Deep Agents** is an open-source multi-agent engineering framework that implements the **Deep Agents Harness Pattern** (LangChain architectural pattern for complex, long-running agentic tasks) coupled with **Brick Semantic Routing**.
 
 ### The Problem
+
 Monolithic agent architectures route every step (from trivial docstring parsing to complex architectural planning) to a single frontier reasoning model. This causes:
 - **Massive Cost Inflation**: Overpaying by up to 10x for lightweight extraction, parsing, and formatting steps.
 - **Attention Drift & Context Window Pollution**: LLMs lose precision as prompts accumulate irrelevant tool schemas and intermediate artifacts.
 - **Fragility & Budget Failure**: Single-model pipelines lack dynamic budget governance, failure escalation, and cost-controlled fallback mechanisms.
 
 ### The Solution
+
 1. **100% Dynamic, Automated Decision-Making**: No manual model picking or static sub-agent bindings. The meta-router `brick-complexity-pro` analyzes the actual task complexity (1–10), tool capabilities, and **residual token budget** before each execution step.
 2. **Dynamic DAG Planning for Custom Repositories**: Give the system any custom codebase and any synthesis goal, and the **Planner** automatically generates a tailored 5-step DAG execution plan.
 3. **Budget Compliance with ~80% Cost Reduction**: Dynamic downscaling to `gpt-oss-20b` under budget pressure and dynamic escalation to `qwen3.5-122b` for complex reasoning or test-failure retries.
-
----
 
 ## Key Architectural Highlights
 
@@ -76,8 +68,6 @@ Monolithic agent architectures route every step (from trivial docstring parsing 
 - **Dynamic DAG for Any Target Goal**: Works with any codebase (e.g. AI toolkits, quant finance engines, web scrapers, data pipelines) and any user prompt (e.g. *"Analyze all modules in project X and synthesize FastMCP tools with Pydantic validation"*).
 - **Self-Healing Verification Loop**: `CodeExecutor` stages files and runs `pytest` in an isolated sandbox. If verification fails, Brick triggers an **Escalation Gate** (`force_escalate=True`) to `qwen3.5-122b` for automated repair.
 
----
-
 ## Technology Stack
 
 | Layer | Technologies & Version | Purpose |
@@ -91,8 +81,6 @@ Monolithic agent architectures route every step (from trivial docstring parsing 
 | **Terminal UI (TUI)** | Rich (`>= 13.7.0`), Textual (`>= 0.70.0`) | Emerald-green branded CLI with streaming progress & diff inspectors |
 | **Container Engine** | Docker SDK & CLI | Qdrant vector store & isolated MCP execution runtime |
 | **Testing** | Pytest (`>= 8.0.0`) | Automated unit, regression, and end-to-end integration test suite |
-
----
 
 ## Project Architecture
 
@@ -138,9 +126,7 @@ Monolithic agent architectures route every step (from trivial docstring parsing 
 | **Report Writer** | `GLM-5.2` | `gpt-oss-20b` | `GLM-5.2` | `6.0 / 10` | 3,500 | `HARNESS_SPEC.md` documentation & scoreboard |
 | **Budget Controller** | `gpt-oss-20b` | `gpt-oss-20b` | `gpt-oss-20b` | `5.0 / 10` | 1,000 | Active token burn governance & telemetry logging |
 
----
-
-## Getting Started
+## Quick Start
 
 ### Prerequisites
 - **Python 3.9+** (`python3 --version`)
@@ -148,14 +134,21 @@ Monolithic agent architectures route every step (from trivial docstring parsing 
 - **Regolo.ai API Key** ([Get your key at regolo.ai](https://regolo.ai/))
 
 ### 1. Installation & Environment Setup
+
 Clone the repository and run the setup script:
+
 ```bash
+git clone https://github.com/regolo-ai/tutorials.git
+cd tutorials/deepagents-multi-agent-brick
 ./setup.sh
 ```
+
 *This automatically verifies Python, initializes a `.venv` virtual environment, installs dependencies, and creates `.env`.*
 
-### 2. Configuration (`.env`)
+### 2. Configure Environment (`.env`)
+
 Configure your Regolo credentials in `.env`:
+
 ```ini
 # Regolo.ai API Configuration
 REGOLO_API_KEY=your_regolo_api_key_here
@@ -175,16 +168,16 @@ ENABLE_DYNAMIC_ESCALATION=true
 ```
 
 ### 3. Launching the Green Terminal UI
+
 ```bash
 ./run.sh
 ```
 
 ### 4. Running Headless (Automated CLI / CI)
+
 ```bash
 python3 main.py --auto --target "/path/to/custom-repo" --goal "Analyze all modules and synthesize FastMCP tools"
 ```
-
----
 
 ## Project Structure
 
@@ -238,8 +231,6 @@ deepagents-multi-agent-brick/
     └── test_deep_agents_e2e.py
 ```
 
----
-
 ## Key Features
 
 1. **Automatic, Dynamic Model Routing (`brick-complexity-pro`)**:
@@ -259,11 +250,10 @@ deepagents-multi-agent-brick/
 8. **Human-In-The-Loop DAG Gate**:
    Interactive visualization of the execution DAG with operator approval (`Accept`/`Reject`) before code execution proceeds.
 
----
-
 ## Development Workflow & Custom Repository Analysis
 
 ### 1. Interactive TUI Menu Options
+
 Launch `./run.sh` to access the main menu:
 
 ```
@@ -277,6 +267,7 @@ Launch `./run.sh` to access the main menu:
 ```
 
 ### 2. Analyzing Custom Codebases
+
 To analyze any custom repository on your machine:
 1. Select option `[1] Run Deep Agent Pipeline`.
 2. Choose option `[2] Custom Local Project Directory`.
@@ -289,8 +280,6 @@ To analyze any custom repository on your machine:
    - Extracts real AST modules, runs live schema probing, writes FastMCP server code, and runs `pytest`.
    - Produces `data/synthesized_harness/HARNESS_SPEC.md` containing the **Table of Discovered Modules**, **Synthesized MCP Registry**, and **Brick Telemetry Scoreboard**.
 
----
-
 ## YouTube Video Script & Storyboard
 
 | Scene | Duration | Visual Display | Key Narrative / Concept |
@@ -301,16 +290,12 @@ To analyze any custom repository on your machine:
 | **Scene 4: Live Execution** | 06:30 - 11:00 | TUI Menu `[1] Run Deep Agent Pipeline` | Step-by-step trace on custom target: DAG approval, AST extraction, FastMCP synthesis, sandbox pytest passing (`✔ PASSED`), and review scorecard (`98/100`). |
 | **Scene 5: Telemetry** | 11:00 - 13:00 | Telemetry Scoreboard table | Comparative cost breakdown: **-80% cost savings** ($0.0168 vs $0.1420) and **2x speedup** with Regolo Brick. |
 
----
-
 ## Coding Standards
 
 - **Strict Type Safety**: All synthesized MCP tools must use Pydantic `V2` models with explicit `Field(..., description=...)` bounds (`ge`, `le`, `min_length`).
 - **SSRF & Sandbox Defensive Controls**: Web scraping and execution tools must validate protocols (`http/https`), block private loopback addresses (`127.0.0.1`, `localhost`), and enforce timeout limits.
 - **Sub-Agent Isolation**: Sub-agents pass structured JSON handoffs (`SubAgentResult`) to prevent context window pollution.
 - **Defensive File Paths**: All filesystem operations expand and sanitize user input (`.strip("'\"")`, `.expanduser().resolve()`).
-
----
 
 ## Testing
 
@@ -330,7 +315,13 @@ python3 -m pytest -v
 - `test_docker_manager.py`: Port collision detection, incremental port discovery, container status queries.
 - `test_deep_agents_e2e.py`: Full end-to-end multi-agent orchestration on target repositories.
 
----
+## How to Use
+
+1. Clone this repository: `git clone https://github.com/regolo-ai/tutorials.git`
+2. Navigate to the tutorial folder: `cd tutorials/deepagents-multi-agent-brick`
+3. Follow the instructions in this README.
+4. Get a free API key from Regolo to run the code: [Sign Up for Free Trial](https://regolo.ai/pricing).
+5. Run the code and see the results in minutes.
 
 ## Contributing
 
@@ -339,8 +330,20 @@ python3 -m pytest -v
 3. Ensure all tests pass (`pytest -v`).
 4. Open a Pull Request with a clear summary of changes.
 
----
+## Links
+
+- [Regolo.ai](https://regolo.ai) — European OpenAI-compatible GPU inference
+- [Free API key](https://regolo.ai/pricing) — Pay as You Go, no commitment
+- [Models Library](https://regolo.ai/models-library/)
+- [Documentation](https://regolo.ai/docs)
+- [Discord](https://discord.gg/wHxwWCC8)
 
 ## License
 
-Distributed under the **MIT License**. See `LICENSE` for more information.
+MIT — see [LICENSE](LICENSE) for details.
+
+## Powered By
+
+- [Regolo.ai](https://regolo.ai) — OpenAI-compatible LLM API & Brick Semantic Router
+- [FastMCP](https://github.com/jlowin/fastmcp) — Standardized Model Context Protocol framework
+- [Pydantic V2](https://docs.pydantic.dev/latest/) — High-performance data validation
