@@ -1,0 +1,117 @@
+# Regolo.ai
+
+> Regolo.ai is a European LLM inference provider: an OpenAI-compatible API with Zero Data Retention, full EU data residency (Seeweb / DHH Group data centers), powered by 100% renewable energy. It offers serverless access to open-weight models (chat, embeddings, rerank, vision, image generation, speech-to-text) and dedicated GPU deployment of custom Hugging Face models.
+
+Regolo is built for AI teams that need GDPR-compliant, EU-sovereign inference without infrastructure complexity. Integration is drop-in: swap the base URL to https://api.regolo.ai/v1 and keep using the OpenAI SDK, LangChain, LlamaIndex, or any OpenAI-compatible tool. Data is processed in volatile memory and never stored, logged, or used for training. A free 30-day trial is available, no credit card required.
+
+## Platform
+
+- [Homepage](https://regolo.ai/): Product overview, use cases (RAG, conversational AI, document processing, content generation, transcription, code assistance), and getting-started examples
+- [Models Library](https://regolo.ai/models/): Full catalog of pre-loaded models with pricing and limits, callable via the OpenAI-compatible API
+- [Pricing](https://regolo.ai/pricing/): Pay-as-you-go token pricing, subscription plans (Core, Boost, Pro, Scale), free 30-day trial, and hourly GPU instance pricing
+- [Custom Models](https://regolo.ai/pricing/): Deploy any vLLM-compatible model from Hugging Face on dedicated EU GPUs with hourly billing and no lock-in
+- [Case Studies](https://regolo.ai/case-studies/): Production deployments of Regolo inference in customer products
+- [Regolo Labs](https://regolo.ai/labs/): Technical blog — compliance, benchmarks, cost optimization, self-hosting, and tutorials
+- [Models Archive](https://regolo.ai/models-archive/): Models previously published on the platform
+
+## Documentation & Tools
+
+- [Documentation](https://docs.regolo.ai/): Quickstarts for Python, Node.js, and cURL; guides for chat completions, vision, image generation, speech-to-text, embeddings, rerank, and reasoning
+- [API Reference](https://docs.regolo.ai/): Complete OpenAI-compatible API docs with Swagger UI; base URL https://api.regolo.ai/v1
+- [Dashboard](https://dashboard.regolo.ai/): Sign up, generate API keys, deploy custom models, monitor token usage
+- [Model Catalog](https://docs.regolo.ai/): Browse all available models from the docs
+
+## Core Models (pay-as-you-go, EUR per 1M tokens input/output)
+
+- apertus-70b: €0.40 / €2.10 — open multilingual LLM
+- brick-complexity-pro: €0.10 / €0.40 — Regolo's spatial routing/complexity model for cost optimization
+- brick-v1-beta: €0.00 / €0.00 — free beta routing model
+- gemma4-31b: €0.40 / €2.10
+- glm5.2: €2.00 / €5.20 — 744B MoE (40B active), 1M context, MIT license, long-horizon coding
+- gpt-oss-120b: €1.00 / €4.20 — OpenAI open-weight flagship, reasoning support
+- gpt-oss-20b: €0.10 / €0.42 — lightweight open-weight model
+- Llama-3.3-70B-Instruct: €0.60 / €2.70 — balanced general-purpose chat
+- mistral-small-4-119b: €0.50 / €2.10 — 256K context, reasoning_effort support
+- qwen3-coder-next: €0.50 / €2.00 — code-specialized, 262K context
+- qwen3.5-122b: €1.00 / €4.20 — maximum reasoning quality
+- qwen3.5-9b: €0.07 / €0.35 — low-cost dev/test
+- qwen3.6-27b: €0.50 / €2.10
+
+The catalog also includes embedding models (e.g., qwen3-embedding-8b), rerankers (qwen3-reranker-4b), image generation (qwen-image), and speech-to-text. All chat models are included in subscriptions.
+
+## GPU Instances for Custom Models (hourly)
+
+- NVIDIA RTX6000 (24 GB): €0.29/h
+- NVIDIA L4 (24 GB): €0.38/h — also 2x and 4x configurations
+- NVIDIA RTXA6000 (47.3 GB): €0.74/h — also 2x and 4x
+- NVIDIA L40S (48 GB): €0.85/h — also 2x and 4x
+- NVIDIA A100 (80 GB): €0.99/h — also 2x
+- NVIDIA RTXPRO6000 (96 GB): €1.25/h — also 2x and 4x
+- NVIDIA H100 (80 GB): €1.89/h
+- NVIDIA H200 (141 GB): €2.60/h — also 2x and 4x
+
+## Case Studies
+
+- [Case Studies Archive](https://regolo.ai/case-studies/): All customer stories
+- [Tiered AI Memory: Knotic + Regolo Brick](https://regolo.ai/case-studies/tiered-ai-memory-how-knotic-and-regolo-brick-build-context-that-works/): VS Code fork with project-context memory; 55% cost reduction, 23% fewer tool calls
+- [EngiMedia: AI-powered technical SEO reporting](https://regolo.ai/case-studies/automating-technical-seo-reporting-engimedia/): 99.7% cost reduction, 80% time saved vs. local hardware
+- Plus Hosting Grupa: open-source call QA automation, 15 hours/month saved, GDPR-compliant (see archive)
+- Alembic (Redix): private document AI platform for enterprise (see archive)
+- Euraika Aegis: AI compliance command center, ~60% lower GPU costs (see archive)
+- NEITCUS Business Intelligence: embedded financial AI, <226 ms latency, 2-day integration (see archive)
+
+## Regolo Labs — Compliance & Privacy
+
+- [What Is EU AI Act Compliance for AI Infrastructure? A CTO's Guide](https://regolo.ai/what-is-eu-ai-act-compliance-for-ai-infrastructure-a-ctos-guide/): Obligations for infrastructure providers after the 2 August 2026 deadline
+- [The EU AI Act beyond the basics](https://regolo.ai/the-eu-ai-act-beyond-the-basics-the-obligations-most-guides-forget/): The obligations most guides forget — Article 30 records, DPAs, DPIAs, audit trails
+- [Article 50 AI Act compliance for generative AI](https://regolo.ai/article-50-ai-act-compliance-for-generative-ai-a-practical-guide-for-ctos-and-agency-developers/): Transparency obligations, marking, deepfake labelling, 30-point checklist
+- [AI Act, August 2, 2026: what CTOs must actually do](https://regolo.ai/ai-act-august-2-2026-what-ctos-must-actually-do/): Inventory, risk classification, ownership, logging, documentation
+- [AI privacy and compliance in 2026](https://regolo.ai/ai-privacy-and-compliance-in-2026-what-changes-for-llm-providers/): What changes for LLM providers under the AI Act and GDPR
+- [Data Privacy First: CTO Guide to AI Act Compliance](https://regolo.ai/data-privacy-first-ai-act-cto-guide/): Zero-retention architecture and GDPR-ready scaling
+- [Multi-agent AI for compliance in banks and insurers](https://regolo.ai/multi-agent-ai-for-compliance-in-banks-and-insurers-a-practical-playbook/): Practical playbook for regulated multi-agent workflows (KYC, AML)
+- [AI governance, copyright, and enterprise risk](https://regolo.ai/ai-governance-copyright-and-enterprise-risk-how-to-build-a-policy-gateway-before-you-ship/): Building a policy gateway before shipping
+- [Human-in-the-loop for autonomous AI agents](https://regolo.ai/human-in-the-loop-autonomous-ai-agents-governance/): Fail-safes, escalation protocols, and governance tiers
+
+## Regolo Labs — Benchmarks & Cost Optimization
+
+- [Qwen3.8-Max vs Kimi K3: When to Use Each Model](https://regolo.ai/qwen3-8-max-vs-kimi-k3-when-to-use-each-model/): Frontier MoE comparison — cost, quality per dollar, multimodal
+- [GLM-5.2 vs Kimi K3: The Pragmatic Engineering Guide](https://regolo.ai/glm-5-2-vs-kimi-k3-the-pragmatic-engineering-guide-for-ctos-and-leads/): Benchmarks, self-hosting footprint, licensing
+- [GLM-5.2 vs Kimi K2.7 Code](https://regolo.ai/glm-5-2-vs-kimi-k2-7-code-the-definitive-guide-for-coding/): SWE benchmarks, context windows, output speed
+- [MiniMax M3 vs GLM-5.2](https://regolo.ai/minimax-m3-vs-glm-5-2-when-to-use-each-open-weight-giant/): Coding, reasoning, context length, and latency trade-offs
+- [DeepAgents + Brick: A Production Agent Harness at a Fraction of the Inference Cost](https://regolo.ai/deepagents-brick-a-production-agent-harness-at-a-fraction-of-the-inference-cost/): LangChain's DeepAgents harness with Brick as the inference routing layer
+- [How to audit a production monorepo with deepsec, Docker, and Brick](https://regolo.ai/how-to-audit-a-production-monorepo-with-deepsec-local-docker-and-brick/): Security audits with open-weight models at $10–30 per 100 files
+- [DFlash: 3x LLM inference speed](https://regolo.ai/dflash-x3-llm-inference-speed-guide-and-codes/): Speculative decoding with vLLM on Regolo custom models
+
+## Regolo Labs — Tutorials & DevOps
+
+- [Self-Hosted Web Search for AI Agents](https://regolo.ai/self-hosted-web-search-for-ai-agents-replace-tavily-cut-costs-80-and-keep-every-token-private/): Replace Tavily with SearXNG + Regolo, cut costs 80%
+- [Hermes Agent Security: Hardening Guide](https://regolo.ai/hermes-agent-security-hardening-guide-regolo-zero-data-retention/): Hardening Nous Research's Hermes runtime with Regolo Zero Data Retention
+- [Run MiroFish with regolo.ai](https://regolo.ai/run-mirofish-with-regolo-ai-a-complete-integration-guide/): Complete integration guide with OpenAI-compatible endpoints
+- [Privacy-First Email Search with LlamaIndex](https://regolo.ai/privacy-first-email-search-building-a-rag-system-with-llamaindex/): Secure RAG over sensitive email on EU infrastructure
+- [What is an inference provider? A European privacy-first take](https://regolo.ai/what-is-an-inference-provider-a-european-privacy-first-take/): Observable, evaluable, governable agents before AI Act deadlines
+- [GitHub Copilot Alternative](https://regolo.ai/github-copilot-alternative-copilot-vs-custom-llm-assistant-cheaper-and-faster/): Custom LLM assistant that is cheaper and faster
+- [We Let an LLM Play Pokémon (PokéRogue) Blind](https://regolo.ai/llm-plays-pokemon-pokerogue-regolo-ai/): gpt-oss-120b as an LLM-driven game agent — what broke first
+
+## Company
+
+- [DHH Group](https://regolo.ai/dhh-group/): Regolo.ai is developed by Seeweb within the DHH Group, European cloud and digital infrastructure group
+- [GPU Cloud Infrastructure](https://regolo.ai/team-infrastructure/): Serverless GPU cloud powered by Seeweb and VAST Data (H100/H200)
+- [European Presence](https://regolo.ai/european-presence/): EU data residency; no retention, logging, or reuse of input/output data
+- [Why open source and green infrastructure](https://regolo.ai/why-open-source-and-green-infrastructure-are-at-the-core-of-regolo-ais-european-llm-platform/): The platform's founding principles
+- [What is cloud LLM hosting](https://regolo.ai/what-is-cloud-llm-hosting-a-european-take-on-scalable-private-and-green-ai-infrastructure/): Scalable, private, green AI infrastructure in Europe
+- [Hello, World!](https://regolo.ai/hello-world/): Regolo's launch post and mission
+
+## Contact & Community
+
+- Email: support@regolo.ai
+- Discord: community server linked from the homepage and docs
+- GitHub: https://github.com/regolo-ai (demo repositories and integrations)
+
+## Optional
+
+- [Compliance & Privacy category](https://regolo.ai/category/compliance-and-privacy/): All compliance articles
+- [Self-Hosting & DevOps category](https://regolo.ai/category/self-hosting-devops/): All DevOps articles
+- [Benchmarks & Cost Optimization category](https://regolo.ai/category/benchmarks-cost-optimization/): All benchmark articles
+- [Tutorial & How-to category](https://regolo.ai/category/tutorial/): All tutorials
+- [Case Studies & Community Stories category](https://regolo.ai/category/case-studies-community-stories/): Community experiments
+- [Product & Release Notes category](https://regolo.ai/category/product-release-notes/): New models and platform updates

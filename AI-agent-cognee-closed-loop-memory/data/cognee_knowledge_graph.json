@@ -1,0 +1,384 @@
+{
+  "nodes": {
+    "ADR-001": {
+      "id": "ADR-001",
+      "type": "ArchitecturalDecision",
+      "title": "Tenant Isolation via Explicit Context Session",
+      "content": "All database and service queries must obtain tenant_id exclusively from the cryptographically verified JWT session context (core.context.get_current_tenant_id()). Endpoints are forbidden from accepting tenant_id as a client\u2011controlled URL parameter or request body field. Database queries must enforce row\u2011level security or explicit User.tenant_id == get_current_tenant_id() filter.",
+      "category": "architecture_decisions",
+      "created_at": 1787815431.46985
+    },
+    "ADR-002": {
+      "id": "ADR-002",
+      "type": "ArchitecturalDecision",
+      "title": "Idempotent Webhook Processing & Async Retries",
+      "content": "All external webhook consumers must store incoming idempotency event IDs in Redis with a 72\u2011hour TTL; background task handlers must be decorated with @idempotent_task; failed jobs must use exponential backoff with dead\u2011letter queue escalation.",
+      "category": "architecture_decisions",
+      "created_at": 1787815420.5458949
+    },
+    "ADR-003": {
+      "id": "ADR-003",
+      "type": "ArchitecturalDecision",
+      "title": "Mandatory Parameterized SQLAlchemy Core Queries",
+      "category": "Security",
+      "content": "Prohibit all Python f-string or string formatting inside SQL queries. All queries must use SQLAlchemy select() / update() construct with explicit parameter binding.",
+      "status": "APPROVED",
+      "created_at": 1786467867.001208
+    },
+    "CONV-01": {
+      "id": "CONV-01",
+      "type": "Convention",
+      "title": "Store webhook event IDs in Redis with 72\u2011hour TTL",
+      "content": "Webhook consumers persist the idempotency event ID in Redis, expiring after 72 hours to prevent duplicate processing.",
+      "category": "architecture_decisions",
+      "created_at": 1787815420.736074
+    },
+    "CONV-02": {
+      "id": "CONV-02",
+      "type": "Convention",
+      "title": "Decorate background task handlers with @idempotent_task",
+      "content": "All async task handlers must be wrapped with the @idempotent_task decorator to enforce idempotency.",
+      "category": "architecture_decisions",
+      "created_at": 1787815420.873601
+    },
+    "CI-FAIL-89": {
+      "id": "CI-FAIL-89",
+      "type": "PastCIError",
+      "title": "CI Run #89: Tenant search test suite broke due to unparameterized SQL query",
+      "category": "CI/CD",
+      "content": "Test test_tenant_search_isolation failed with SQLSyntaxError when query contained special characters. Caused by f-string interpolation in users/search endpoint.",
+      "status": "RESOLVED",
+      "created_at": 1786640667.0012102
+    },
+    "PR-142": {
+      "id": "PR-142",
+      "type": "SimilarPR",
+      "title": "PR #142: Fix SQL injection in search & enforce ADR-003 parameterized query binding",
+      "category": "PR History",
+      "content": "Refactored user search filter to use SQLAlchemy select(User).where(User.username.ilike(...)) and context tenant_id. Added automated regression test.",
+      "status": "MERGED",
+      "created_at": 1786727067.0012102
+    },
+    "VULN-CWE-89": {
+      "id": "VULN-CWE-89",
+      "type": "ResolvedVulnerability",
+      "title": "CWE-89: SQL Injection in User Search Endpoint",
+      "category": "Security Vulnerability",
+      "content": "Reported vulnerability where query parameters were directly formatted into raw SQL string. Resolved by PR #142 adhering to ADR-003.",
+      "status": "MITIGATED",
+      "created_at": 1786554267.0012102
+    },
+    "TEAM-PREF-01": {
+      "id": "TEAM-PREF-01",
+      "type": "TeamPreference",
+      "title": "Comprehensive Pytest Fixtures with Rollback",
+      "category": "Team Preference",
+      "content": "Every database test must use the async_session fixture with transaction rollback to keep test sandboxes isolated.",
+      "status": "ACTIVE",
+      "created_at": 1785517467.001211
+    },
+    "RUNBOOK-01": {
+      "id": "RUNBOOK-01",
+      "type": "Runbook",
+      "title": "Security Vulnerability Remediation Runbook",
+      "category": "Runbook",
+      "content": "1. Isolate reproduction test in tests/ directory. 2. Verify ADR compliance. 3. Apply patch using Regolo coding specialist. 4. Run automated test suite with zero-trust verification.",
+      "status": "ACTIVE",
+      "created_at": 1785776667.001211
+    },
+    "FILE_README_md": {
+      "id": "FILE_README_md",
+      "type": "Documentation",
+      "title": "File: README.md",
+      "content": "# CloudPlatform SaaS Core Repository\nMulti-tenant enterprise SaaS platform with microservices for authentication, subscription billing, and real-time data ingestion.\n\n## Architecture\n- **Framework**: FastAPI (Async-First)\n- **Database**: PostgreSQL 16 + SQLAlchemy Core ORM\n- **Isolation**: Tenant Context Session (ADR-001)\n- **Security**: Mandatory Parameterized Queries (ADR-003) & PyJWT Algorithm ",
+      "category": "sample_repo",
+      "created_at": 1787815411.343245
+    },
+    "FILE_tests_test_auth_py": {
+      "id": "FILE_tests_test_auth_py",
+      "type": "SourceCode",
+      "title": "File: tests/test_auth.py",
+      "content": "\"\"\"Test suite for authentication and tenant isolation.\"\"\"\n\nimport asyncio\nimport sys\nfrom pathlib import Path\n\nsample_repo_root = Path(__file__).resolve().parent.parent\nif str(sample_repo_root) not in sys.path:\n    sys.path.insert(0, str(sample_repo_root))\n\nfrom src.api.auth import search_users\n\n\ndef test_tenant_search_isolation():\n    \"\"\"Verify that user search filters by current tenant and rejec",
+      "category": "tests",
+      "created_at": 1787815411.56286
+    },
+    "FILE_src_db_models_py": {
+      "id": "FILE_src_db_models_py",
+      "type": "SourceCode",
+      "title": "File: src/db/models.py",
+      "content": "\"\"\"SQLAlchemy database models.\"\"\"\n\nclass User:\n    def __init__(self, id: int, username: str, tenant_id: int, email: str):\n        self.id = id\n        self.username = username\n        self.tenant_id = tenant_id\n        self.email = email\n",
+      "category": "db",
+      "created_at": 1787815412.1981099
+    },
+    "FILE_src_api_auth_py": {
+      "id": "FILE_src_api_auth_py",
+      "type": "SourceCode",
+      "title": "File: src/api/auth.py",
+      "content": "\"\"\"Authentication & User API endpoints.\"\"\"\n\nfrom typing import List, Optional\nfrom pydantic import BaseModel\nfrom sqlalchemy import select, and_\n\nclass UserSearchRequest(BaseModel):\n    query: str\n\nclass UserResponse(BaseModel):\n    id: int\n    username: str\n    tenant_id: int\n\nasync def search_users(db_session, query_str: str) -> List[dict]:\n    \"\"\"Search tenant users securely using ADR-001 sessi",
+      "category": "api",
+      "created_at": 1787815412.320433
+    },
+    "FILE_src_api_billing_py": {
+      "id": "FILE_src_api_billing_py",
+      "type": "SourceCode",
+      "title": "File: src/api/billing.py",
+      "content": "\"\"\"Billing & Subscription API endpoints.\"\"\"\n\nfrom pydantic import BaseModel\n\nclass WebhookEvent(BaseModel):\n    event_id: str\n    tenant_id: int\n    amount: float\n\nasync def process_billing_webhook(event: WebhookEvent) -> dict:\n    \"\"\"Process incoming billing webhook with idempotency check (ADR-002).\"\"\"\n    # Enforces ADR-002 idempotency key validation\n    return {\"status\": \"processed\", \"event_id\"",
+      "category": "api",
+      "created_at": 1787815412.44957
+    },
+    "FILE_docs_architecture_decisions_ADR-002-async-job-retry_md": {
+      "id": "FILE_docs_architecture_decisions_ADR-002-async-job-retry_md",
+      "type": "ArchitecturalDecision",
+      "title": "File: docs/architecture_decisions/ADR-002-async-job-retry.md",
+      "content": "# ADR-002: Idempotent Webhook Processing & Async Retries\n\n## Status\nAPPROVED (2026-07-02)\n\n## Context\nPayment providers (Stripe, SEPA) send duplicate webhook events during network retransmissions. Processing payments multiple times caused ledger inconsistencies and duplicate user invoice generation.\n\n## Decision\n1. All external webhook consumers must store incoming idempotency event IDs in Redis w",
+      "category": "architecture_decisions",
+      "created_at": 1787815421.314036
+    },
+    "FILE_docs_architecture_decisions_ADR-001-tenant-isolation_md": {
+      "id": "FILE_docs_architecture_decisions_ADR-001-tenant-isolation_md",
+      "type": "ArchitecturalDecision",
+      "title": "File: docs/architecture_decisions/ADR-001-tenant-isolation.md",
+      "content": "# ADR-001: Tenant Isolation via Explicit Context Session\n\n## Status\nAPPROVED (2026-06-15)\n\n## Context\nOur SaaS platform serves multi-tenant enterprise customers sharing the same underlying database clusters. Passing `tenant_id` via HTTP request payloads or URL parameters created severe IDOR risks (CWE-639) and allowed users to query data from competitor organizations.\n\n## Decision\n1. All database ",
+      "category": "architecture_decisions",
+      "created_at": 1787815432.137761
+    },
+    "FILE_docs_architecture_decisions_ADR-003-parameterized-queries_md": {
+      "id": "FILE_docs_architecture_decisions_ADR-003-parameterized-queries_md",
+      "type": "ArchitecturalDecision",
+      "title": "File: docs/architecture_decisions/ADR-003-parameterized-queries.md",
+      "content": "# ADR-003: Mandatory Parameterized SQLAlchemy Core Queries\n\n## Status\nAPPROVED (2026-07-20)\n\n## Context\nA critical vulnerability (CWE-89) was discovered in the user search filter where raw Python f-strings formatted user input into SQLite/Postgres query strings, causing CI Run #89 to fail.\n\n## Decision\n1. Never use raw string formatting (`f\"SELECT ... {param}\"` or `.format()`) inside any database ",
+      "category": "architecture_decisions",
+      "created_at": 1787815443.285814
+    },
+    "FILE_docs_runbooks_security_vulnerability_remediation_md": {
+      "id": "FILE_docs_runbooks_security_vulnerability_remediation_md",
+      "type": "Documentation",
+      "title": "File: docs/runbooks/security_vulnerability_remediation.md",
+      "content": "# Security Vulnerability Remediation Runbook\n\n## Protocol\n1. **Classify**: Map finding to CWE category (e.g., CWE-89, CWE-639, CWE-287).\n2. **Recall**: Pull past fixes from Cognee memory to preserve architectural integrity.\n3. **Patch**: Apply fix with Regolo `qwen3-coder-next`.\n4. **Verify**: Run zero-trust regression tests.\n",
+      "category": "runbooks",
+      "created_at": 1787815443.447264
+    },
+    "FILE_docs_runbooks_ci_failure_triage_md": {
+      "id": "FILE_docs_runbooks_ci_failure_triage_md",
+      "type": "Documentation",
+      "title": "File: docs/runbooks/ci_failure_triage.md",
+      "content": "# CI Failure Triage Runbook\n\n## Protocol for Failing Builds\n1. Inspect failing test node in `tests/`.\n2. Check if the failure is related to a known architectural constraint (`ADR-001` or `ADR-003`).\n3. Query Cognee Memory Graph to identify similar past PRs (`PR-142`).\n4. Re-run security test harness before staging merge requests.\n",
+      "category": "runbooks",
+      "created_at": 1787815443.60789
+    },
+    "FILE_docs_conventions_team_preferences_md": {
+      "id": "FILE_docs_conventions_team_preferences_md",
+      "type": "Documentation",
+      "title": "File: docs/conventions/team_preferences.md",
+      "content": "# Team Preferences & Best Practices\n\n- **Zero Data Retention**: Deploy on Regolo.ai EU-sovereign inference.\n- **Testing**: Use pytest fixtures with automatic database transaction rollback.\n- **Logging**: Structured JSON logging (`structlog`), no raw passwords or auth tokens in stdout.\n- **Git & PRs**: Reference relevant ADR numbers in PR descriptions.\n",
+      "category": "conventions",
+      "created_at": 1787815453.5474381
+    },
+    "FILE_docs_conventions_coding_standards_md": {
+      "id": "FILE_docs_conventions_coding_standards_md",
+      "type": "Documentation",
+      "title": "File: docs/conventions/coding_standards.md",
+      "content": "# Repository Coding Standards\n\n## 1. Async-First FastAPI Architecture\n- All API route handlers must be defined as `async def`.\n- Database I/O must use `AsyncSession` with `await session.execute(...)`.\n\n## 2. Input Validation & Strict Typing\n- Every endpoint payload must be typed using Pydantic V2 `BaseModel`.\n- Type annotations (`mypy` strict) are required for all function arguments and returns.\n\n",
+      "category": "conventions",
+      "created_at": 1787815463.343159
+    },
+    "SESSION-OUTCOME-SEARCH": {
+      "id": "SESSION-OUTCOME-SEARCH",
+      "type": "SessionOutcome",
+      "title": "Verified User Search & CI Green",
+      "content": "Verified implementation of user search with ADR-001 & ADR-003 compliance at 2026-08-27 09:12:09",
+      "category": "CI_Verification",
+      "created_at": 1787814729.339554
+    },
+    "FILE_tests_test_users_py": {
+      "id": "FILE_tests_test_users_py",
+      "type": "SourceCode",
+      "title": "File: tests/test_users.py",
+      "content": "\"\"\"Test suite for User Search Endpoint & Tenant Isolation (sample_repo).\nValidates ADR-001 (Tenant Isolation) and ADR-003 (Parameterized Queries / IDOR Protection).\n\"\"\"\n\nimport asyncio\nimport sys\nfrom pathlib import Path\n\n# Ensure sample_repo is in python path\nsample_repo_root = Path(__file__).resolve().parent.parent\nif str(sample_repo_root) not in sys.path:\n    sys.path.insert(0, str(sample_repo_",
+      "category": "tests",
+      "created_at": 1787815411.7368908
+    },
+    "FILE_src_core___init___py": {
+      "id": "FILE_src_core___init___py",
+      "type": "SourceCode",
+      "title": "File: src/core/__init__.py",
+      "content": "\"\"\"Core infrastructure for sample_repo.\"\"\"\n",
+      "category": "core",
+      "created_at": 1787815411.853494
+    },
+    "FILE_src_core_context_py": {
+      "id": "FILE_src_core_context_py",
+      "type": "SourceCode",
+      "title": "File: src/core/context.py",
+      "content": "\"\"\"Tenant Context & Session Management for Multi-Tenant Architecture (ADR-001).\"\"\"\n\nimport contextvars\n\n# Context variable holding the verified JWT session tenant ID\n_current_tenant_id: contextvars.ContextVar[int] = contextvars.ContextVar(\"current_tenant_id\", default=1)\n\n\ndef get_current_tenant_id() -> int:\n    \"\"\"Retrieve the cryptographically verified tenant ID from current execution context.\n  ",
+      "category": "core",
+      "created_at": 1787815412.073567
+    },
+    "FILE_src_api_users_py": {
+      "id": "FILE_src_api_users_py",
+      "type": "SourceCode",
+      "title": "File: src/api/users.py",
+      "content": "from typing import Any, Dict, List, Optional\nfrom src.core.context import get_current_tenant_id\n\nSAMPLE_USERS_DB = [\n    {\"id\": 1, \"username\": \"alice\", \"email\": \"alice@tenant1.com\", \"tenant_id\": 1, \"role\": \"admin\"},\n    {\"id\": 2, \"username\": \"bob\", \"email\": \"bob@tenant1.com\", \"tenant_id\": 1, \"role\": \"developer\"},\n    {\"id\": 3, \"username\": \"alice\", \"email\": \"alice@tenant2.com\", \"tenant_id\": 2, \"rol",
+      "category": "api",
+      "created_at": 1787815412.585192
+    },
+    "CONV-03": {
+      "id": "CONV-03",
+      "type": "Convention",
+      "title": "Use exponential backoff with dead\u2011letter queue escalation for failed jobs",
+      "content": "Failed async jobs should retry with exponential backoff and, after a configurable number of attempts, be routed to a dead\u2011letter queue.",
+      "category": "architecture_decisions",
+      "created_at": 1787815421.017775
+    },
+    "CONV-001": {
+      "id": "CONV-001",
+      "type": "Convention",
+      "title": "Endpoint Tenant ID Convention",
+      "content": "Endpoints must not accept tenant_id as a client\u2011controlled URL parameter or request body field.",
+      "category": "architecture_decisions",
+      "created_at": 1787815431.616415
+    },
+    "VUL-001": {
+      "id": "VUL-001",
+      "type": "Vulnerability",
+      "title": "IDOR Risk (CWE\u2011639)",
+      "content": "Passing tenant_id via HTTP request payloads or URL parameters created severe IDOR risks and allowed users to query data from competitor organizations.",
+      "category": "architecture_decisions",
+      "created_at": 1787815431.778771
+    }
+  },
+  "edges": [
+    {
+      "source": "CI-FAIL-89",
+      "target": "VULN-CWE-89",
+      "type": "TRIGGERED_BY",
+      "weight": 1.0
+    },
+    {
+      "source": "PR-142",
+      "target": "CI-FAIL-89",
+      "type": "FIXES_CI_FAILURE",
+      "weight": 1.0
+    },
+    {
+      "source": "PR-142",
+      "target": "VULN-CWE-89",
+      "type": "MITIGATES_VULNERABILITY",
+      "weight": 1.0
+    },
+    {
+      "source": "PR-142",
+      "target": "ADR-003",
+      "type": "IMPLEMENTS_DECISION",
+      "weight": 0.9
+    },
+    {
+      "source": "ADR-001",
+      "target": "CONV-01",
+      "type": "ENFORCES_CONVENTION",
+      "weight": 0.8
+    },
+    {
+      "source": "CONV-02",
+      "target": "VULN-CWE-89",
+      "type": "PREVENTS_CATEGORY",
+      "weight": 0.7
+    },
+    {
+      "source": "RUNBOOK-01",
+      "target": "PR-142",
+      "type": "REFERENCES_PRECEDENT",
+      "weight": 0.6
+    },
+    {
+      "source": "TEAM-PREF-01",
+      "target": "CONV-01",
+      "type": "COMPLEMENTS",
+      "weight": 0.8
+    },
+    {
+      "source": "FILE_tests_test_auth_py",
+      "target": "ADR-001",
+      "type": "GOVERNED_BY_DECISION",
+      "weight": 1.0
+    },
+    {
+      "source": "FILE_tests_test_auth_py",
+      "target": "CONV-02",
+      "type": "REQUIRES_COMPLIANCE",
+      "weight": 1.0
+    },
+    {
+      "source": "FILE_src_api_auth_py",
+      "target": "ADR-001",
+      "type": "GOVERNED_BY_DECISION",
+      "weight": 1.0
+    },
+    {
+      "source": "FILE_src_api_auth_py",
+      "target": "CONV-02",
+      "type": "REQUIRES_COMPLIANCE",
+      "weight": 1.0
+    },
+    {
+      "source": "FILE_src_api_billing_py",
+      "target": "ADR-002",
+      "type": "GOVERNED_BY_DECISION",
+      "weight": 1.0
+    },
+    {
+      "source": "FILE_src_api_billing_py",
+      "target": "PR-142",
+      "type": "PRECEDED_BY_PR",
+      "weight": 1.0
+    },
+    {
+      "source": "SESSION-OUTCOME-SEARCH",
+      "target": "ADR-001",
+      "type": "VERIFIED_BY",
+      "weight": 1.0
+    },
+    {
+      "source": "ADR-002",
+      "target": "CONV-01",
+      "type": "ENFORCES",
+      "weight": 1.0
+    },
+    {
+      "source": "ADR-002",
+      "target": "CONV-02",
+      "type": "ENFORCES",
+      "weight": 1.0
+    },
+    {
+      "source": "ADR-002",
+      "target": "CONV-03",
+      "type": "ENFORCES",
+      "weight": 1.0
+    },
+    {
+      "source": "ADR-001",
+      "target": "CONV-001",
+      "type": "ENFORCES",
+      "weight": 1.0
+    },
+    {
+      "source": "ADR-001",
+      "target": "VUL-001",
+      "type": "RESOLVES",
+      "weight": 1.0
+    },
+    {
+      "source": "CONV-001",
+      "target": "VUL-001",
+      "type": "PREVENTS",
+      "weight": 1.0
+    },
+    {
+      "source": "ADR-003",
+      "target": "VULN-CWE-89",
+      "type": "PREVENTS_CATEGORY",
+      "weight": 1.0
+    }
+  ]
+}
