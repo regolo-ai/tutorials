@@ -17,6 +17,15 @@
 
 <br />
 
+<div align="center">
+  <a href="https://youtu.be/-4c7MPgnBk0" target="_blank">
+    <img src="https://img.youtube.com/vi/-4c7MPgnBk0/maxresdefault.jpg" alt="Private Long-Term Memory for Coding Agents with Cognee & Regolo Video Tutorial" width="800" style="border-radius: 8px;" />
+  </a>
+  <p><em>🎥 <a href="https://youtu.be/-4c7MPgnBk0" target="_blank">Watch the Video Tutorial on YouTube</a> • 📖 <a href="https://regolo.ai/ai-agent-long-term-memory-cognee-regolo/">Read the Full Technical Article</a></em></p>
+</div>
+
+<br />
+
 An enterprise-grade cognitive memory framework that gives autonomous software engineering agents persistent, cross-session memory and architectural awareness. Built on **Cognee** (Knowledge Graph & Vector Store) and powered by **Regolo.ai** European Sovereign AI Cloud with **Zero Data Retention** and dynamic semantic model routing (**Brick Complexity Pro**).
 
 Includes out-of-the-box support for **Claude Code** and **OpenClaw** via native Model Context Protocol (MCP) connectors, an interactive **Rich Terminal User Interface (TUI)**, an autonomous **Agent Loop (`agent_loop.py`) with ReAct self-healing and live pytest validation**, and an interactive **2D physics-based Knowledge Graph Visualizer**.
@@ -522,7 +531,7 @@ pytest sample_repo/tests/ -v
 
 1. Clone this repository: `git clone https://github.com/regolo-ai/tutorials.git`
 2. Navigate to the tutorial folder: `cd tutorials/AI-agent-cognee-closed-loop-memory`
-3. Follow the instructions in this README.
+3. Read the [Blog Article](https://regolo.ai/ai-agent-long-term-memory-cognee-regolo/) and watch the [YouTube Tutorial](https://youtu.be/-4c7MPgnBk0) for complete walkthrough and architectural details.
 4. Get a free API key from Regolo to run the code: [Sign Up for Free Trial](https://regolo.ai/pricing).
 5. Run `./run.sh` or `python3 main.py` and see the results in minutes.
 
@@ -537,6 +546,8 @@ Contributions are welcome! Please follow these steps:
 
 ## Links
 
+- [Blog Article](https://regolo.ai/ai-agent-long-term-memory-cognee-regolo/) — Private Long-Term Memory for Coding Agents with Cognee & Regolo
+- [YouTube Tutorial](https://youtu.be/-4c7MPgnBk0) — Step-by-Step Video Walkthrough
 - [Regolo.ai](https://regolo.ai) — European OpenAI-compatible GPU inference
 - [Free API key](https://regolo.ai/pricing) — Pay as You Go, no commitment
 - [Models Library](https://regolo.ai/models-library/)
