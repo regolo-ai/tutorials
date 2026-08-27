@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regolo.ai + Cognee • Long-Term Memory Knowledge Graph</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <style>
+        :root {
+            --bg-canvas: #F8FAFC;
+            --bg-card: #FFFFFF;
+            --bg-subtle: #F1F5F9;
+            --border: #E2E8F0;
+            --border-hover: #CBD5E1;
+            --text-main: #0F172A;
+            --text-muted: #64748B;
+            --text-subtle: #94A3B8;
+            --primary: #10B981;
+            --primary-light: #ECFDF5;
+            --primary-dark: #047857;
+            --accent: #0284C7;
+            --danger: #F43F5E;
+            --danger-light: #FFF1F2;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+            --shadow-lg: 0 10px 25px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+        }
+
+        [data-theme="dark"] {
+            --bg-canvas: #090D0B;
+            --bg-card: #111A15;
+            --bg-subtle: #18241D;
+            --border: #1E2D24;
+            --border-hover: #2E4537;
+            --text-main: #F8FAFC;
+            --text-muted: #94A3B8;
+            --text-subtle: #64748B;
+            --primary: #00FF66;
+            --primary-light: rgba(0, 255, 102, 0.12);
+            --primary-dark: #00CC52;
+            --accent: #00E5FF;
+            --danger: #FF4D4D;
+            --danger-light: rgba(255, 77, 77, 0.15);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', -apple-system, sans-serif; }
+        body { background-color: var(--bg-canvas); color: var(--text-main); overflow: hidden; height: 100vh; display: flex; flex-direction: column; transition: background-color 0.2s ease, color 0.2s ease; }
+        
+        /* Modern Header */
+        header {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 20;
+            box-shadow: var(--shadow-sm);
+        }
+        .brand-section { display: flex; align-items: center; gap: 14px; }
+        .logo-badge {
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            color: #FFFFFF;
+            font-weight: 800;
+            font-size: 13px;
+            padding: 6px 12px;
+            border-radius: 8px;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+        }
+        .brand-title { font-size: 15px; font-weight: 700; color: var(--text-main); letter-spacing: -0.3px; }
+        .brand-subtitle { font-size: 11px; color: var(--text-muted); font-weight: 400; }
+        
+        .live-status-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .status-dot { width: 7px; height: 7px; background: #10B981; border-radius: 50%; box-shadow: 0 0 8px #10B981; }
+
+        .header-actions { display: flex; align-items: center; gap: 12px; }
+        .stats-badge { font-size: 12px; color: var(--text-muted); background: var(--bg-subtle); border: 1px solid var(--border); padding: 4px 10px; border-radius: 6px; }
+        .stats-badge strong { color: var(--text-main); font-weight: 700; }
+
+        .btn-action {
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.15s;
+        }
+        .btn-action:hover { background: var(--border); }
+        .btn-primary {
+            background: var(--primary);
+            color: #FFFFFF;
+            border: 1px solid var(--primary-dark);
+        }
+        .btn-primary:hover { background: var(--primary-dark); }
+
+        /* Main Workspace */
+        .main-container { display: flex; flex: 1; height: calc(100vh - 65px); position: relative; }
+        #network-canvas {
+            flex: 1;
+            height: 100%;
+            background-color: var(--bg-canvas);
+            background-image: radial-gradient(var(--border) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+        
+        /* Modern Side Inspector */
+        .sidebar {
+            width: 420px;
+            background: var(--bg-card);
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+            z-index: 10;
+            transition: background-color 0.2s;
+        }
+        .sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+        .sidebar-header h2 { font-size: 15px; font-weight: 700; color: var(--text-main); }
+
+        .search-container { position: relative; margin-bottom: 14px; }
+        .search-input {
+            width: 100%;
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 9px 12px 9px 34px;
+            border-radius: 8px;
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .search-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15); }
+        .search-icon { position: absolute; left: 11px; top: 9px; font-size: 14px; color: var(--text-muted); }
+
+        .filter-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+        .chip {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 9px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            background: var(--bg-subtle);
+            color: var(--text-muted);
+            transition: all 0.15s;
+        }
+        .chip:hover, .chip.active { border-color: var(--primary); color: var(--primary-dark); background: var(--primary-light); }
+
+        /* Node Details Card */
+        .node-card {
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 14px;
+            box-shadow: var(--shadow-sm);
+        }
+        .badge-type {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .node-title { font-size: 15px; font-weight: 700; color: var(--text-main); margin-bottom: 8px; line-height: 1.4; }
+        .node-desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; white-space: pre-wrap; font-family: 'Inter', sans-serif; }
+        
+        .node-manage-bar {
+            display: flex;
+            gap: 8px;
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+        .btn-node-edit {
+            flex: 1;
+            background: #F0F9FF;
+            border: 1px solid #BAE6FD;
+            color: #0369A1;
+            padding: 7px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            transition: all 0.15s;
+        }
+        .btn-node-edit:hover { border-color: #0284C7; background: #E0F2FE; }
+        .btn-node-delete {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--danger);
+            padding: 7px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            transition: all 0.15s;
+        }
+        .btn-node-delete:hover { border-color: var(--danger); background: var(--danger-light); }
+
+        .section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin: 16px 0 8px 0; }
+        
+        .relation-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+            padding: 8px 12px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            margin-bottom: 6px;
+            cursor: pointer;
+            transition: border-color 0.15s, background-color 0.15s;
+        }
+        .relation-item:hover { border-color: var(--primary); background: var(--bg-subtle); }
+        .rel-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600; color: var(--primary); background: var(--primary-light); padding: 2px 6px; border-radius: 4px; }
+
+        /* Network Exploration & Navigation Bottom Bar */
+        .nav-exploration-bar {
+            position: absolute;
+            bottom: 20px;
+            left: 24px;
+            right: 444px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            background: var(--bg-card);
+            padding: 8px 14px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-lg);
+            z-index: 10;
+        }
+        .nav-group { display: flex; align-items: center; gap: 6px; }
+        .nav-divider { width: 1px; height: 22px; background: var(--border); margin: 0 4px; }
+        .nav-btn {
+            background: var(--bg-subtle);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 6px 11px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.15s;
+        }
+        .nav-btn:hover { background: var(--border); color: var(--primary-dark); }
+        .nav-btn.active { background: var(--primary-light); color: var(--primary-dark); border-color: var(--primary); }
+        .nav-select {
+            background: var(--bg-subtle);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            outline: none;
+            cursor: pointer;
+        }
+        .nav-indicator { font-size: 11px; font-weight: 700; color: var(--text-muted); padding: 0 4px; }
+
+        /* Legend Card */
+        .legend-card {
+            position: absolute;
+            top: 20px;
+            left: 24px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 11px;
+            box-shadow: var(--shadow-md);
+            z-index: 10;
+            max-width: 260px;
+        }
+        .legend-title { font-weight: 700; font-size: 11px; margin-bottom: 8px; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.5px; }
+        .legend-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; font-size: 11px; color: var(--text-muted); }
+        .legend-indicator { width: 9px; height: 9px; border-radius: 3px; }
+
+        /* Modal for Editing/Adding Node */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(15, 23, 42, 0.45);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            width: 520px;
+            max-width: 90vw;
+            padding: 24px;
+            box-shadow: var(--shadow-lg);
+        }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+        .modal-header h3 { font-size: 16px; font-weight: 700; color: var(--text-main); }
+        .modal-close { background: transparent; border: none; font-size: 18px; color: var(--text-muted); cursor: pointer; }
+        .form-group { margin-bottom: 14px; }
+        .form-label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 9px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            outline: none;
+        }
+        .form-textarea { height: 110px; resize: vertical; }
+        .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+    </style>
+</head>
+<body data-theme="light">
+    <!-- Header -->
+    <header>
+        <div class="brand-section">
+            <div class="logo-badge">COGNEE</div>
+            <div>
+                <div class="brand-title">Long-Term Memory Knowledge Graph</div>
+                <div class="brand-subtitle">Regolo.ai Sovereign EU Inference • Causal Relational Memory</div>
+            </div>
+            <div class="live-status-pill">
+                <div class="status-dot"></div>
+                LIVE MEMORY STATE
+            </div>
+        </div>
+
+        <div class="header-actions">
+            <div class="stats-badge">Nodes: <strong id="statNodes">30</strong></div>
+            <div class="stats-badge">Edges: <strong id="statEdges">22</strong></div>
+            <button class="btn-action" onclick="openAddNodeModal()">➕ Add Node</button>
+            <button class="btn-action" onclick="exportGraphData()">💾 Export JSON</button>
+            <button class="btn-action" onclick="toggleTheme()" id="themeBtn">🌙 Dark Mode</button>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- Legend Overlay -->
+        <div class="legend-card">
+            <div class="legend-title">Entity Categories</div>
+            <div class="legend-row"><div class="legend-indicator" style="background:#10B981;"></div> Architectural Decisions (ADR)</div>
+            <div class="legend-row"><div class="legend-indicator" style="background:#F43F5E;"></div> Past CI Errors</div>
+            <div class="legend-row"><div class="legend-indicator" style="background:#38BDF8;"></div> Similar PRs & Resolutions</div>
+            <div class="legend-row"><div class="legend-indicator" style="background:#F59E0B;"></div> Repository Conventions</div>
+            <div class="legend-row"><div class="legend-indicator" style="background:#A855F7;"></div> Resolved Vulnerabilities</div>
+            <div class="legend-row"><div class="legend-indicator" style="background:#818CF8;"></div> Source Code & Docs</div>
+        </div>
+
+        <!-- Canvas -->
+        <div id="network-canvas"></div>
+
+        <!-- Network Exploration & Navigation Bottom Bar -->
+        <div class="nav-exploration-bar">
+            <!-- Viewport & Step Navigation -->
+            <div class="nav-group">
+                <button class="nav-btn" onclick="fitNetwork()" title="Reset view and center the entire graph">🎯 Center Graph</button>
+                <div class="nav-divider"></div>
+                <button class="nav-btn" onclick="stepNode(-1)" title="Previous node">◀ Prev</button>
+                <span class="nav-indicator" id="navStepIndicator">1 / 30</span>
+                <button class="nav-btn" onclick="stepNode(1)" title="Next node">Next ▶</button>
+            </div>
+
+            <!-- Hub & Cluster Exploration -->
+            <div class="nav-group">
+                <div class="nav-divider"></div>
+                <select class="nav-select" id="hubSelector" onchange="if(this.value) focusNode(this.value)">
+                    <option value="">🌟 Key Hub Nodes...</option>
+                    <option value="ADR-001">📜 ADR-001 (Tenant Context)</option>
+                    <option value="ADR-003">🛡️ ADR-003 (Parameterized SQL)</option>
+                    <option value="CI-FAIL-89">🚨 CI Failure #89 (SQL Injection)</option>
+                    <option value="PR-142">🔧 PR-142 (Security Hotfix)</option>
+                    <option value="VULN-CWE-89">⚠️ CWE-89 (SQL Injection)</option>
+                </select>
+
+                <select class="nav-select" id="clusterSelector" onchange="jumpToCluster(this.value)">
+                    <option value="">🗂️ Jump to Cluster...</option>
+                    <option value="ArchitecturalDecision">ADRs (Decisions)</option>
+                    <option value="PastCIError">Historical CI Errors</option>
+                    <option value="SimilarPR">Previous Pull Requests</option>
+                    <option value="RepositoryConvention">Repository Conventions</option>
+                    <option value="ResolvedVulnerability">Resolved Vulnerabilities</option>
+                    <option value="SourceCode">Code & Documentation</option>
+                </select>
+
+                <button class="nav-btn" id="isolateBtn" onclick="toggleIsolateNeighborhood()" title="Isolate connected neighbors for selected node">🔍 Isolate Neighbors</button>
+            </div>
+
+            <!-- Zoom controls -->
+            <div class="nav-group">
+                <div class="nav-divider"></div>
+                <button class="nav-btn" onclick="zoomNetwork(1.25)" title="Zoom In">➕</button>
+                <button class="nav-btn" onclick="zoomNetwork(0.8)" title="Zoom Out">➖</button>
+            </div>
+        </div>
+
+        <!-- Node Inspector Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>Node Inspector & Memory Manager</h2>
+                <span style="font-size: 11px; color: var(--text-subtle);">Live Graph State</span>
+            </div>
+
+            <div class="search-container">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" id="nodeSearch" placeholder="Search memory nodes, ADRs, CVEs..." oninput="searchNodes(this.value)">
+            </div>
+
+            <div class="filter-chips">
+                <div class="chip active" onclick="filterType('ALL', this)">All</div>
+                <div class="chip" onclick="filterType('ArchitecturalDecision', this)">ADRs</div>
+                <div class="chip" onclick="filterType('PastCIError', this)">CI Errors</div>
+                <div class="chip" onclick="filterType('SimilarPR', this)">PRs</div>
+                <div class="chip" onclick="filterType('RepositoryConvention', this)">Conventions</div>
+                <div class="chip" onclick="filterType('ResolvedVulnerability', this)">CVEs</div>
+            </div>
+
+            <div id="nodeDetails">
+                <div class="node-card">
+                    <span class="badge-type" style="background: #E2E8F0; color: #475569;">Interactive Explorer</span>
+                    <div class="node-title">Explore & Manage Knowledge Graph</div>
+                    <div class="node-desc">Click any node on the canvas to inspect policy specifications, edit knowledge content, or delete node entities. Use the bottom navigation bar to explore clusters and causal relationships.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Edit / Add Node -->
+    <div class="modal-overlay" id="nodeModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 id="modalTitle">Edit Node Knowledge</h3>
+                <button class="modal-close" onclick="closeNodeModal()">✕</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Node ID</label>
+                <input type="text" class="form-input" id="modalNodeId" placeholder="e.g. ADR-004">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Category / Entity Type</label>
+                <select class="form-select" id="modalNodeType">
+                    <option value="ArchitecturalDecision">ArchitecturalDecision (ADR)</option>
+                    <option value="PastCIError">PastCIError (CI Error)</option>
+                    <option value="SimilarPR">SimilarPR (Pull Request)</option>
+                    <option value="RepositoryConvention">RepositoryConvention (Convention)</option>
+                    <option value="ResolvedVulnerability">ResolvedVulnerability (Vulnerability)</option>
+                    <option value="TeamPreference">TeamPreference (Team Preference)</option>
+                    <option value="SourceCode">SourceCode (Code)</option>
+                    <option value="Documentation">Documentation (Documentation)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Title</label>
+                <input type="text" class="form-input" id="modalNodeTitle" placeholder="Descriptive title...">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Content / Knowledge Specifications</label>
+                <textarea class="form-textarea" id="modalNodeContent" placeholder="Detailed policy description, constraints, or code specifications..."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-action" onclick="closeNodeModal()">Cancel</button>
+                <button class="btn-action btn-primary" onclick="saveNodeModal()">Save Knowledge</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        let rawNodes = [{"id": "ADR-001", "label": "ADR-001\nTenant Isolation via Explici...", "group": "ArchitecturalDecision", "shape": "box", "margin": {"top": 10, "bottom": 10, "left": 14, "right": 14}, "color": {"background": "#ECFDF5", "border": "#10B981", "highlight": {"background": "#FFFFFF", "border": "#10B981"}, "hover": {"background": "#FFFFFF", "border": "#10B981"}}, "font": {"color": "#065F46", "size": 12, "face": "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", "bold": "600"}, "borderWidth": 2, "shadow": {"enabled": true, "color": "rgba(15, 23, 42, 0.08)", "size": 10, "x": 0, "y": 4}, "raw_data": {"id": "ADR-001", "type": "ArchitecturalDecision", "title": "Tenant Isolation via Explicit Context Session", "content": "All database and service queries must obtain tenant_id exclusively from the cryptographically verified JWT session context (core.context.get_current_tenant_id()). Endpoints are forbidden from accepting tenant_id as a client\u2011controlled URL parameter or request body field. Database queries must enforce row\u2011level security or explicit User.tenant_id == get_current_tenant_id() filter.", "category": "architecture_decisions", "created_at": 1787815431.46985}}, {"id": "ADR-002", "label": "ADR-002\nIdempotent Webhook Processin...", "group": "ArchitecturalDecision", "shape": "box", "margin": {"top": 10, "bottom": 10, "left": 14, "right": 14}, "color": {"background": "#ECFDF5", "border": "#10B981", "highlight": {"background": "#FFFFFF", "border": "#10B981"}, "hover": {"background": "#FFFFFF", "border": "#10B981"}}, "font": {"color": "#065F46", "size": 12, "face": "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", "bold": "600"}, "borderWidth": 2, "shadow": {"enabled": true, "color": "rgba(15, 23, 42, 0.08)", "size": 10, "x": 0, "y": 4}, "raw_data": {"id": "ADR-002", "type": "ArchitecturalDecision", "title": "Idempotent Webhook Processing & Async Retries", "content": "All external webhook consumers must store incoming idempotency event IDs in Redis with a 72\u2011hour TTL; background task handlers must be decorated with @idempotent_task; failed jobs must use exponential backoff with dead\u2011letter queue escalation.", "category": "architecture_decisions", "created_at": 1787815420.5458949}}, {"id": "ADR-003", "label": "ADR-003\nMandatory Parameterized SQLA...", "group": "ArchitecturalDecision", "shape": "box", "margin": {"top": 10, "bottom": 10, "left": 14, "right": 14}, "color": {"background": "#ECFDF5", "border": "#10B981", "highlight": {"background": "#FFFFFF", "border": "#10B981"}, "hover": {"background": "#FFFFFF", "border": "#10B981"}}, "font": {"color": "#065F46", "size": 12, "face": "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", "bold": "600"}, "borderWidth": 2, "shadow": {"enabled": true, "color": "rgba(15, 23, 42, 0.08)", "size": 10, "x": 0, "y": 4}, "raw_data": {"id": "ADR-003", "type": "ArchitecturalDecision", "title": "Mandatory Parameterized SQLAlchemy Core Queries", "category": "Security", "content": "Prohibit all Python f-string or string formatting inside SQL queries. All queries must use SQLAlchemy select() / update() construct with explicit parameter binding.", "status": "APPROVED", "created_at": 1786467867.001208}}, {"id": "CONV-01", "label": "CONV-01\nStore webhook event IDs in R...", "group": "Convention", "shape": "box", "margin": {"top": 10, "bottom": 10, "left": 14, "right": 14}, "color": {"background": "#F8FAFC", "border": "#94A3B8", "highlight": {"background": "#FFFFFF", "border": "#94A3B8"}, "hover": {"background": "#FFFFFF", "border": "#94A3B8"}}, "font": {"color": "#334155", "size": 12, "face": "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", "bold": "600"}, "borderWidth": 2, "shadow": {"enabled": true, "color": "rgba(15, 23, 42, 0.08)", "size": 10, "x": 0, "y": 4}, "raw_data": {"id": "CONV-01", "type": "Convention", "title": "Store webhook event IDs in Redis with 72\u2011hour TTL", "content": "Webhook consumers persist the idempotency event ID in Redis, expiring after 72 hours to prevent duplicate processing.", "category": "architecture_decisions", "created_at": 1787815420.736074}}, {"id": "CONV-02", "label": "CONV-02\nDecorate background task han...", "group": "Convention", "shape": "box", "margin": {"top": 10, "bottom": 10, "left": 14, "right": 14}, "color": {"background": "#F8FAFC", "border": "#94A3B8", "highlight": {"background": "#FFFFFF", "border": "#94A3B8"}, "hover": {"background": "#FFFFFF", "border": "#94A3B8"}}, "font": {"color": "#334155", "size": 12, "face": "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", "bold": "600"}, "borderWidth": 2, "shadow": {"enabled": true, "color": "rgba(15, 23, 42, 0.08)", "size": 10, "x": 0, "y": 4}, "raw_data": {"id": "CONV-02", "type": "Convention", "title": "Decorate background task handlers with @idempotent_task", "content": "All async task handlers must be wrapped with the @idempotent_task decorator to enforce idempotency.", "category": "architecture_decisions", "created_at": 1787815420.873601}}, {"id": "CI-FAIL-89", "label": "CI-FAIL-89\nCI Run #89: Tenant search te...", "group": "PastCIError", "shape": "box", "margin": {"top": 10, "bottom": 10, "left": 14, "right": 14}, "color": {"background": "#FFF1F2", "border": "#F43F5E", "highlight": {"background": "#FFFFFF", "border": "#F43F5E"}, "hover": {"background": "#FFFFFF", "border": "#F43F5E"}}, "font": {"color": "#9F1239", "size": 12, "face": "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", "bold": "600"}, "borderWidth": 2, "shadow": {"enabled": true, "color": "rgba(15, 23, 42, 0.08)", "size": 10, "x": 0, "y": 4}, "raw_data": {"id": "CI-FAIL-89", "type": "PastCIError", "title": "CI Run #89: Tenant search test suite broke due to unparameterized SQL query", "category": "CI/CD", "content": "Test test_tenant_search_isolation failed with SQLSyntaxError when query contained special characters. Caused by f-string interpolation in users/search endpoint.", "status": "RESOLVED", "created_at": 1786640667.0012102}}, {"id": "PR-142", "label": "PR-142\nPR #142: Fix SQL injection i...", "group": "SimilarPR", "shape": "box", "margin": {"top": 10, "bottom": 10, "left": 14, "right": 14}, "color": {"background": "#F0F9FF", "border": "#38BDF8", "highlight": {"background": "#FFFFFF", "border": "#38BDF8"}, "hover": {"background": "#FFFFFF", "border": "#38BDF8"}}, "font": {"color": "#0369A1", "size": 12, "face": "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", "bold": "600"}, "borderWidth": 2, "shadow": {"enabled": true, "color": "rgba(15, 23, 42, 0.08)", "size": 10, "x": 0, "y": 4}, "raw_data": {"id": "PR-142", "type": "SimilarPR", "title": "PR #142: Fix SQL injection in search & enforce ADR-003 parameterized query binding", "category": "PR History", "content": "Refactored user search filter to use SQLAlchemy select(User).where(User.username.ilike(...)) and context tenant_id. Added automated regression test.", "status": "MERGED", "created_at": 1786727067.0012102}}, {"id": "VULN-CWE-89", "label": "VULN-CWE-89\nCWE-89: SQL Injection in Use...", "group": "ResolvedVulnerability", "shape": "box", "margin": {"top": 10, "bottom": 10, "left": 14, "right": 14}, "color": {"background": "#FAF5FF", "border": "#A855F7", "highlight": {"background": "#FFFFFF", "border": "#A855F7"}, "hover": {"background": "#FFFFFF", "border": "#A855F7"}}, "font": {"color": "#6B21A8", "size": 12, "face": "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", "bold": "600"}, "borderWidth": 2, "shadow": {"enabled": true, "color": "rgba(15, 23, 42, 0.08)", "size": 10, "x": 0, "y": 4}, "raw_data": {"id": "VULN-CWE-89", "type": "ResolvedVulnerability", "title": "CWE-89: SQL Injection in User Search Endpoint", "category": "Security Vulnerability", "content": "Reported vulnerability where query parameters were directly formatted into raw SQL string. Resolved by PR #142 adhering to ADR-003.", "status": "MITIGATED", "created_at": 1786554267.0012102}}, {"id": "TEAM-PREF-01", "label": "TEAM-PREF-01\nComprehensive Pytest Fixture...", "group": "TeamPreference", "shape": "box", "margin": {"top": 10, "bottom": 10, "left": 14, "right": 14}, "color": {"background": "#FFF7ED", "border": "#FB923C", "highlight": {"background": "#FFFFFF", "border": "#FB923C"}, "hover": {"background": "#FFFFFF", "border": "#FB923C"}}, "font": {"color": "#9A3412", "size": 12, "face": "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", "bold": "600"}, "borderWidth": 2, "shadow": {"enabled": true, "color": "rgba(15, 23, 42, 0.08)", "size": 10, "x": 0, "y": 4}, "raw_data": {"id": "TEAM-PREF-01", "type": "TeamPreference", "title": "Comprehensive Pytest Fixtures with Rollback", "category": "Team Preference", "content": "Every database test must use the async_session fixture with transaction rollback to keep test sandboxes isolated.", "status": "ACTIVE", "created_at": 1785517467.001211}}, {"id": "RUNBOOK-01", "label": "RUNBOOK-01\nSecurity Vulnerability Remed...", "group": "Runbook", "shape": "box", "margin": {"top": 10, "bottom": 10, "left": 14, "right": 14}, "color": {"background": "#F0FDF4", "border": "#0EA5E9", "highlight": {"background": "#FFFFFF", "border": "#0EA5E9"}, "hover": {"background": "#FFFFFF", "border": "#0EA5E9"}}, "font": {"color": "#0284C7", "size": 12, "face": "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", "bold": "600"}, "borderWidth": 2, "shadow": {"enabled": true, "color": "rgba(15, 23, 42, 0.08)", "size": 10, "x": 0, "y": 4}, "raw_data": {"id": "RUNBOOK-01", "type": "Runbook", "title": "Security Vulnerability Remediation Runbook", "category": "Runbook", "content": "1. Isolate reproduction test in tests/ directory. 2. Verify ADR compliance. 3. Apply patch using Regolo coding specialist. 4. Run automated test suite with zero-trust verification.", "status": "ACTIVE", "created_at": 1785776667.001211}}, {"id": "FILE_README_md", "label": "FILE_README_md\nFile: README.md", "group": "Documentation", "shape": "box", "margin": {"top": 10, "bottom": 10, "left": 14, "right": 14}, "color": {"background": "#F8FAFC", "border": "#94A3B8", "highlight": {"background": "#FFFFFF", "border": "#94A3B8"}, "hover": {"background": "#FFFFFF", "border": "#94A3B8"}}, "font": {"color": "#1E293B", "size": 12, "face": "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", "bold": "600"}, "borderWidth": 2, "shadow": {"enabled": true, "color": "rgba(15, 23, 42, 0.08)", "size": 10, "x": 0, "y": 4}, "raw_data": {"id": "FILE_README_md", "type": "Documentation", "title": "File: README.md", "content": "# CloudPlatform SaaS Core Repository\nMulti-tenant enterprise SaaS platform with microservices for authentication, subscription billing, and real-time data ingestion.\n\n## Architecture\n- **Framework**: FastAPI (Async-First)\n- **Database**: PostgreSQL 16 + SQLAlchemy Core ORM\n- **Isolation**: Tenant Context Session (ADR-001)\n- **Security**: Mandatory Parameterized Queries (ADR-003) & PyJWT Algorithm ", "category": "sample_repo", "created_at": 1787815411.343245}}, {"id": "FILE_tests_test_auth_py", "label": "FILE_tests_test_auth_py\nFile: tests/test_auth.py", "group": "SourceCode", "shape": "box", "margin": {"top": 10, "bottom": 10, "left": 14, "right": 14}, "color": {"background": "#F8FAFC", "border": "#818CF8", "highlight": {"background": "#FFFFFF", "border": "#818CF8"}, "hover": {"background": "#FFFFFF", "border": "#818CF8"}}, "font": {"color": "#3730A3", "size": 12, "face": "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", "bold": "600"}, "borderWidth": 2, "shadow": {"enabled": true, "color": "rgba(15, 23, 42, 0.08)", "size": 10, "x": 0, "y": 4}, "raw_data": {"id": "FILE_tests_test_auth_py", "type": "SourceCode", "title": "File: tests/test_auth.py", "content": "\"\"\"Test suite for authentication and tenant isolation.\"\"\"\n\nimport asyncio\nimport sys\nfrom pathlib import Path\n\nsample_repo_root = Path(__file__).resolve().parent.parent\nif str(sample_repo_root) not in sys.path:\n    sys.path.insert(0, str(sample_repo_root))\n\nfrom src.api.auth import search_users\n\n\ndef test_tenant_search_isolation():\n    \"\"\"Verify that user search filters by current tenant and rejec", "category": "tests", "created_at": 1787815411.56286}}, {"id": "FILE_src_db_models_py", "label": "FILE_src_db_models_py\nFile: src/db/models.py", "group": "SourceCode", "shape": "box", "margin": {"top": 10, "bottom": 10, "left": 14, "right": 14}, "color": {"background": "#F8FAFC", "border": "#818CF8", "highlight": {"background": "#FFFFFF", "border": "#818CF8"}, "hover": {"background": "#FFFFFF", "border": "#818CF8"}}, "font": {"color": "#3730A3", "size": 12, "face": "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", "bold": "600"}, "borderWidth": 2, "shadow": {"enabled": true, "color": "rgba(15, 23, 42, 0.08)", "size": 10, "x": 0, "y": 4}, "raw_data": {"id": "FILE_src_db_models_py", "type": "SourceCode", "title": "File: src/db/models.py", "content": "\"\"\"SQLAlchemy database models.\"\"\"\n\nclass User:\n    def __init__(self, id: int, username: str, tenant_id: int, email: str):\n        self.id = id\n        self.username = username\n        self.tenant_id = tenant_id\n        self.email = email\n", "category": "db", "created_at": 1787815412.1981099}}, {"id": "FILE_src_api_auth_py", "label": "FILE_src_api_auth_py\nFile: src/api/auth.py", "group": "SourceCode", "shape": "box", "margin": {"top": 10, "bottom": 10, "left": 14, "right": 14}, "color": {"background": "#F8FAFC", "border": "#818CF8", "highlight": {"background": "#FFFFFF", "border": "#818CF8"}, "hover": {"background": "#FFFFFF", "border": "#818CF8"}}, "font": {"color": "#3730A3", "size": 12, "face": "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", "bold": "600"}, "borderWidth": 2, "shadow": {"enabled": true, "color": "rgba(15, 23, 42, 0.08)", "size": 10, "x": 0, "y": 4}, "raw_data": {"id": "FILE_src_api_auth_py", "type": "SourceCode", "title": "File: src/api/auth.py", "content": "\"\"\"Authentication & User API endpoints.\"\"\"\n\nfrom typing import List, Optional\nfrom pydantic import BaseModel\nfrom sqlalchemy import select, and_\n\nclass UserSearchRequest(BaseModel):\n    query: str\n\nclass UserResponse(BaseModel):\n    id: int\n    username: str\n    tenant_id: int\n\nasync def search_users(db_session, query_str: str) -> List[dict]:\n    \"\"\"Search tenant users securely using ADR-001 sessi", "category": "api", "created_at": 1787815412.320433}}, {"id": "FILE_src_api_billing_py", "label": "FILE_src_api_billing_py\nFile: src/api/billing.py", "group": "SourceCode", "shape": "box", "margin": {"top": 10, "bottom": 10, "left": 14, "right": 14}, "color": {"background": "#F8FAFC", "border": "#818CF8", "highlight": {"background": "#FFFFFF", "border": "#818CF8"}, "hover": {"background": "#FFFFFF", "border": "#818CF8"}}, "font": {"color": "#3730A3", "size": 12, "face": "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", "bold": "600"}, "borderWidth": 2, "shadow": {"enabled": true, "color": "rgba(15, 23, 42, 0.08)", "size": 10, "x": 0, "y": 4}, "raw_data": {"id": "FILE_src_api_billing_py", "type": "SourceCode", "title": "File: src/api/billing.py", "content": "\"\"\"Billing & Subscription API endpoints.\"\"\"\n\nfrom pydantic import BaseModel\n\nclass WebhookEvent(BaseModel):\n    event_id: str\n    tenant_id: int\n    amount: float\n\nasync def process_billing_webhook(event: WebhookEvent) -> dict:\n    \"\"\"Process incoming billing webhook with idempotency check (ADR-002).\"\"\"\n    # Enforces ADR-002 idempotency key validation\n    return {\"status\": \"processed\", \"event_id\"", "category": "api", "created_at": 1787815412.44957}}, {"id": "FILE_docs_architecture_decisions_ADR-002-async-job-retry_md", "label": "FILE_docs_architecture_decisions_ADR-002-async-job-retry_md\nFile: docs/architecture_deci...", "group": "ArchitecturalDecision", "shape": "box", "margin": {"top": 10, "bottom": 10, "left": 14, "right": 14}, "color": {"background": "#ECFDF5", "border": "#10B981", "highlight": {"background": "#FFFFFF", "border": "#10B981"}, "hover": {"background": "#FFFFFF", "border": "#10B981"}}, "font": {"color": "#065F46", "size": 12, "face": "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", "bold": "600"}, "borderWidth": 2, "shadow": {"enabled": true, "color": "rgba(15, 23, 42, 0.08)", "size": 10, "x": 0, "y": 4}, "raw_data": {"id": "FILE_docs_architecture_decisions_ADR-002-async-job-retry_md", "type": "ArchitecturalDecision", "title": "File: docs/architecture_decisions/ADR-002-async-job-retry.md", "content": "# ADR-002: Idempotent Webhook Processing & Async Retries\n\n## Status\nAPPROVED (2026-07-02)\n\n## Context\nPayment providers (Stripe, SEPA) send duplicate webhook events during network retransmissions. Processing payments multiple times caused ledger inconsistencies and duplicate user invoice generation.\n\n## Decision\n1. All external webhook consumers must store incoming idempotency event IDs in Redis w", "category": "architecture_decisions", "created_at": 1787815421.314036}}, {"id": "FILE_docs_architecture_decisions_ADR-001-tenant-isolation_md", "label": "FILE_docs_architecture_decisions_ADR-001-tenant-isolation_md\nFile: docs/architecture_deci...", "group": "ArchitecturalDecision", "shape": "box", "margin": {"top": 10, "bottom": 10, "left": 14, "right": 14}, "color": {"background": "#ECFDF5", "border": "#10B981", "highlight": {"background": "#FFFFFF", "border": "#10B981"}, "hover": {"background": "#FFFFFF", "border": "#10B981"}}, "font": {"color": "#065F46", "size": 12, "face": "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", "bold": "600"}, "borderWidth": 2, "shadow": {"enabled": true, "color": "rgba(15, 23, 42, 0.08)", "size": 10, "x": 0, "y": 4}, "raw_data": {"id": "FILE_docs_architecture_decisions_ADR-001-tenant-isolation_md", "type": "ArchitecturalDecision", "title": "File: docs/architecture_decisions/ADR-001-tenant-isolation.md", "content": "# ADR-001: Tenant Isolation via Explicit Context Session\n\n## Status\nAPPROVED (2026-06-15)\n\n## Context\nOur SaaS platform serves multi-tenant enterprise customers sharing the same underlying database clusters. Passing `tenant_id` via HTTP request payloads or URL parameters created severe IDOR risks (CWE-639) and allowed users to query data from competitor organizations.\n\n## Decision\n1. All database ", "category": "architecture_decisions", "created_at": 1787815432.137761}}, {"id": "FILE_docs_architecture_decisions_ADR-003-parameterized-queries_md", "label": "FILE_docs_architecture_decisions_ADR-003-parameterized-queries_md\nFile: docs/architecture_deci...", "group": "ArchitecturalDecision", "shape": "box", "margin": {"top": 10, "bottom": 10, "left": 14, "right": 14}, "color": {"background": "#ECFDF5", "border": "#10B981", "highlight": {"background": "#FFFFFF", "border": "#10B981"}, "hover": {"background": "#FFFFFF", "border": "#10B981"}}, "font": {"color": "#065F46", "size": 12, "face": "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", "bold": "600"}, "borderWidth": 2, "shadow": {"enabled": true, "color": "rgba(15, 23, 42, 0.08)", "size": 10, "x": 0, "y": 4}, "raw_data": {"id": "FILE_docs_architecture_decisions_ADR-003-parameterized-queries_md", "type": "ArchitecturalDecision", "title": "File: docs/architecture_decisions/ADR-003-parameterized-queries.md", "content": "# ADR-003: Mandatory Parameterized SQLAlchemy Core Queries\n\n## Status\nAPPROVED (2026-07-20)\n\n## Context\nA critical vulnerability (CWE-89) was discovered in the user search filter where raw Python f-strings formatted user input into SQLite/Postgres query strings, causing CI Run #89 to fail.\n\n## Decision\n1. Never use raw string formatting (`f\"SELECT ... {param}\"` or `.format()`) inside any database ", "category": "architecture_decisions", "created_at": 1787815443.285814}}, {"id": "FILE_docs_runbooks_security_vulnerability_remediation_md", "label": "FILE_docs_runbooks_security_vulnerability_remediation_md\nFile: docs/runbooks/security...", "group": "Documentation", "shape": "box", "margin": {"top": 10, "bottom": 10, "left": 14, "right": 14}, "color": {"background": "#F8FAFC", "border": "#94A3B8", "highlight": {"background": "#FFFFFF", "border": "#94A3B8"}, "hover": {"background": "#FFFFFF", "border": "#94A3B8"}}, "font": {"color": "#1E293B", "size": 12, "face": "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", "bold": "600"}, "borderWidth": 2, "shadow": {"enabled": true, "color": "rgba(15, 23, 42, 0.08)", "size": 10, "x": 0, "y": 4}, "raw_data": {"id": "FILE_docs_runbooks_security_vulnerability_remediation_md", "type": "Documentation", "title": "File: docs/runbooks/security_vulnerability_remediation.md", "content": "# Security Vulnerability Remediation Runbook\n\n## Protocol\n1. **Classify**: Map finding to CWE category (e.g., CWE-89, CWE-639, CWE-287).\n2. **Recall**: Pull past fixes from Cognee memory to preserve architectural integrity.\n3. **Patch**: Apply fix with Regolo `qwen3-coder-next`.\n4. **Verify**: Run zero-trust regression tests.\n", "category": "runbooks", "created_at": 1787815443.447264}}, {"id": "FILE_docs_runbooks_ci_failure_triage_md", "label": "FILE_docs_runbooks_ci_failure_triage_md\nFile: docs/runbooks/ci_failu...", "group": "Documentation", "shape": "box", "margin": {"top": 10, "bottom": 10, "left": 14, "right": 14}, "color": {"background": "#F8FAFC", "border": "#94A3B8", "highlight": {"background": "#FFFFFF", "border": "#94A3B8"}, "hover": {"background": "#FFFFFF", "border": "#94A3B8"}}, "font": {"color": "#1E293B", "size": 12, "face": "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", "bold": "600"}, "borderWidth": 2, "shadow": {"enabled": true, "color": "rgba(15, 23, 42, 0.08)", "size": 10, "x": 0, "y": 4}, "raw_data": {"id": "FILE_docs_runbooks_ci_failure_triage_md", "type": "Documentation", "title": "File: docs/runbooks/ci_failure_triage.md", "content": "# CI Failure Triage Runbook\n\n## Protocol for Failing Builds\n1. Inspect failing test node in `tests/`.\n2. Check if the failure is related to a known architectural constraint (`ADR-001` or `ADR-003`).\n3. Query Cognee Memory Graph to identify similar past PRs (`PR-142`).\n4. Re-run security test harness before staging merge requests.\n", "category": "runbooks", "created_at": 1787815443.60789}}, {"id": "FILE_docs_conventions_team_preferences_md", "label": "FILE_docs_conventions_team_preferences_md\nFile: docs/conventions/team_...", "group": "Documentation", "shape": "box", "margin": {"top": 10, "bottom": 10, "left": 14, "right": 14}, "color": {"background": "#F8FAFC", "border": "#94A3B8", "highlight": {"background": "#FFFFFF", "border": "#94A3B8"}, "hover": {"background": "#FFFFFF", "border": "#94A3B8"}}, "font": {"color": "#1E293B", "size": 12, "face": "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", "bold": "600"}, "borderWidth": 2, "shadow": {"enabled": true, "color": "rgba(15, 23, 42, 0.08)", "size": 10, "x": 0, "y": 4}, "raw_data": {"id": "FILE_docs_conventions_team_preferences_md", "type": "Documentation", "title": "File: docs/conventions/team_preferences.md", "content": "# Team Preferences & Best Practices\n\n- **Zero Data Retention**: Deploy on Regolo.ai EU-sovereign inference.\n- **Testing**: Use pytest fixtures with automatic database transaction rollback.\n- **Logging**: Structured JSON logging (`structlog`), no raw passwords or auth tokens in stdout.\n- **Git & PRs**: Reference relevant ADR numbers in PR descriptions.\n", "category": "conventions", "created_at": 1787815453.5474381}}, {"id": "FILE_docs_conventions_coding_standards_md", "label": "FILE_docs_conventions_coding_standards_md\nFile: docs/conventions/codin...", "group": "Documentation", "shape": "box", "margin": {"top": 10, "bottom": 10, "left": 14, "right": 14}, "color": {"background": "#F8FAFC", "border": "#94A3B8", "highlight": {"background": "#FFFFFF", "border": "#94A3B8"}, "hover": {"background": "#FFFFFF", "border": "#94A3B8"}}, "font": {"color": "#1E293B", "size": 12, "face": "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", "bold": "600"}, "borderWidth": 2, "shadow": {"enabled": true, "color": "rgba(15, 23, 42, 0.08)", "size": 10, "x": 0, "y": 4}, "raw_data": {"id": "FILE_docs_conventions_coding_standards_md", "type": "Documentation", "title": "File: docs/conventions/coding_standards.md", "content": "# Repository Coding Standards\n\n## 1. Async-First FastAPI Architecture\n- All API route handlers must be defined as `async def`.\n- Database I/O must use `AsyncSession` with `await session.execute(...)`.\n\n## 2. Input Validation & Strict Typing\n- Every endpoint payload must be typed using Pydantic V2 `BaseModel`.\n- Type annotations (`mypy` strict) are required for all function arguments and returns.\n\n", "category": "conventions", "created_at": 1787815463.343159}}, {"id": "SESSION-OUTCOME-SEARCH", "label": "SESSION-OUTCOME-SEARCH\nVerified User Search & CI Gr...", "group": "SessionOutcome", "shape": "box", "margin": {"top": 10, "bottom": 10, "left": 14, "right": 14}, "color": {"background": "#F0FDF4", "border": "#22C55E", "highlight": {"background": "#FFFFFF", "border": "#22C55E"}, "hover": {"background": "#FFFFFF", "border": "#22C55E"}}, "font": {"color": "#15803D", "size": 12, "face": "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", "bold": "600"}, "borderWidth": 2, "shadow": {"enabled": true, "color": "rgba(15, 23, 42, 0.08)", "size": 10, "x": 0, "y": 4}, "raw_data": {"id": "SESSION-OUTCOME-SEARCH", "type": "SessionOutcome", "title": "Verified User Search & CI Green", "content": "Verified implementation of user search with ADR-001 & ADR-003 compliance at 2026-08-27 09:12:09", "category": "CI_Verification", "created_at": 1787814729.339554}}, {"id": "FILE_tests_test_users_py", "label": "FILE_tests_test_users_py\nFile: tests/test_users.py", "group": "SourceCode", "shape": "box", "margin": {"top": 10, "bottom": 10, "left": 14, "right": 14}, "color": {"background": "#F8FAFC", "border": "#818CF8", "highlight": {"background": "#FFFFFF", "border": "#818CF8"}, "hover": {"background": "#FFFFFF", "border": "#818CF8"}}, "font": {"color": "#3730A3", "size": 12, "face": "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", "bold": "600"}, "borderWidth": 2, "shadow": {"enabled": true, "color": "rgba(15, 23, 42, 0.08)", "size": 10, "x": 0, "y": 4}, "raw_data": {"id": "FILE_tests_test_users_py", "type": "SourceCode", "title": "File: tests/test_users.py", "content": "\"\"\"Test suite for User Search Endpoint & Tenant Isolation (sample_repo).\nValidates ADR-001 (Tenant Isolation) and ADR-003 (Parameterized Queries / IDOR Protection).\n\"\"\"\n\nimport asyncio\nimport sys\nfrom pathlib import Path\n\n# Ensure sample_repo is in python path\nsample_repo_root = Path(__file__).resolve().parent.parent\nif str(sample_repo_root) not in sys.path:\n    sys.path.insert(0, str(sample_repo_", "category": "tests", "created_at": 1787815411.7368908}}, {"id": "FILE_src_core___init___py", "label": "FILE_src_core___init___py\nFile: src/core/__init__.py", "group": "SourceCode", "shape": "box", "margin": {"top": 10, "bottom": 10, "left": 14, "right": 14}, "color": {"background": "#F8FAFC", "border": "#818CF8", "highlight": {"background": "#FFFFFF", "border": "#818CF8"}, "hover": {"background": "#FFFFFF", "border": "#818CF8"}}, "font": {"color": "#3730A3", "size": 12, "face": "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", "bold": "600"}, "borderWidth": 2, "shadow": {"enabled": true, "color": "rgba(15, 23, 42, 0.08)", "size": 10, "x": 0, "y": 4}, "raw_data": {"id": "FILE_src_core___init___py", "type": "SourceCode", "title": "File: src/core/__init__.py", "content": "\"\"\"Core infrastructure for sample_repo.\"\"\"\n", "category": "core", "created_at": 1787815411.853494}}, {"id": "FILE_src_core_context_py", "label": "FILE_src_core_context_py\nFile: src/core/context.py", "group": "SourceCode", "shape": "box", "margin": {"top": 10, "bottom": 10, "left": 14, "right": 14}, "color": {"background": "#F8FAFC", "border": "#818CF8", "highlight": {"background": "#FFFFFF", "border": "#818CF8"}, "hover": {"background": "#FFFFFF", "border": "#818CF8"}}, "font": {"color": "#3730A3", "size": 12, "face": "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", "bold": "600"}, "borderWidth": 2, "shadow": {"enabled": true, "color": "rgba(15, 23, 42, 0.08)", "size": 10, "x": 0, "y": 4}, "raw_data": {"id": "FILE_src_core_context_py", "type": "SourceCode", "title": "File: src/core/context.py", "content": "\"\"\"Tenant Context & Session Management for Multi-Tenant Architecture (ADR-001).\"\"\"\n\nimport contextvars\n\n# Context variable holding the verified JWT session tenant ID\n_current_tenant_id: contextvars.ContextVar[int] = contextvars.ContextVar(\"current_tenant_id\", default=1)\n\n\ndef get_current_tenant_id() -> int:\n    \"\"\"Retrieve the cryptographically verified tenant ID from current execution context.\n  ", "category": "core", "created_at": 1787815412.073567}}, {"id": "FILE_src_api_users_py", "label": "FILE_src_api_users_py\nFile: src/api/users.py", "group": "SourceCode", "shape": "box", "margin": {"top": 10, "bottom": 10, "left": 14, "right": 14}, "color": {"background": "#F8FAFC", "border": "#818CF8", "highlight": {"background": "#FFFFFF", "border": "#818CF8"}, "hover": {"background": "#FFFFFF", "border": "#818CF8"}}, "font": {"color": "#3730A3", "size": 12, "face": "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", "bold": "600"}, "borderWidth": 2, "shadow": {"enabled": true, "color": "rgba(15, 23, 42, 0.08)", "size": 10, "x": 0, "y": 4}, "raw_data": {"id": "FILE_src_api_users_py", "type": "SourceCode", "title": "File: src/api/users.py", "content": "from typing import Any, Dict, List, Optional\nfrom src.core.context import get_current_tenant_id\n\nSAMPLE_USERS_DB = [\n    {\"id\": 1, \"username\": \"alice\", \"email\": \"alice@tenant1.com\", \"tenant_id\": 1, \"role\": \"admin\"},\n    {\"id\": 2, \"username\": \"bob\", \"email\": \"bob@tenant1.com\", \"tenant_id\": 1, \"role\": \"developer\"},\n    {\"id\": 3, \"username\": \"alice\", \"email\": \"alice@tenant2.com\", \"tenant_id\": 2, \"rol", "category": "api", "created_at": 1787815412.585192}}, {"id": "CONV-03", "label": "CONV-03\nUse exponential backoff with...", "group": "Convention", "shape": "box", "margin": {"top": 10, "bottom": 10, "left": 14, "right": 14}, "color": {"background": "#F8FAFC", "border": "#94A3B8", "highlight": {"background": "#FFFFFF", "border": "#94A3B8"}, "hover": {"background": "#FFFFFF", "border": "#94A3B8"}}, "font": {"color": "#334155", "size": 12, "face": "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", "bold": "600"}, "borderWidth": 2, "shadow": {"enabled": true, "color": "rgba(15, 23, 42, 0.08)", "size": 10, "x": 0, "y": 4}, "raw_data": {"id": "CONV-03", "type": "Convention", "title": "Use exponential backoff with dead\u2011letter queue escalation for failed jobs", "content": "Failed async jobs should retry with exponential backoff and, after a configurable number of attempts, be routed to a dead\u2011letter queue.", "category": "architecture_decisions", "created_at": 1787815421.017775}}, {"id": "CONV-001", "label": "CONV-001\nEndpoint Tenant ID Conventio...", "group": "Convention", "shape": "box", "margin": {"top": 10, "bottom": 10, "left": 14, "right": 14}, "color": {"background": "#F8FAFC", "border": "#94A3B8", "highlight": {"background": "#FFFFFF", "border": "#94A3B8"}, "hover": {"background": "#FFFFFF", "border": "#94A3B8"}}, "font": {"color": "#334155", "size": 12, "face": "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", "bold": "600"}, "borderWidth": 2, "shadow": {"enabled": true, "color": "rgba(15, 23, 42, 0.08)", "size": 10, "x": 0, "y": 4}, "raw_data": {"id": "CONV-001", "type": "Convention", "title": "Endpoint Tenant ID Convention", "content": "Endpoints must not accept tenant_id as a client\u2011controlled URL parameter or request body field.", "category": "architecture_decisions", "created_at": 1787815431.616415}}, {"id": "VUL-001", "label": "VUL-001\nIDOR Risk (CWE\u2011639)", "group": "Vulnerability", "shape": "box", "margin": {"top": 10, "bottom": 10, "left": 14, "right": 14}, "color": {"background": "#F8FAFC", "border": "#94A3B8", "highlight": {"background": "#FFFFFF", "border": "#94A3B8"}, "hover": {"background": "#FFFFFF", "border": "#94A3B8"}}, "font": {"color": "#334155", "size": 12, "face": "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", "bold": "600"}, "borderWidth": 2, "shadow": {"enabled": true, "color": "rgba(15, 23, 42, 0.08)", "size": 10, "x": 0, "y": 4}, "raw_data": {"id": "VUL-001", "type": "Vulnerability", "title": "IDOR Risk (CWE\u2011639)", "content": "Passing tenant_id via HTTP request payloads or URL parameters created severe IDOR risks and allowed users to query data from competitor organizations.", "category": "architecture_decisions", "created_at": 1787815431.778771}}];
+        let rawEdges = [{"id": "e_0", "from": "CI-FAIL-89", "to": "VULN-CWE-89", "label": "TRIGGERED_BY", "arrows": {"to": {"enabled": true, "scaleFactor": 0.75}}, "font": {"color": "#64748B", "size": 10, "face": "Inter, sans-serif", "align": "middle", "background": "#FFFFFF", "strokeWidth": 0}, "color": {"color": "#CBD5E1", "highlight": "#10B981", "hover": "#0EA5E9"}, "smooth": {"type": "cubicBezier", "roundness": 0.25}, "width": 1.75}, {"id": "e_1", "from": "PR-142", "to": "CI-FAIL-89", "label": "FIXES_CI_FAILURE", "arrows": {"to": {"enabled": true, "scaleFactor": 0.75}}, "font": {"color": "#64748B", "size": 10, "face": "Inter, sans-serif", "align": "middle", "background": "#FFFFFF", "strokeWidth": 0}, "color": {"color": "#CBD5E1", "highlight": "#10B981", "hover": "#0EA5E9"}, "smooth": {"type": "cubicBezier", "roundness": 0.25}, "width": 1.75}, {"id": "e_2", "from": "PR-142", "to": "VULN-CWE-89", "label": "MITIGATES_VULNERABILITY", "arrows": {"to": {"enabled": true, "scaleFactor": 0.75}}, "font": {"color": "#64748B", "size": 10, "face": "Inter, sans-serif", "align": "middle", "background": "#FFFFFF", "strokeWidth": 0}, "color": {"color": "#CBD5E1", "highlight": "#10B981", "hover": "#0EA5E9"}, "smooth": {"type": "cubicBezier", "roundness": 0.25}, "width": 1.75}, {"id": "e_3", "from": "PR-142", "to": "ADR-003", "label": "IMPLEMENTS_DECISION", "arrows": {"to": {"enabled": true, "scaleFactor": 0.75}}, "font": {"color": "#64748B", "size": 10, "face": "Inter, sans-serif", "align": "middle", "background": "#FFFFFF", "strokeWidth": 0}, "color": {"color": "#CBD5E1", "highlight": "#10B981", "hover": "#0EA5E9"}, "smooth": {"type": "cubicBezier", "roundness": 0.25}, "width": 1.75}, {"id": "e_4", "from": "ADR-001", "to": "CONV-01", "label": "ENFORCES_CONVENTION", "arrows": {"to": {"enabled": true, "scaleFactor": 0.75}}, "font": {"color": "#64748B", "size": 10, "face": "Inter, sans-serif", "align": "middle", "background": "#FFFFFF", "strokeWidth": 0}, "color": {"color": "#CBD5E1", "highlight": "#10B981", "hover": "#0EA5E9"}, "smooth": {"type": "cubicBezier", "roundness": 0.25}, "width": 1.75}, {"id": "e_5", "from": "CONV-02", "to": "VULN-CWE-89", "label": "PREVENTS_CATEGORY", "arrows": {"to": {"enabled": true, "scaleFactor": 0.75}}, "font": {"color": "#64748B", "size": 10, "face": "Inter, sans-serif", "align": "middle", "background": "#FFFFFF", "strokeWidth": 0}, "color": {"color": "#CBD5E1", "highlight": "#10B981", "hover": "#0EA5E9"}, "smooth": {"type": "cubicBezier", "roundness": 0.25}, "width": 1.75}, {"id": "e_6", "from": "RUNBOOK-01", "to": "PR-142", "label": "REFERENCES_PRECEDENT", "arrows": {"to": {"enabled": true, "scaleFactor": 0.75}}, "font": {"color": "#64748B", "size": 10, "face": "Inter, sans-serif", "align": "middle", "background": "#FFFFFF", "strokeWidth": 0}, "color": {"color": "#CBD5E1", "highlight": "#10B981", "hover": "#0EA5E9"}, "smooth": {"type": "cubicBezier", "roundness": 0.25}, "width": 1.75}, {"id": "e_7", "from": "TEAM-PREF-01", "to": "CONV-01", "label": "COMPLEMENTS", "arrows": {"to": {"enabled": true, "scaleFactor": 0.75}}, "font": {"color": "#64748B", "size": 10, "face": "Inter, sans-serif", "align": "middle", "background": "#FFFFFF", "strokeWidth": 0}, "color": {"color": "#CBD5E1", "highlight": "#10B981", "hover": "#0EA5E9"}, "smooth": {"type": "cubicBezier", "roundness": 0.25}, "width": 1.75}, {"id": "e_8", "from": "FILE_tests_test_auth_py", "to": "ADR-001", "label": "GOVERNED_BY_DECISION", "arrows": {"to": {"enabled": true, "scaleFactor": 0.75}}, "font": {"color": "#64748B", "size": 10, "face": "Inter, sans-serif", "align": "middle", "background": "#FFFFFF", "strokeWidth": 0}, "color": {"color": "#CBD5E1", "highlight": "#10B981", "hover": "#0EA5E9"}, "smooth": {"type": "cubicBezier", "roundness": 0.25}, "width": 1.75}, {"id": "e_9", "from": "FILE_tests_test_auth_py", "to": "CONV-02", "label": "REQUIRES_COMPLIANCE", "arrows": {"to": {"enabled": true, "scaleFactor": 0.75}}, "font": {"color": "#64748B", "size": 10, "face": "Inter, sans-serif", "align": "middle", "background": "#FFFFFF", "strokeWidth": 0}, "color": {"color": "#CBD5E1", "highlight": "#10B981", "hover": "#0EA5E9"}, "smooth": {"type": "cubicBezier", "roundness": 0.25}, "width": 1.75}, {"id": "e_10", "from": "FILE_src_api_auth_py", "to": "ADR-001", "label": "GOVERNED_BY_DECISION", "arrows": {"to": {"enabled": true, "scaleFactor": 0.75}}, "font": {"color": "#64748B", "size": 10, "face": "Inter, sans-serif", "align": "middle", "background": "#FFFFFF", "strokeWidth": 0}, "color": {"color": "#CBD5E1", "highlight": "#10B981", "hover": "#0EA5E9"}, "smooth": {"type": "cubicBezier", "roundness": 0.25}, "width": 1.75}, {"id": "e_11", "from": "FILE_src_api_auth_py", "to": "CONV-02", "label": "REQUIRES_COMPLIANCE", "arrows": {"to": {"enabled": true, "scaleFactor": 0.75}}, "font": {"color": "#64748B", "size": 10, "face": "Inter, sans-serif", "align": "middle", "background": "#FFFFFF", "strokeWidth": 0}, "color": {"color": "#CBD5E1", "highlight": "#10B981", "hover": "#0EA5E9"}, "smooth": {"type": "cubicBezier", "roundness": 0.25}, "width": 1.75}, {"id": "e_12", "from": "FILE_src_api_billing_py", "to": "ADR-002", "label": "GOVERNED_BY_DECISION", "arrows": {"to": {"enabled": true, "scaleFactor": 0.75}}, "font": {"color": "#64748B", "size": 10, "face": "Inter, sans-serif", "align": "middle", "background": "#FFFFFF", "strokeWidth": 0}, "color": {"color": "#CBD5E1", "highlight": "#10B981", "hover": "#0EA5E9"}, "smooth": {"type": "cubicBezier", "roundness": 0.25}, "width": 1.75}, {"id": "e_13", "from": "FILE_src_api_billing_py", "to": "PR-142", "label": "PRECEDED_BY_PR", "arrows": {"to": {"enabled": true, "scaleFactor": 0.75}}, "font": {"color": "#64748B", "size": 10, "face": "Inter, sans-serif", "align": "middle", "background": "#FFFFFF", "strokeWidth": 0}, "color": {"color": "#CBD5E1", "highlight": "#10B981", "hover": "#0EA5E9"}, "smooth": {"type": "cubicBezier", "roundness": 0.25}, "width": 1.75}, {"id": "e_14", "from": "SESSION-OUTCOME-SEARCH", "to": "ADR-001", "label": "VERIFIED_BY", "arrows": {"to": {"enabled": true, "scaleFactor": 0.75}}, "font": {"color": "#64748B", "size": 10, "face": "Inter, sans-serif", "align": "middle", "background": "#FFFFFF", "strokeWidth": 0}, "color": {"color": "#CBD5E1", "highlight": "#10B981", "hover": "#0EA5E9"}, "smooth": {"type": "cubicBezier", "roundness": 0.25}, "width": 1.75}, {"id": "e_15", "from": "ADR-002", "to": "CONV-01", "label": "ENFORCES", "arrows": {"to": {"enabled": true, "scaleFactor": 0.75}}, "font": {"color": "#64748B", "size": 10, "face": "Inter, sans-serif", "align": "middle", "background": "#FFFFFF", "strokeWidth": 0}, "color": {"color": "#CBD5E1", "highlight": "#10B981", "hover": "#0EA5E9"}, "smooth": {"type": "cubicBezier", "roundness": 0.25}, "width": 1.75}, {"id": "e_16", "from": "ADR-002", "to": "CONV-02", "label": "ENFORCES", "arrows": {"to": {"enabled": true, "scaleFactor": 0.75}}, "font": {"color": "#64748B", "size": 10, "face": "Inter, sans-serif", "align": "middle", "background": "#FFFFFF", "strokeWidth": 0}, "color": {"color": "#CBD5E1", "highlight": "#10B981", "hover": "#0EA5E9"}, "smooth": {"type": "cubicBezier", "roundness": 0.25}, "width": 1.75}, {"id": "e_17", "from": "ADR-002", "to": "CONV-03", "label": "ENFORCES", "arrows": {"to": {"enabled": true, "scaleFactor": 0.75}}, "font": {"color": "#64748B", "size": 10, "face": "Inter, sans-serif", "align": "middle", "background": "#FFFFFF", "strokeWidth": 0}, "color": {"color": "#CBD5E1", "highlight": "#10B981", "hover": "#0EA5E9"}, "smooth": {"type": "cubicBezier", "roundness": 0.25}, "width": 1.75}, {"id": "e_18", "from": "ADR-001", "to": "CONV-001", "label": "ENFORCES", "arrows": {"to": {"enabled": true, "scaleFactor": 0.75}}, "font": {"color": "#64748B", "size": 10, "face": "Inter, sans-serif", "align": "middle", "background": "#FFFFFF", "strokeWidth": 0}, "color": {"color": "#CBD5E1", "highlight": "#10B981", "hover": "#0EA5E9"}, "smooth": {"type": "cubicBezier", "roundness": 0.25}, "width": 1.75}, {"id": "e_19", "from": "ADR-001", "to": "VUL-001", "label": "RESOLVES", "arrows": {"to": {"enabled": true, "scaleFactor": 0.75}}, "font": {"color": "#64748B", "size": 10, "face": "Inter, sans-serif", "align": "middle", "background": "#FFFFFF", "strokeWidth": 0}, "color": {"color": "#CBD5E1", "highlight": "#10B981", "hover": "#0EA5E9"}, "smooth": {"type": "cubicBezier", "roundness": 0.25}, "width": 1.75}, {"id": "e_20", "from": "CONV-001", "to": "VUL-001", "label": "PREVENTS", "arrows": {"to": {"enabled": true, "scaleFactor": 0.75}}, "font": {"color": "#64748B", "size": 10, "face": "Inter, sans-serif", "align": "middle", "background": "#FFFFFF", "strokeWidth": 0}, "color": {"color": "#CBD5E1", "highlight": "#10B981", "hover": "#0EA5E9"}, "smooth": {"type": "cubicBezier", "roundness": 0.25}, "width": 1.75}, {"id": "e_21", "from": "ADR-003", "to": "VULN-CWE-89", "label": "PREVENTS_CATEGORY", "arrows": {"to": {"enabled": true, "scaleFactor": 0.75}}, "font": {"color": "#64748B", "size": 10, "face": "Inter, sans-serif", "align": "middle", "background": "#FFFFFF", "strokeWidth": 0}, "color": {"color": "#CBD5E1", "highlight": "#10B981", "hover": "#0EA5E9"}, "smooth": {"type": "cubicBezier", "roundness": 0.25}, "width": 1.75}];
+        let currentNodeIndex = 0;
+        let selectedNodeId = null;
+        let isIsolatedNeighborhood = false;
+
+        const colorMap = {
+            "ArchitecturalDecision": {"bg": "#ECFDF5", "border": "#10B981", "text": "#065F46", "badge": "#D1FAE5"},
+            "PastCIError": {"bg": "#FFF1F2", "border": "#F43F5E", "text": "#9F1239", "badge": "#FFE4E6"},
+            "SimilarPR": {"bg": "#F0F9FF", "border": "#38BDF8", "text": "#0369A1", "badge": "#E0F2FE"},
+            "RepositoryConvention": {"bg": "#FFFBEB", "border": "#F59E0B", "text": "#92400E", "badge": "#FEF3C7"},
+            "ResolvedVulnerability": {"bg": "#FAF5FF", "border": "#A855F7", "text": "#6B21A8", "badge": "#F3E8FF"},
+            "TeamPreference": {"bg": "#FFF7ED", "border": "#FB923C", "text": "#9A3412", "badge": "#FFEDD5"},
+            "Runbook": {"bg": "#F0FDF4", "border": "#0EA5E9", "text": "#0284C7", "badge": "#E0F2FE"},
+            "SourceCode": {"bg": "#F8FAFC", "border": "#818CF8", "text": "#3730A3", "badge": "#EEF2FF"},
+            "Documentation": {"bg": "#F8FAFC", "border": "#94A3B8", "text": "#1E293B", "badge": "#F1F5F9"},
+            "SessionOutcome": {"bg": "#F0FDF4", "border": "#22C55E", "text": "#15803D", "badge": "#DCFCE7"}
+        };
+
+        const container = document.getElementById('network-canvas');
+        const nodesDataSet = new vis.DataSet(rawNodes);
+        const edgesDataSet = new vis.DataSet(rawEdges);
+        const data = { nodes: nodesDataSet, edges: edgesDataSet };
+
+        const options = {
+            nodes: {
+                shape: 'box',
+                borderWidth: 2,
+                shadow: true,
+                chosen: {
+                    node: function(values, id, selected, hovering) {
+                        values.borderWidth = 3;
+                        values.shadowSize = 14;
+                    }
+                }
+            },
+            edges: {
+                width: 1.75,
+                arrows: { to: { enabled: true, scaleFactor: 0.75 } },
+                font: { color: '#475569', size: 10, align: 'middle', background: '#FFFFFF', strokeWidth: 2, strokeColor: '#FFFFFF' },
+                color: { color: '#CBD5E1', highlight: '#10B981', hover: '#0EA5E9' }
+            },
+            physics: {
+                solver: 'forceAtlas2Based',
+                forceAtlas2Based: {
+                    gravitationalConstant: -45,
+                    centralGravity: 0.01,
+                    springLength: 100,
+                    springConstant: 0.08,
+                    damping: 0.4
+                },
+                maxVelocity: 50,
+                minVelocity: 0.1,
+                stabilization: { iterations: 160 }
+            },
+            interaction: {
+                hover: true,
+                tooltipDelay: 200,
+                navigationButtons: false,
+                keyboard: true
+            }
+        };
+
+        const network = new vis.Network(container, data, options);
+
+        // Stabilize physics automatically so nodes stay locked in place
+        network.once("stabilizationIterationsDone", function () {
+            network.setOptions({ physics: { enabled: false } });
+        });
+
+        network.on("click", function (params) {
+            if (params.nodes.length > 0) {
+                const nId = params.nodes[0];
+                selectAndDisplayNode(nId);
+            } else {
+                if (isIsolatedNeighborhood) {
+                    resetIsolation();
+                }
+            }
+        });
+
+        function updateStats() {
+            document.getElementById('statNodes').innerText = nodesDataSet.length;
+            document.getElementById('statEdges').innerText = edgesDataSet.length;
+            updateStepIndicator();
+        }
+
+        function updateStepIndicator() {
+            const visibleNodes = rawNodes.filter(n => !n.hidden);
+            const total = visibleNodes.length;
+            const current = total > 0 ? (currentNodeIndex % total) + 1 : 0;
+            document.getElementById('navStepIndicator').innerText = `${current} / ${total}`;
+        }
+
+        function selectAndDisplayNode(nodeId) {
+            selectedNodeId = nodeId;
+            const idx = rawNodes.findIndex(n => n.id === nodeId);
+            if (idx !== -1) currentNodeIndex = idx;
+            updateStepIndicator();
+            displayNodeDetails(nodeId);
+        }
+
+        function displayNodeDetails(nodeId) {
+            const node = rawNodes.find(n => n.id === nodeId);
+            if (!node) return;
+
+            const nData = node.raw_data || {};
+            const inbound = rawEdges.filter(e => e.to === nodeId);
+            const outbound = rawEdges.filter(e => e.from === nodeId);
+
+            const badgeBg = node.color.background;
+            const badgeColor = node.color.border;
+
+            let inHtml = inbound.map(e => `
+                <div class="relation-item" onclick="focusNode('${e.from}')">
+                    <span><b>${e.from}</b></span>
+                    <span class="rel-label">◀ ${e.label}</span>
+                </div>
+            `).join('') || '<div style="color:var(--text-subtle); font-size:12px; padding: 4px 0;">(No inbound relations)</div>';
+
+            let outHtml = outbound.map(e => `
+                <div class="relation-item" onclick="focusNode('${e.to}')">
+                    <span><b>${e.to}</b></span>
+                    <span class="rel-label">${e.label} ▶</span>
+                </div>
+            `).join('') || '<div style="color:var(--text-subtle); font-size:12px; padding: 4px 0;">(No outbound dependencies)</div>';
+
+            const html = `
+                <div class="node-card">
+                    <span class="badge-type" style="background: ${badgeBg}; color: ${badgeColor};">${nData.type || 'Entity'}</span>
+                    <div class="node-title">${nodeId} • ${nData.title || ''}</div>
+                    <div class="node-desc">${nData.content || '(No description text)'}</div>
+                    
+                    <div class="node-manage-bar">
+                        <button class="btn-node-edit" onclick="openEditNodeModal('${nodeId}')">✏️ Edit Content</button>
+                        <button class="btn-node-delete" onclick="deleteNode('${nodeId}')">🗑️ Delete</button>
+                    </div>
+                </div>
+
+                <div class="section-label">Inbound Causal Precedents (${inbound.length})</div>
+                ${inHtml}
+
+                <div class="section-label">Outbound Dependencies (${outbound.length})</div>
+                ${outHtml}
+            `;
+            document.getElementById('nodeDetails').innerHTML = html;
+        }
+
+        function focusNode(nodeId) {
+            selectAndDisplayNode(nodeId);
+            network.focus(nodeId, {
+                scale: 1.35,
+                animation: { duration: 600, easingFunction: 'easeInOutQuad' }
+            });
+            network.selectNodes([nodeId]);
+        }
+
+        function fitNetwork() {
+            resetIsolation();
+            network.fit({ animation: { duration: 600, easingFunction: 'easeInOutQuad' } });
+        }
+
+        function zoomNetwork(factor) {
+            const currentScale = network.getScale();
+            network.moveTo({
+                scale: currentScale * factor,
+                animation: { duration: 300 }
+            });
+        }
+
+        function stepNode(delta) {
+            const visibleNodes = rawNodes.filter(n => !n.hidden);
+            if (visibleNodes.length === 0) return;
+            currentNodeIndex = (currentNodeIndex + delta + visibleNodes.length) % visibleNodes.length;
+            const target = visibleNodes[currentNodeIndex];
+            if (target) focusNode(target.id);
+        }
+
+        function jumpToCluster(groupType) {
+            if (!groupType) return;
+            const matching = rawNodes.filter(n => n.group === groupType);
+            if (matching.length > 0) {
+                const targetIds = matching.map(n => n.id);
+                network.fit({
+                    nodes: targetIds,
+                    animation: { duration: 600, easingFunction: 'easeInOutQuad' }
+                });
+                focusNode(matching[0].id);
+            }
+        }
+
+        function toggleIsolateNeighborhood() {
+            if (!selectedNodeId) {
+                alert("Please select a node on the canvas first to isolate its neighbors.");
+                return;
+            }
+
+            isIsolatedNeighborhood = !isIsolatedNeighborhood;
+            const btn = document.getElementById('isolateBtn');
+            btn.classList.toggle('active', isIsolatedNeighborhood);
+
+            if (isIsolatedNeighborhood) {
+                const connectedNodes = new Set(network.getConnectedNodes(selectedNodeId));
+                connectedNodes.add(selectedNodeId);
+
+                const updates = rawNodes.map(n => ({
+                    id: n.id,
+                    opacity: connectedNodes.has(n.id) ? 1.0 : 0.15
+                }));
+                nodesDataSet.update(updates);
+            } else {
+                resetIsolation();
+            }
+        }
+
+        function resetIsolation() {
+            isIsolatedNeighborhood = false;
+            document.getElementById('isolateBtn').classList.remove('active');
+            nodesDataSet.update(rawNodes.map(n => ({ id: n.id, opacity: 1.0 })));
+        }
+
+        function searchNodes(query) {
+            if (!query.trim()) return;
+            const q = query.toLowerCase();
+            const match = rawNodes.find(n => n.id.toLowerCase().includes(q) || (n.raw_data && n.raw_data.title && n.raw_data.title.toLowerCase().includes(q)));
+            if (match) {
+                focusNode(match.id);
+            }
+        }
+
+        function filterType(typeName, chipEl) {
+            document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+            chipEl.classList.add('active');
+
+            if (typeName === 'ALL') {
+                rawNodes.forEach(n => n.hidden = false);
+                nodesDataSet.update(rawNodes.map(n => ({ id: n.id, hidden: false })));
+            } else {
+                rawNodes.forEach(n => n.hidden = (n.group !== typeName));
+                nodesDataSet.update(rawNodes.map(n => ({ id: n.id, hidden: n.group !== typeName })));
+            }
+            updateStepIndicator();
+        }
+
+        /* Node CRUD Operations in UI */
+        let isEditing = false;
+
+        function openEditNodeModal(nodeId) {
+            const node = rawNodes.find(n => n.id === nodeId);
+            if (!node) return;
+
+            isEditing = true;
+            document.getElementById('modalTitle').innerText = `Edit Node: ${nodeId}`;
+            document.getElementById('modalNodeId').value = nodeId;
+            document.getElementById('modalNodeId').disabled = true;
+            document.getElementById('modalNodeType').value = node.group || 'ArchitecturalDecision';
+            document.getElementById('modalNodeTitle').value = node.raw_data.title || '';
+            document.getElementById('modalNodeContent').value = node.raw_data.content || '';
+            document.getElementById('nodeModal').style.display = 'flex';
+        }
+
+        function openAddNodeModal() {
+            isEditing = false;
+            document.getElementById('modalTitle').innerText = "Add New Knowledge Node";
+            document.getElementById('modalNodeId').value = `MEM-${Math.floor(100 + Math.random() * 900)}`;
+            document.getElementById('modalNodeId').disabled = false;
+            document.getElementById('modalNodeType').value = 'ArchitecturalDecision';
+            document.getElementById('modalNodeTitle').value = '';
+            document.getElementById('modalNodeContent').value = '';
+            document.getElementById('nodeModal').style.display = 'flex';
+        }
+
+        function closeNodeModal() {
+            document.getElementById('nodeModal').style.display = 'none';
+        }
+
+        function saveNodeModal() {
+            const nId = document.getElementById('modalNodeId').value.trim();
+            const nType = document.getElementById('modalNodeType').value;
+            const nTitle = document.getElementById('modalNodeTitle').value.trim();
+            const nContent = document.getElementById('modalNodeContent').value.trim();
+
+            if (!nId || !nTitle) {
+                alert("Node ID and Title are required.");
+                return;
+            }
+
+            const palette = colorMap[nType] || {"bg": "#F8FAFC", "border": "#94A3B8", "text": "#334155"};
+            const cleanTitle = nTitle.length > 28 ? nTitle.slice(0, 28) + '...' : nTitle;
+            const nodeLabel = `${nId}\n${cleanTitle}`;
+
+            if (isEditing) {
+                const existing = rawNodes.find(n => n.id === nId);
+                if (existing) {
+                    existing.group = nType;
+                    existing.label = nodeLabel;
+                    existing.color = { background: palette.bg, border: palette.border, highlight: { background: "#FFF", border: palette.border } };
+                    existing.font = { color: palette.text, size: 12, bold: "600" };
+                    existing.raw_data.title = nTitle;
+                    existing.raw_data.content = nContent;
+                    existing.raw_data.type = nType;
+                    nodesDataSet.update(existing);
+                }
+            } else {
+                const newNode = {
+                    id: nId,
+                    label: nodeLabel,
+                    group: nType,
+                    shape: "box",
+                    margin: { top: 10, bottom: 10, left: 14, right: 14 },
+                    color: { background: palette.bg, border: palette.border, highlight: { background: "#FFF", border: palette.border } },
+                    font: { color: palette.text, size: 12, bold: "600" },
+                    borderWidth: 2,
+                    shadow: { enabled: true, color: "rgba(15, 23, 42, 0.08)", size: 10, x: 0, y: 4 },
+                    raw_data: { id: nId, type: nType, title: nTitle, content: nContent, category: "Custom", created_at: Date.now() }
+                };
+                rawNodes.push(newNode);
+                nodesDataSet.add(newNode);
+            }
+
+            closeNodeModal();
+            updateStats();
+            focusNode(nId);
+        }
+
+        function deleteNode(nodeId) {
+            if (!confirm(`Are you sure you want to delete memory node '${nodeId}' and all its causal relations?`)) return;
+
+            rawNodes = rawNodes.filter(n => n.id !== nodeId);
+            nodesDataSet.remove(nodeId);
+
+            const edgesToRemove = rawEdges.filter(e => e.from === nodeId || e.to === nodeId).map(e => e.id);
+            rawEdges = rawEdges.filter(e => e.from !== nodeId && e.to !== nodeId);
+            edgesDataSet.remove(edgesToRemove);
+
+            updateStats();
+            document.getElementById('nodeDetails').innerHTML = `
+                <div class="node-card">
+                    <span class="badge-type" style="background: var(--danger-light); color: var(--danger);">Deleted</span>
+                    <div class="node-title">Node ${nodeId} Removed</div>
+                    <div class="node-desc">The entity knowledge and its associated relationships have been removed from the active graph.</div>
+                </div>
+            `;
+        }
+
+        function exportGraphData() {
+            const exportObj = {
+                exported_at: new Date().toISOString(),
+                total_nodes: rawNodes.length,
+                total_edges: rawEdges.length,
+                nodes: rawNodes.map(n => n.raw_data || { id: n.id, title: n.label }),
+                edges: rawEdges.map(e => ({ source: e.from, target: e.to, relation: e.label }))
+            };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `cognee_knowledge_graph_export_${Date.now()}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const isDark = body.getAttribute('data-theme') === 'dark';
+            const newTheme = isDark ? 'light' : 'dark';
+            body.setAttribute('data-theme', newTheme);
+            document.getElementById('themeBtn').innerHTML = isDark ? '🌙 Dark Mode' : '☀️ Light Mode';
+        }
+
+        updateStats();
+    </script>
+</body>
+</html>

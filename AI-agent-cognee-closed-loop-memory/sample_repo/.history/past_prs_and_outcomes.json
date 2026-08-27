@@ -1,0 +1,20 @@
+[
+  {
+    "pr_number": 142,
+    "title": "Fix SQL injection in user search and enforce ADR-003 parameterized query binding",
+    "author": "agent-swe-bot",
+    "merged_at": 1752584600,
+    "changed_files": ["src/api/auth.py", "tests/test_auth.py"],
+    "linked_adr": "ADR-003",
+    "outcome": "PASSED - All CI tests green, SQL injection eliminated."
+  },
+  {
+    "pr_number": 128,
+    "title": "Refactor JWT decode options to enforce HS256 algorithm whitelisting",
+    "author": "agent-swe-bot",
+    "merged_at": 1751807000,
+    "changed_files": ["src/api/auth.py"],
+    "linked_adr": "CONV-02",
+    "outcome": "PASSED - Resolved CWE-287."
+  }
+]

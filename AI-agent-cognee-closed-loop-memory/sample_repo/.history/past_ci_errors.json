@@ -1,0 +1,11 @@
+[
+  {
+    "ci_run_id": 89,
+    "timestamp": 1752498200,
+    "branch": "feature/user-search-filter",
+    "failed_test": "tests/test_auth.py::test_tenant_search_isolation",
+    "error_message": "SQLSyntaxError: near 'UNION': syntax error. Query attempted: SELECT * FROM users WHERE tenant_id = '1' AND name LIKE '%test' UNION SELECT ...",
+    "root_cause": "Raw f-string interpolation allowed SQL injection and crossed tenant isolation boundaries.",
+    "resolution_pr": 142
+  }
+]

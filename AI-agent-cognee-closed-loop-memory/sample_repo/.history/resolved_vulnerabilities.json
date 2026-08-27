@@ -1,0 +1,18 @@
+[
+  {
+    "cwe_id": "CWE-89",
+    "title": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')",
+    "severity": "CRITICAL",
+    "affected_endpoint": "/api/v1/users/search",
+    "mitigation_commit": "c48f9a2",
+    "fixed_in_pr": 142
+  },
+  {
+    "cwe_id": "CWE-639",
+    "title": "Authorization Bypass Through User-Controlled Key (IDOR)",
+    "severity": "HIGH",
+    "affected_endpoint": "/api/v1/orders/{order_id}",
+    "mitigation_commit": "e81d22b",
+    "fixed_in_pr": 135
+  }
+]

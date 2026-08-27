@@ -1,0 +1,1381 @@
+[
+  {
+    "timestamp": 1787677467.207756,
+    "query": "Implement user search endpoint with tenant isolation",
+    "retrieved_nodes": [
+      "CONV-02",
+      "VULN-CWE-89",
+      "RUNBOOK-01",
+      "ADR-003",
+      "CI-FAIL-89",
+      "PR-142"
+    ],
+    "graph_paths": 9,
+    "latency_seconds": 0.0
+  },
+  {
+    "timestamp": 1787677467.617297,
+    "query": "Search users endpoint",
+    "retrieved_nodes": [
+      "CONV-02",
+      "VULN-CWE-89",
+      "RUNBOOK-01",
+      "ADR-003",
+      "CI-FAIL-89",
+      "PR-142"
+    ],
+    "graph_paths": 8,
+    "latency_seconds": 0.0
+  },
+  {
+    "timestamp": 1787677475.419063,
+    "query": "Add user search endpoint respecting tenant isolation and parameterized SQL queries",
+    "retrieved_nodes": [
+      "VULN-CWE-89",
+      "PR-142",
+      "RUNBOOK-01",
+      "ADR-003",
+      "CI-FAIL-89"
+    ],
+    "graph_paths": 7,
+    "latency_seconds": 0.0
+  },
+  {
+    "timestamp": 1787677482.5102022,
+    "query": "how to fix tenant sql injection",
+    "retrieved_nodes": [
+      "VULN-CWE-89",
+      "CI-FAIL-89",
+      "PR-142",
+      "RUNBOOK-01",
+      "ADR-003",
+      "FILE_src_api_billing_py"
+    ],
+    "graph_paths": 5,
+    "latency_seconds": 0.0
+  },
+  {
+    "timestamp": 1787677906.109714,
+    "query": "Add a new user search endpoint '/api/v1/users/search' allowing enterprise admins to query accounts by username, while strictly respecting multi-tenant isolation.",
+    "retrieved_nodes": [
+      "ADR-003",
+      "FILE_src_api_auth_py",
+      "CONV-02",
+      "PR-142",
+      "ADR-001",
+      "VULN-CWE-89"
+    ],
+    "graph_paths": 7,
+    "latency_seconds": 0.0
+  },
+  {
+    "timestamp": 1787678138.131333,
+    "query": "Implement user search endpoint with tenant isolation",
+    "retrieved_nodes": [
+      "ADR-002",
+      "ADR-003",
+      "ADR-001"
+    ],
+    "graph_paths": 0,
+    "latency_seconds": 0.121
+  },
+  {
+    "timestamp": 1787678147.169371,
+    "query": "Search users endpoint",
+    "retrieved_nodes": [
+      "ADR-002",
+      "ADR-003",
+      "ADR-001"
+    ],
+    "graph_paths": 0,
+    "latency_seconds": 0.119
+  },
+  {
+    "timestamp": 1787678265.416116,
+    "query": "Implement user search endpoint with tenant isolation",
+    "retrieved_nodes": [
+      "ADR-001",
+      "ADR-003",
+      "ADR-002"
+    ],
+    "graph_paths": 0,
+    "latency_seconds": 0.588
+  },
+  {
+    "timestamp": 1787724223.811955,
+    "query": "Implement user search endpoint with tenant isolation",
+    "retrieved_nodes": [
+      "ADR-001",
+      "ADR-003",
+      "ADR-002"
+    ],
+    "graph_paths": 0,
+    "latency_seconds": 0.563
+  },
+  {
+    "timestamp": 1787724240.791442,
+    "query": "Search users endpoint",
+    "retrieved_nodes": [
+      "ADR-001",
+      "ADR-003",
+      "ADR-002"
+    ],
+    "graph_paths": 0,
+    "latency_seconds": 0.121
+  },
+  {
+    "timestamp": 1787725211.493451,
+    "query": "Implement user search endpoint with tenant isolation",
+    "retrieved_nodes": [
+      "ADR-002",
+      "ADR-003",
+      "ADR-001"
+    ],
+    "graph_paths": 0,
+    "latency_seconds": 0.64
+  },
+  {
+    "timestamp": 1787725228.6004,
+    "query": "Search users endpoint",
+    "retrieved_nodes": [
+      "ADR-002",
+      "ADR-003",
+      "ADR-001"
+    ],
+    "graph_paths": 0,
+    "latency_seconds": 0.123
+  },
+  {
+    "timestamp": 1787725242.982615,
+    "query": "Implement user search endpoint with tenant isolation",
+    "retrieved_nodes": [
+      "ADR-002",
+      "ADR-001",
+      "ADR-003"
+    ],
+    "graph_paths": 0,
+    "latency_seconds": 0.512
+  },
+  {
+    "timestamp": 1787725258.3074932,
+    "query": "Search users endpoint",
+    "retrieved_nodes": [
+      "ADR-002",
+      "ADR-001",
+      "ADR-003"
+    ],
+    "graph_paths": 0,
+    "latency_seconds": 0.119
+  },
+  {
+    "timestamp": 1787725264.317903,
+    "query": "tenant isolation SQL query parameters",
+    "retrieved_nodes": [
+      "ADR-002",
+      "ADR-001",
+      "ADR-003"
+    ],
+    "graph_paths": 0,
+    "latency_seconds": 0.18
+  },
+  {
+    "timestamp": 1787725276.3675919,
+    "query": "Add billing user search filter",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.12
+  },
+  {
+    "timestamp": 1787725281.652118,
+    "query": "tenant isolation and parameterized queries",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.185
+  },
+  {
+    "timestamp": 1787725446.991012,
+    "query": "Implement user search endpoint with tenant isolation",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.623
+  },
+  {
+    "timestamp": 1787725465.946322,
+    "query": "Search users endpoint",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.119
+  },
+  {
+    "timestamp": 1787725472.7075908,
+    "query": "tenant isolation SQL query parameters",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.18
+  },
+  {
+    "timestamp": 1787725487.676631,
+    "query": "Add billing user search filter",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.134
+  },
+  {
+    "timestamp": 1787725493.8239622,
+    "query": "tenant isolation and parameterized queries",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.213
+  },
+  {
+    "timestamp": 1787725571.270655,
+    "query": "Implement user search endpoint with tenant isolation",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.549
+  },
+  {
+    "timestamp": 1787725590.452306,
+    "query": "Search users endpoint",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.145
+  },
+  {
+    "timestamp": 1787725598.0153432,
+    "query": "tenant isolation SQL query parameters",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.306
+  },
+  {
+    "timestamp": 1787725612.662223,
+    "query": "Add billing user search filter",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.127
+  },
+  {
+    "timestamp": 1787725618.0295098,
+    "query": "tenant isolation and parameterized queries",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.194
+  },
+  {
+    "timestamp": 1787725626.027231,
+    "query": "user search tenant isolation",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.583
+  },
+  {
+    "timestamp": 1787728438.1673129,
+    "query": "Implement user search endpoint with tenant isolation",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.724
+  },
+  {
+    "timestamp": 1787728454.343642,
+    "query": "Search users endpoint",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.179
+  },
+  {
+    "timestamp": 1787728460.125335,
+    "query": "tenant isolation SQL query parameters",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.194
+  },
+  {
+    "timestamp": 1787728472.167381,
+    "query": "Add billing user search filter",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.167
+  },
+  {
+    "timestamp": 1787728476.6991491,
+    "query": "tenant isolation and parameterized queries",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.208
+  },
+  {
+    "timestamp": 1787728587.293014,
+    "query": "Implement user search endpoint with tenant isolation",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.616
+  },
+  {
+    "timestamp": 1787728602.67621,
+    "query": "Search users endpoint",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.119
+  },
+  {
+    "timestamp": 1787728608.0335429,
+    "query": "tenant isolation SQL query parameters",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.252
+  },
+  {
+    "timestamp": 1787728619.9612238,
+    "query": "Add billing user search filter",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.126
+  },
+  {
+    "timestamp": 1787728624.64105,
+    "query": "tenant isolation and parameterized queries",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.186
+  },
+  {
+    "timestamp": 1787728738.956715,
+    "query": "Implement user search endpoint with tenant isolation",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.638
+  },
+  {
+    "timestamp": 1787728756.361196,
+    "query": "Search users endpoint",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.137
+  },
+  {
+    "timestamp": 1787728762.994255,
+    "query": "tenant isolation SQL query parameters",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.184
+  },
+  {
+    "timestamp": 1787728774.161068,
+    "query": "Add billing user search filter",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.121
+  },
+  {
+    "timestamp": 1787728779.4049878,
+    "query": "tenant isolation and parameterized queries",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.172
+  },
+  {
+    "timestamp": 1787730587.960779,
+    "query": "Implement user search endpoint with tenant isolation",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.701
+  },
+  {
+    "timestamp": 1787730605.555996,
+    "query": "Search users endpoint",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.13
+  },
+  {
+    "timestamp": 1787730610.92205,
+    "query": "tenant isolation SQL query parameters",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.263
+  },
+  {
+    "timestamp": 1787730623.124657,
+    "query": "Add billing user search filter",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.133
+  },
+  {
+    "timestamp": 1787730628.182719,
+    "query": "tenant isolation and parameterized queries",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.192
+  },
+  {
+    "timestamp": 1787730724.811024,
+    "query": "Implement user search endpoint with tenant isolation",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.63
+  },
+  {
+    "timestamp": 1787730742.918689,
+    "query": "Search users endpoint",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.148
+  },
+  {
+    "timestamp": 1787730749.216148,
+    "query": "tenant isolation SQL query parameters",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.208
+  },
+  {
+    "timestamp": 1787730762.62915,
+    "query": "Add billing user search filter",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.127
+  },
+  {
+    "timestamp": 1787730768.072223,
+    "query": "tenant isolation and parameterized queries",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.183
+  },
+  {
+    "timestamp": 1787731382.040162,
+    "query": "Implement user search endpoint with tenant isolation",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.624
+  },
+  {
+    "timestamp": 1787731409.945997,
+    "query": "Search users endpoint",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.132
+  },
+  {
+    "timestamp": 1787731419.8741388,
+    "query": "tenant isolation SQL query parameters",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.286
+  },
+  {
+    "timestamp": 1787731435.232909,
+    "query": "Add billing user search filter",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.142
+  },
+  {
+    "timestamp": 1787731445.058243,
+    "query": "tenant isolation and parameterized queries",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.207
+  },
+  {
+    "timestamp": 1787731496.8839731,
+    "query": "Implement user search endpoint with tenant isolation",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.679
+  },
+  {
+    "timestamp": 1787731536.445496,
+    "query": "Search users endpoint",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.121
+  },
+  {
+    "timestamp": 1787731546.275958,
+    "query": "tenant isolation SQL query parameters",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.242
+  },
+  {
+    "timestamp": 1787731566.0765052,
+    "query": "Add billing user search filter",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.123
+  },
+  {
+    "timestamp": 1787731576.009759,
+    "query": "tenant isolation and parameterized queries",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.207
+  },
+  {
+    "timestamp": 1787731875.704878,
+    "query": "Implement user search endpoint with tenant isolation",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.606
+  },
+  {
+    "timestamp": 1787731900.1881459,
+    "query": "Search users endpoint",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.12
+  },
+  {
+    "timestamp": 1787731910.038325,
+    "query": "tenant isolation SQL query parameters",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.19
+  },
+  {
+    "timestamp": 1787731926.557297,
+    "query": "Add billing user search filter",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.122
+  },
+  {
+    "timestamp": 1787731933.078133,
+    "query": "tenant isolation and parameterized queries",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.201
+  },
+  {
+    "timestamp": 1787731943.215988,
+    "query": "tenant isolation SQL query parameters",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.539
+  },
+  {
+    "timestamp": 1787743722.6661701,
+    "query": "Implement user search endpoint with tenant isolation",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.65
+  },
+  {
+    "timestamp": 1787743744.0447161,
+    "query": "Search users endpoint",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.166
+  },
+  {
+    "timestamp": 1787743755.234715,
+    "query": "tenant isolation SQL query parameters",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.23
+  },
+  {
+    "timestamp": 1787743776.675617,
+    "query": "Add billing user search filter",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.139
+  },
+  {
+    "timestamp": 1787743787.875998,
+    "query": "tenant isolation and parameterized queries",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.21
+  },
+  {
+    "timestamp": 1787744099.107376,
+    "query": "Implement user search endpoint with tenant isolation",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.628
+  },
+  {
+    "timestamp": 1787744140.6714501,
+    "query": "Search users endpoint",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.126
+  },
+  {
+    "timestamp": 1787744156.418746,
+    "query": "tenant isolation SQL query parameters",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.199
+  },
+  {
+    "timestamp": 1787744183.813479,
+    "query": "Add billing user search filter",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.137
+  },
+  {
+    "timestamp": 1787744196.0098848,
+    "query": "tenant isolation and parameterized queries",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.222
+  },
+  {
+    "timestamp": 1787745016.01778,
+    "query": "Implement user search endpoint with tenant isolation",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.624
+  },
+  {
+    "timestamp": 1787745048.477985,
+    "query": "Search users endpoint",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.142
+  },
+  {
+    "timestamp": 1787745073.534067,
+    "query": "tenant isolation SQL query parameters",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.202
+  },
+  {
+    "timestamp": 1787745116.786072,
+    "query": "Add billing user search filter",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.148
+  },
+  {
+    "timestamp": 1787745131.650549,
+    "query": "tenant isolation and parameterized queries",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.257
+  },
+  {
+    "timestamp": 1787753317.4488268,
+    "query": "Implement user search endpoint with tenant isolation",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.78
+  },
+  {
+    "timestamp": 1787753366.05741,
+    "query": "Search users endpoint",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.139
+  },
+  {
+    "timestamp": 1787753421.9752162,
+    "query": "tenant isolation SQL query parameters",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.247
+  },
+  {
+    "timestamp": 1787753932.861442,
+    "query": "tenant isolation",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 1.063
+  },
+  {
+    "timestamp": 1787753941.498682,
+    "query": "user search tenant isolation",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 1.151
+  },
+  {
+    "timestamp": 1787756160.386972,
+    "query": "tenant isolation and parameterized queries",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.547
+  },
+  {
+    "timestamp": 1787756165.3855748,
+    "query": "tenant isolation SQL query parameters",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.448
+  },
+  {
+    "timestamp": 1787756228.551546,
+    "query": "Implement user search endpoint with tenant isolation",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.584
+  },
+  {
+    "timestamp": 1787756561.710909,
+    "query": "tenant isolation SQL query parameters",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 1.113
+  },
+  {
+    "timestamp": 1787756631.957314,
+    "query": "tenant isolation SQL query parameters",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.633
+  },
+  {
+    "timestamp": 1787756724.4596999,
+    "query": "Add billing user search filter",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.148
+  },
+  {
+    "timestamp": 1787756775.863316,
+    "query": "tenant isolation SQL query parameters",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.667
+  },
+  {
+    "timestamp": 1787757114.434211,
+    "query": "Implement user search endpoint with tenant isolation",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.1
+  },
+  {
+    "timestamp": 1787757115.501632,
+    "query": "Search users endpoint",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.091
+  },
+  {
+    "timestamp": 1787757115.694902,
+    "query": "tenant isolation SQL query parameters",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.18
+  },
+  {
+    "timestamp": 1787757118.077457,
+    "query": "Add billing user search filter",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.093
+  },
+  {
+    "timestamp": 1787757118.490266,
+    "query": "tenant isolation and parameterized queries",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.399
+  },
+  {
+    "timestamp": 1787757206.908548,
+    "query": "tenant isolation SQL query parameters",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.801
+  },
+  {
+    "timestamp": 1787757526.585496,
+    "query": "Add billing user search filter",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.128
+  },
+  {
+    "timestamp": 1787757714.065779,
+    "query": "tenant isolation SQL query parameters",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.626
+  },
+  {
+    "timestamp": 1787757845.655314,
+    "query": "Add billing user search filter",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.214
+  },
+  {
+    "timestamp": 1787757983.5480902,
+    "query": "Implement user search endpoint with tenant isolation",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.09
+  },
+  {
+    "timestamp": 1787757984.994596,
+    "query": "Search users endpoint",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.137
+  },
+  {
+    "timestamp": 1787757985.224144,
+    "query": "tenant isolation SQL query parameters",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.216
+  },
+  {
+    "timestamp": 1787757987.249654,
+    "query": "Add billing user search filter",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.102
+  },
+  {
+    "timestamp": 1787757987.4869409,
+    "query": "tenant isolation and parameterized queries",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.224
+  },
+  {
+    "timestamp": 1787758099.3113759,
+    "query": "Implement user search endpoint with tenant isolation",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.103
+  },
+  {
+    "timestamp": 1787758100.4111428,
+    "query": "Search users endpoint",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.084
+  },
+  {
+    "timestamp": 1787758100.655186,
+    "query": "tenant isolation SQL query parameters",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.231
+  },
+  {
+    "timestamp": 1787758102.755577,
+    "query": "Add billing user search filter",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.124
+  },
+  {
+    "timestamp": 1787758102.986044,
+    "query": "tenant isolation and parameterized queries",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.217
+  },
+  {
+    "timestamp": 1787758625.1662111,
+    "query": "Implement user search endpoint with tenant isolation",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.115
+  },
+  {
+    "timestamp": 1787758626.4747531,
+    "query": "Search users endpoint",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.095
+  },
+  {
+    "timestamp": 1787758626.714349,
+    "query": "tenant isolation SQL query parameters",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.226
+  },
+  {
+    "timestamp": 1787758628.859144,
+    "query": "Add billing user search filter",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.096
+  },
+  {
+    "timestamp": 1787758629.090451,
+    "query": "tenant isolation and parameterized queries",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.218
+  },
+  {
+    "timestamp": 1787814487.54062,
+    "query": "Implement user search endpoint with tenant isolation",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.075
+  },
+  {
+    "timestamp": 1787814488.964273,
+    "query": "Search users endpoint",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.095
+  },
+  {
+    "timestamp": 1787814489.1872299,
+    "query": "tenant isolation SQL query parameters",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.21
+  },
+  {
+    "timestamp": 1787814491.148722,
+    "query": "Add billing user search filter",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.079
+  },
+  {
+    "timestamp": 1787814491.351396,
+    "query": "tenant isolation and parameterized queries",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.189
+  },
+  {
+    "timestamp": 1787814576.0071402,
+    "query": "Implement user search endpoint with tenant isolation",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.08
+  },
+  {
+    "timestamp": 1787814577.031436,
+    "query": "Search users endpoint",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.098
+  },
+  {
+    "timestamp": 1787814577.2596538,
+    "query": "tenant isolation SQL query parameters",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.215
+  },
+  {
+    "timestamp": 1787814579.082197,
+    "query": "Add billing user search filter",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.102
+  },
+  {
+    "timestamp": 1787814579.2914271,
+    "query": "tenant isolation and parameterized queries",
+    "retrieved_nodes": [
+      "ADR-001",
+      "SESSION-OUTCOME-SEARCH"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.196
+  },
+  {
+    "timestamp": 1787814727.236442,
+    "query": "Implement user search endpoint with tenant isolation",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.099
+  },
+  {
+    "timestamp": 1787814728.32295,
+    "query": "Search users endpoint",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.087
+  },
+  {
+    "timestamp": 1787814728.541322,
+    "query": "tenant isolation SQL query parameters",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.204
+  },
+  {
+    "timestamp": 1787814730.452569,
+    "query": "Add billing user search filter",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.079
+  },
+  {
+    "timestamp": 1787814730.66797,
+    "query": "tenant isolation and parameterized queries",
+    "retrieved_nodes": [
+      "SESSION-OUTCOME-SEARCH",
+      "ADR-001"
+    ],
+    "graph_paths": 1,
+    "latency_seconds": 0.201
+  }
+]

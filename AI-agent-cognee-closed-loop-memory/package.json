@@ -1,0 +1,22 @@
+{
+  "name": "@regolo/cognee-agent-memory",
+  "version": "1.0.0",
+  "description": "Regolo.ai + Cognee Long-Term Memory Connector for Claude Code & OpenClaw",
+  "main": "plugins/mcp_server.js",
+  "scripts": {
+    "start": "node plugins/mcp_server.js",
+    "test": "node --test"
+  },
+  "keywords": [
+    "regolo",
+    "cognee",
+    "ai-agent",
+    "long-term-memory",
+    "claude-code",
+    "openclaw",
+    "mcp"
+  ],
+  "author": "Regolo.ai (DHH Group)",
+  "license": "MIT",
+  "type": "module"
+}

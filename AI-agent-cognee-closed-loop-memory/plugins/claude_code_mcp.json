@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "regolo-cognee-memory": {
+      "command": "python3",
+      "args": [
+        "/Users/alexgenovese/Desktop/regolo/video/3 - Cognee/plugins/mcp_server.py"
+      ],
+      "env": {
+        "REGOLO_API_KEY": "sk-J21g3JrsGF22G63MEHxGiA",
+        "REGOLO_BASE_URL": "https://api.regolo.ai/v1",
+        "COGNEE_API_URL": "http://127.0.0.1:8800"
+      }
+    }
+  }
+}

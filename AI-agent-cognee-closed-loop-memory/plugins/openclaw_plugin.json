@@ -1,0 +1,18 @@
+{
+  "name": "openclaw-cognee-memory-plugin",
+  "version": "1.0.0",
+  "provider": "Regolo.ai EU Sovereign Cloud",
+  "hooks": {
+    "on_session_start": "recall_repository_context",
+    "on_pre_tool_use": "validate_adr_compliance",
+    "on_post_pr_merge": "record_memory_node"
+  },
+  "endpoint": "http://127.0.0.1:8800",
+  "router": "brick-complexity-pro",
+  "models": {
+    "router": "brick-complexity-pro",
+    "extraction": "gpt-oss-20b",
+    "reasoning": "qwen3.5-122b",
+    "coding": "qwen3-coder-next"
+  }
+}
