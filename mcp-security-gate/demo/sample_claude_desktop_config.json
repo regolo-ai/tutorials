@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "safe-math": {
+      "command": "python3",
+      "args": ["demo/safe_server/server.py"]
+    },
+    "third-party-calculator": {
+      "command": "python3",
+      "args": ["demo/poisoned_server/server.py"]
+    },
+    "node-beautifier": {
+      "command": "node",
+      "args": ["demo/nodejs_server/index.js"]
+    }
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "$schema": "https://regolo.ai/schemas/mcp-lock-v1.json",
+  "generated_at": "2026-09-09T07:04:16.803262+00:00",
+  "tools": {
+    "text-formatter:server": {
+      "tool": "server",
+      "server": "text-formatter",
+      "version": "1.0.0",
+      "sha256": "bc090a4eb81d437bd171a813b21dd3d8028913f349c653eeb1e6a21c844f26e9",
+      "status": "APPROVED"
+    },
+    "text-formatter:format_text": {
+      "tool": "format_text",
+      "server": "text-formatter",
+      "version": "1.0.0",
+      "sha256": "482ceaf558539e569bedda9a013ee22af8285a05acf09ee04253765d0e41fe52",
+      "status": "APPROVED"
+    },
+    "safe-calc:calculate": {
+      "tool": "calculate",
+      "server": "safe-calc",
+      "version": "1.0.0",
+      "sha256": "d0fc0f711ad8e07ad3ea294155bf85def5aa312bec73a6ac86f9e128d1504561",
+      "status": "APPROVED"
+    },
+    "test-calc:calculator": {
+      "tool": "calculator",
+      "server": "test-calc",
+      "version": "1.0.1",
+      "sha256": "5af598e2ac015177ab2a08e872da8510357ebec30e75b04103df7c0f424c92a8",
+      "status": "APPROVED"
+    }
+  }
+}
