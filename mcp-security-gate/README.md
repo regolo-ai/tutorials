@@ -1,8 +1,45 @@
-# REGOLO MCP Security Gate & AI Remediation
+<div align="center">
+  <img src="https://regolo.ai/wp-content/uploads/2026/06/Regolo_logo_positive.png" alt="Regolo.ai Logo" width="300" />
+</div>
+
+# MCP Security Gate & AI Remediation
+
+<div align="center">
+  <img src="https://img.shields.io/badge/build-passing-brightgreen.svg" alt="Build passing" />
+  <img src="https://img.shields.io/badge/python-3.10+-blue.svg?logo=python&logoColor=white" alt="Python 3.10+" />
+  <img src="https://img.shields.io/badge/Code-Runnable_Examples-2ea44f.svg" alt="Code: Runnable Examples" />
+  <img src="https://img.shields.io/badge/Security-OWASP_LLM_Top_10-red.svg" alt="Security: OWASP LLM Top 10" />
+  <img src="https://img.shields.io/badge/API-OpenAI_Compatible-313236.svg" alt="API OpenAI Compatible" />
+  <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" />
+</div>
+
+<br />
 
 Pre-installation security scanner, cryptographic fingerprint locking, and automated AI remediation powered by **REGOLO `brick-complexity-pro`** for Model Context Protocol (MCP) tools.
 
-Repository: [https://github.com/regolo-ai/tutorials/mcp-scan-security-repo](https://github.com/regolo-ai/tutorials/mcp-scan-security-repo)
+**Reference article:**
+👉 [How to Stop Malicious MCP Tools from Hijacking Your AI Agent](https://regolo.ai/how-to-stop-malicious-mcp-tools-from-hijacking-your-ai-agent/)
+
+---
+
+### How to Use
+1. Clone this repository: `git clone https://github.com/regolo-ai/tutorials.git`
+2. Navigate to the desired tutorial folder: `cd tutorials/mcp-security-gate`
+3. Follow the instructions in this README.md. 
+4. Get a free API key from Regolo to run the code: [Sign Up for Free Trial](https://regolo.ai/pricing).
+5. Run the code and see the results in minutes.
+
+> [!IMPORTANT]  
+> ## 🎁 Special Offer: 30 Days Free Trial
+> 
+> To power your AI agent, you need an API key. Sign up for Regolo today and get **30 days completely free**, plus a massive **70% discount for the following 3 months!**
+> 
+> 🚀 **[CLICK HERE TO GET STARTED AND CLAIM YOUR FREE TRIAL](https://regolo.ai/pricing)** 🚀
+> 
+> ---
+> **Explore Regolo:** [Platform](https://regolo.ai) | [Models Library](https://regolo.ai/models-library/) | [Documentation & Guides](https://regolo.ai/docs) | [YouTube](https://www.youtube.com/@regoloai) | [Discord](https://discord.gg/wHxwWCC8)
+
+---
 
 ```text
 ======================================================================
@@ -53,47 +90,24 @@ When an AI coding agent (OpenCode, Claude Desktop, Cursor, Kilo) loads an uninsp
 
 ---
 
-## Repository Structure
+## Setup
 
-```text
-mcp-security-gate/
-├── regolo                        # Executable CLI launcher
-├── regolo.py                     # Interactive TUI & entry point
-├── gate/
-│   ├── scan.py                   # Static file & stdio scanner
-│   ├── rules.py                  # Injection & exfiltration detection rules
-│   ├── fingerprint.py            # Canonical SHA-256 fingerprinting (anti rug-pull)
-│   ├── registry.py               # Approved tool registry & mcp-lock.json generator
-│   ├── remediate.py              # REGOLO API integration (brick-complexity-pro auto-fix & PR)
-│   ├── service_manager.py        # Process lifecycle for background MCP servers
-│   ├── environment.py            # Environment diagnostics (Python, Node.js, Docker)
-│   ├── mcp_server.py             # Native JSON-RPC MCP server for OpenCode & Kilo
-│   └── gate_cli.py               # Command-line interface with --remediate and --create-pr
-├── demo/
-│   ├── safe_server/              # Vetted legitimate calculator tool
-│   ├── poisoned_server/          # Exploit demo: hidden prompt injection targeting ~/.ssh/id_rsa
-│   ├── rugpull_server/
-│   │   ├── v1/                   # Audited baseline release (v1.0.0)
-│   │   └── v2/                   # Stealth update adding backdoor exfiltration (v2.0.0)
-│   ├── nodejs_server/            # Node.js MCP server implementation
-│   └── sample_claude_desktop_config.json # Sample agent configuration
-├── scripts/
-│   ├── pre-commit-hook.sh        # Git pre-commit hook preventing tainted commits
-│   └── test-ci-local.sh          # Local runner reproducing GitHub Actions CI
-├── .github/workflows/
-│   └── mcp-gate.yml              # CI workflow: downloads gate, scans repo, fixes via PR
-├── tests/
-│   └── test_gate.py              # Unit & integration test suite
-├── mcp-lock.json                 # Cryptographic tool lockfile
-├── requirements.txt
-├── Dockerfile
-├── docker-compose.yml
-└── TUTORIAL.md                   # Step-by-step tutorial & FAQ
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+Set your Regolo API key (required for automated AI remediation):
+
+```bash
+export REGOLO_API_KEY="your-regolo-api-key"
 ```
 
 ---
 
-## Quickstart
+## Quickstart & Usage
 
 ### 1. Launch the Interactive Green TUI
 
@@ -124,9 +138,32 @@ python3 -m gate.gate_cli scan demo/poisoned_server/server.py --remediate
 
 ---
 
+## Running inside OpenCode as a Native MCP Server
+
+In `opencode.json` (or `.kilo/config.json`):
+
+```json
+{
+  "mcp": {
+    "regolo-gate": {
+      "command": "python3",
+      "args": [
+        "/absolute/path/to/tutorials/mcp-security-gate/regolo.py",
+        "--mcp"
+      ]
+    }
+  }
+}
+```
+
+When running OpenCode with **`brick-complexity-pro`**, ask the model directly:
+> *"Audit `demo/poisoned_server/server.py` with `security_gate_scan_tool`. If you detect prompt injection, use `security_gate_remediate_tool` to sanitize the schema and update `mcp-lock.json` before installation."*
+
+---
+
 ## GitHub Actions CI Workflow
 
-The workflow at `.github/workflows/mcp-gate.yml` downloads this security suite from `https://github.com/regolo-ai/tutorials/mcp-scan-security-repo`, scans the target repository (excluding `.gitignore`), and if vulnerabilities are detected, calls REGOLO API with `brick-complexity-pro` to open an automated remediation Pull Request:
+The workflow at `.github/workflows/mcp-gate.yml` scans the target repository (excluding `.gitignore`), and if vulnerabilities are detected, calls REGOLO API with `brick-complexity-pro` to open an automated remediation Pull Request:
 
 ```yaml
 name: REGOLO MCP Security Gate
@@ -151,15 +188,9 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Download REGOLO MCP Security Gate
+      - name: Setup Python & Dependencies
         run: |
-          if [ -d "gate" ] && [ -f "regolo.py" ]; then
-            GATE_DIR="."
-          else
-            git clone --depth 1 https://github.com/regolo-ai/tutorials/mcp-scan-security-repo.git .regolo-security-gate
-            GATE_DIR=".regolo-security-gate"
-          fi
-          pip install -r $GATE_DIR/requirements.txt
+          pip install -r requirements.txt
 
       - name: Scan Project for MCP Security Violations
         id: mcp_scan
@@ -184,25 +215,50 @@ jobs:
 
 ---
 
-## Running inside OpenCode as a Native MCP Server
+## Repository Structure
 
-In `opencode.json` (or `.kilo/config.json`):
-
-```json
-{
-  "mcp": {
-    "regolo-gate": {
-      "command": "python3",
-      "args": [
-        "/absolute/path/to/mcp-security-gate/regolo.py",
-        "--mcp"
-      ]
-    }
-  }
-}
+```text
+mcp-security-gate/
+├── regolo                        # Executable CLI launcher
+├── regolo.py                     # Interactive TUI & entry point
+├── gate/
+│   ├── scan.py                   # Static file & stdio scanner
+│   ├── rules.py                  # Injection & exfiltration detection rules
+│   ├── fingerprint.py            # Canonical SHA-256 fingerprinting (anti rug-pull)
+│   ├── registry.py               # Approved tool registry & mcp-lock.json generator
+│   ├── remediate.py              # REGOLO API integration (brick-complexity-pro auto-fix & PR)
+│   ├── service_manager.py        # Process lifecycle for background MCP servers
+│   ├── environment.py            # Environment diagnostics (Python, Node.js, Docker)
+│   ├── mcp_server.py             # Native JSON-RPC MCP server for OpenCode & Kilo
+│   └── gate_cli.py               # Command-line interface with --remediate and --create-pr
+├── demo/
+│   ├── safe_server/              # Vetted legitimate calculator tool
+│   ├── poisoned_server/          # Exploit demo: hidden prompt injection targeting ~/.ssh/id_rsa
+│   ├── rugpull_server/
+│   │   ├── v1/                   # Audited baseline release (v1.0.0)
+│   │   └── v2/                   # Stealth update adding backdoor exfiltration (v2.0.0)
+│   ├── nodejs_server/            # Node.js MCP server implementation
+│   └── sample_claude_desktop_config.json # Sample agent configuration
+├── scripts/
+│   ├── pre-commit-hook.sh        # Git pre-commit hook preventing tainted commits
+│   └── test-ci-local.sh          # Local runner reproducing GitHub Actions CI
+├── .github/workflows/
+│   └── mcp-gate.yml              # CI workflow: scans repo, fixes via PR
+├── tests/
+│   └── test_gate.py              # Unit & integration test suite
+├── mcp-lock.json                 # Cryptographic tool lockfile
+├── requirements.txt              # Core dependencies
+└── TUTORIAL.md                   # Step-by-step tutorial & FAQ
 ```
 
-When running OpenCode with **`brick-complexity-pro`**, ask the model directly:
-> *"Audit `demo/poisoned_server/server.py` with `security_gate_scan_tool`. If you detect prompt injection, use `security_gate_remediate_tool` to sanitize the schema and update `mcp-lock.json` before installation."*
+---
 
-For detailed guides, examples, and search FAQs, see [`TUTORIAL.md`](TUTORIAL.md).
+## Dependencies
+
+- **rich**: Terminal formatting, tables, syntax highlighting, and live TUI rendering
+- **requests**: HTTP client for communicating with the REGOLO AI inference API
+- **pyyaml**: Parsing YAML configurations and workflow files
+- **pytest**: Test suite framework
+
+---
+
