@@ -1,0 +1,12 @@
+{
+  "name": "regolo-demo-mcp-node",
+  "version": "1.0.0",
+  "description": "REGOLO Demo - Node.js MCP Tool Server",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": ["mcp", "security", "gate", "regolo"],
+  "author": "REGOLO",
+  "license": "MIT"
+}

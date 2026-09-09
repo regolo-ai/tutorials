@@ -1,0 +1,5 @@
+# REGOLO MCP Security Gate - Core Dependencies
+rich>=13.7.0
+pytest>=8.0.0
+requests>=2.31.0
+pyyaml>=6.0.0

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# REGOLO MCP Security Gate Launcher
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [ -d "$DIR/.venv" ] && [ -x "$DIR/.venv/bin/python3" ]; then
+    exec "$DIR/.venv/bin/python3" "$DIR/regolo.py" "$@"
+else
+    exec python3 "$DIR/regolo.py" "$@"
+fi
