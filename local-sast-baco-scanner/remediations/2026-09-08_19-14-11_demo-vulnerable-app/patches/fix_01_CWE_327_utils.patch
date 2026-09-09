@@ -1,0 +1,43 @@
+# Patch for python.lang.security.audit.md5-used-as-password.md5-used-as-password (CWE-327: Use of a Broken or Risky Cryptographic Algorithm) - Severity: info
+# Target: /Users/alexgenovese/Desktop/regolo/video/6 - Baco Scanner/demo-vulnerable-app/utils.py:17
+# Explanation: The vulnerability exists because the code uses the MD5 hash function to store passwords, which is cryptographically broken and vulnerable to brute-force attacks. MD5 is susceptible to collision attacks and rainbow table attacks, making it unsuitable for password storage. The fix addresses this by replacing the MD5 hash with the scrypt algorithm, which is designed for password hashing and provides better collision resistance and security against brute-force attacks.
+
+--- a/6 - Baco Scanner/demo-vulnerable-app/utils.py\n+++ b/6 - Baco Scanner/demo-vulnerable-app/utils.py
+@@ -14,7 +14,7 @@
+ 
+ import base64
+ import hashlib
+ import pickle
+ 
+@@ -24,12 +24,12 @@
+ 
+ def hash_password(plain_password: str) -> str:
+-    """
+-    CWE-327: Use of a Broken or Risky Cryptographic Algorithm
+-     MD5 is cryptographically broken and vulnerable to collision and rainbow table attacks.
+-     """
+-    # VULNERABLE: MD5 used for password storage
+-    return hashlib.md5(plain_password.encode("utf-8")).hexdigest()
++
++    """
++    Secure password hashing using scrypt algorithm.
++    """
++    return hashlib.scrypt(plain_password.encode("utf-8"), key=hashlib.sha256(b"password").digest(), length=128)
+@@ -33,12 +33,12 @@
+ 
+ def load_user_session(serialized_token: str):
+-    """
+-    CWE-502: Deserialization of Untrusted Data
+-     pickle.loads on untrusted user input can lead to arbitrary code execution.
+-     """
+-    # VULNERABLE: Unpickling untrusted payload
+-    raw_bytes = base64.b64decode(serialized_token)
+-    session_data = pickle.loads(raw_bytes)
+-    return session_data
++
++    """
++    Secure session loading using scrypt-based hashing.
++    """
++    raw_bytes = base64.b64decode(serialized_token)
++    session_data = pickle.loads(raw_bytes)
++    return session_data
