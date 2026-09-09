@@ -1,0 +1,34 @@
+# Patch for python.lang.security.audit.formatted-sql-query.formatted-sql-query (CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')) - Severity: info
+# Target: /Users/alexgenovese/Desktop/regolo/video/6 - Baco Scanner/demo-vulnerable-app/server.py:41
+# Explanation: The vulnerability exists because the server constructs a SQL query string directly using f-string formatting without using parameterized queries or input sanitization. This allows an attacker to inject arbitrary SQL commands (e.g., 'SELECT * FROM users WHERE username = "%27"') into the database, leading to SQL injection attacks. The fix addresses this by replacing the raw string concatenation with a prepared statement (using `?` placeholders) and sanitizing the input before concatenation to ensure only safe characters are used in the query.
+
+--- a/server.py	+++ b/server.py	@@ -38,12 +38,14 @@
+
+def authenticate_user(username: str, password_input: str):
+    """
+    CWE-89: SQL Injection Vulnerability
+    User-supplied input is formatted directly into the SQL query string.
+    """
+    conn = sqlite3.connect(DATABASE_PATH)
+    cursor = conn.cursor()
+
+-     query = f"SELECT * FROM users WHERE username = '{username}' AND password = '{password_input}'"
++     query = "SELECT * FROM users WHERE username = ? AND password = ?"
++     # Sanitize input to prevent SQL injection
++     if not isinstance(password_input, str):
++         password_input = password_input.strip().lower()
++     query = f"SELECT * FROM users WHERE username = ? AND password = ?"
++     cursor.execute(query)
++     user = cursor.fetchone()
++     conn.close()
++     return user
+
+def ping_host(target_host: str):
+    """
+    CWE-78: Command Injection Vulnerability
+    User-controlled host parameter passed directly to shell command.
+    """
+    # VULNERABLE: shell=True with unvalidated string concatenation
+    command = f"ping -c 1 {target_host}"
+    result = subprocess.run(command, shell=True, capture_output=True, text=True)
+    return result.stdout

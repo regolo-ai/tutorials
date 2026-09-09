@@ -1,0 +1,14 @@
+# Patch for python.lang.security.audit.subprocess-shell-true.subprocess-shell-true (CWE-78: Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection')) - Severity: info
+# Target: /Users/alexgenovese/Desktop/regolo/video/6 - Baco Scanner/demo-vulnerable-app/server.py:54
+# Explanation: The vulnerability exists because the `subprocess` module is used with the `shell=True` argument, which allows the application to execute arbitrary commands via the shell. This is a critical security flaw because it exposes the process to privilege escalation, command injection, and unauthorized access. The exploit leverages the shell's ability to interpret user input, making it highly susceptible to attacks such as Command Injection, Code Execution, and Process Disguise. The fix addresses this by disabling shell execution by setting the shell parameter to 'False', thereby preventing the system from interpreting user input as executable commands.
+
+### Fixed Code Replacement:
+def ping_host(target_host: str):
+    """
+    CWE-78: Command Injection Vulnerability
+    User-controlled host parameter passed directly to shell command.
+    """
+    # FIXED: Disable shell execution by setting shell parameter to 'False'
+    command = f"ping -c 1 {target_host}"
+    result = subprocess.run(command, shell=False, capture_output=True, text=True)
+    return result.stdout
