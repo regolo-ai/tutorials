@@ -33,6 +33,10 @@ inputs:
     description: "Path to the repository to inspect"
     required: false
     default: "."
+  github_token:
+    description: "GitHub Token for opening Pull Requests (defaults to github.token)"
+    required: false
+    default: "${{ github.token }}"
 
 runs:
   using: "composite"
@@ -59,6 +63,46 @@ runs:
       run: |
         FIX_FLAG=""
         if [ "${{ inputs.auto_fix }}" = "true" ]; then
-          FIX_FLAG="--fix"
+          FIX_FLAG="--fix --apply"
         fi
         python3 -m regolo_agent_stack.cli review --path "${{ inputs.path }}" --scope pr --base "${{ inputs.base_branch }}" $FIX_FLAG
+
+    - name: Create Pull Request with Auto-Fixes
+      if: ${{ inputs.auto_fix == 'true' }}
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github_token }}
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+        BASE_BRANCH: ${{ inputs.base_branch }}
+      run: |
+        # Check if working tree has any modifications
+        STATUS_OUT=$(git status --porcelain)
+        if [ -z "$STATUS_OUT" ]; then
+          echo "ℹ️ No changes detected after auto-fix."
+          exit 0
+        fi
+
+        echo "🚀 Auto-fixes applied to repository. Preparing Pull Request..."
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+        PR_BRANCH="regolo-autofix-$(date +%s)"
+        git checkout -b "$PR_BRANCH"
+        git add -A
+        git commit -m "fix(security): apply automated fixes via Regolo ZDR"
+
+        if [ "$ACT" = "true" ] || [ -z "$GH_TOKEN" ]; then
+          echo "ℹ️ Running in local/test environment (ACT=$ACT). Branch '$PR_BRANCH' created and committed locally."
+          git show --stat
+          exit 0
+        fi
+
+        git push -u origin "$PR_BRANCH"
+        PR_TITLE="🤖 [Regolo ZDR] Automated security & code quality fixes"
+        PR_BODY="### 🛡️ Regolo EU ZDR Automated Code Fixes\n\nThis Pull Request was generated automatically by **Regolo CodeOps ZDR** with fixes for vulnerabilities identified during review.\n\n- Infrastructure: EU Zero Data Retention (Regolo)\n- Target base branch: ${BASE_BRANCH}\n- Validation: AST syntax verified."
+
+        gh pr create \
+          --base "${BASE_BRANCH#origin/}" \
+          --head "$PR_BRANCH" \
+          --title "$PR_TITLE" \
+          --body "$PR_BODY" || echo "⚠️ gh pr create failed. Verify GITHUB_TOKEN has 'pull-requests: write' and 'contents: write' permissions."

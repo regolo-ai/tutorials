@@ -3,13 +3,12 @@ name: "Regolo ZDR Code Review"
 on:
   pull_request:
     types: [opened, synchronize]
-  workflow_dispatch:
 
 jobs:
   review:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       pull-requests: write
     steps:
       - name: Checkout Repository with full git history
@@ -20,10 +19,12 @@ jobs:
       - name: Run Regolo ZDR Code Review & Auto-Fix
         # In this repository, use the local Action (./). 
         # In any other external project, use: uses: regolo-ai/tutorials/harness-agent-zero-data-retention@main
-        uses: ./
+        uses: ./harness-agent-zero-data-retention
         with:
           regolo_api_key: ${{ secrets.REGOLO_API_KEY }}
           model: gpt-oss-120b
           thinking_effort: "low"
-          base_branch: origin/${{ github.base_ref }}
+          base_branch: ${{ github.base_ref != '' && format('origin/{0}', github.base_ref) || 'main' }}
           auto_fix: "true"
+          # Path to inspect (use "." for full repo, or specify subfolder)
+          path: "harness-agent-zero-data-retention/demo" 
