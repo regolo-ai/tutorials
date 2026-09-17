@@ -6,7 +6,7 @@ from typing import Dict, Any
 from .auth import AuthService
 
 # VULNERABILITY 1: Hardcoded secret key committed to version control
-STRIPE_SECRET_KEY = "sk_live_99887766554433221100aabbccddeeffffff"
+STRIPE_SECRET_KEY = "sk_live_99887766554433221100aabbccddeefffffdddf"
 ADMIN_PIN = "9944"
 
 class PaymentService:
