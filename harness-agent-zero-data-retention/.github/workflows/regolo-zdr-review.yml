@@ -20,7 +20,8 @@ jobs:
       - name: Run Regolo ZDR Code Review & Auto-Fix
         # In this repository, use the local Action (./). 
         # In any other external project, use: uses: regolo-ai/tutorials/harness-agent-zero-data-retention@main
-        uses: ./
+        # if this script run on root folder change the line below in ./ 
+        uses: ./harness-agent-zero-data-retention
         with:
           regolo_api_key: ${{ secrets.REGOLO_API_KEY }}
           model: gpt-oss-120b
