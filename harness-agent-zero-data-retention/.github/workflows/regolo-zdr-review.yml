@@ -1,0 +1,28 @@
+name: "Regolo ZDR Code Review"
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout Repository with full git history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Regolo ZDR Code Review & Auto-Fix
+        # In questo repository usa l'Action locale (./).
+        # In qualsiasi altro progetto esterno si usa: uses: regolo-ai/tutorials/harness-agent-zero-data-retention@main
+        uses: ./
+        with:
+          regolo_api_key: ${{ secrets.REGOLO_API_KEY }}
+          model: gpt-oss-120b
+          thinking_effort: "low"
+          base_branch: origin/${{ github.base_ref }}
+          auto_fix: "true"
