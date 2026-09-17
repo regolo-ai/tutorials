@@ -25,6 +25,18 @@ def _is_git_repo(repo_root: Path) -> bool:
     except Exception:
         return False
 
+def _get_git_root(path: Path) -> Path:
+    try:
+        out = subprocess.check_output(
+            ["git", "rev-parse", "--show-toplevel"],
+            cwd=path,
+            text=True,
+            stderr=subprocess.PIPE,
+        ).strip()
+        return Path(out).resolve()
+    except Exception:
+        return path.resolve()
+
 def _enrich_context_with_ast(repo_root: Path, diff_text: str, files: list[Path]) -> tuple[str, str, str]:
     """
     Extracts enclosing function scopes, cross-file AST skeletons, and associated tests
@@ -172,15 +184,55 @@ def select_pr_context(repo_root: Path, base: str, head: str, allowed_extensions:
             "error": "Directory corrente non è un repository Git."
         }
 
+    git_root = _get_git_root(repo_root)
+    diff = ""
+    # Filter git diff to repo_root if it is a subfolder of git_root
+    try:
+        rel_to_git = repo_root.relative_to(git_root)
+        path_args = ["--", str(rel_to_git)] if str(rel_to_git) != "." else []
+    except ValueError:
+        path_args = []
+
     try:
         diff = subprocess.check_output(
-            ["git", "diff", f"{base}...{head}", "--no-color"],
-            cwd=repo_root,
+            ["git", "diff", f"{base}...{head}", "--no-color"] + path_args,
+            cwd=git_root,
             text=True,
             stderr=subprocess.PIPE,
         )
-    except subprocess.CalledProcessError as exc:
-        raise RuntimeError(f"git diff failed: {exc.stderr}") from exc
+    except subprocess.CalledProcessError:
+        # Fallback if origin/base ref does not exist locally (e.g. in container / act / local branch)
+        alt_base = base.replace("origin/", "") if base.startswith("origin/") else f"origin/{base}"
+        try:
+            diff = subprocess.check_output(
+                ["git", "diff", f"{alt_base}...{head}", "--no-color"] + path_args,
+                cwd=git_root,
+                text=True,
+                stderr=subprocess.PIPE,
+            )
+        except subprocess.CalledProcessError as exc:
+            return {
+                "diff": "",
+                "files": [],
+                "enclosing_scopes": "",
+                "ast_skeletons": "",
+                "associated_tests": "",
+                "redacted": False,
+                "secrets": [],
+                "error": f"Git diff between '{base}' and '{head}' failed: {exc.stderr.strip() if exc.stderr else exc}"
+            }
+
+    if not diff.strip():
+        # Fallback to compare against base including working tree changes (e.g. in local act testing)
+        try:
+            diff = subprocess.check_output(
+                ["git", "diff", base, "--no-color"] + path_args,
+                cwd=git_root,
+                text=True,
+                stderr=subprocess.PIPE,
+            )
+        except subprocess.CalledProcessError:
+            pass
 
     if not diff.strip():
         return {
@@ -198,8 +250,8 @@ def select_pr_context(repo_root: Path, base: str, head: str, allowed_extensions:
         if line.startswith("+++ b/") or line.startswith("--- a/"):
             rel = line[6:]
             if rel != "/dev/null":
-                p = repo_root / rel
-                if p.suffix in allowed_extensions:
+                p = (git_root / rel).resolve()
+                if p.exists() and p.suffix in allowed_extensions:
                     files.append(p)
     files = sorted(set(files))
     files = filter_files(files)
@@ -207,11 +259,11 @@ def select_pr_context(repo_root: Path, base: str, head: str, allowed_extensions:
     secrets = scan_for_secrets(diff)
     redacted_diff = redact_text(diff) if secrets else diff
 
-    enclosing_scopes, ast_skeletons, associated_tests = _enrich_context_with_ast(repo_root, diff, files)
+    enclosing_scopes, ast_skeletons, associated_tests = _enrich_context_with_ast(git_root, diff, files)
 
     return {
         "diff": redacted_diff[:MAX_DIFF_CHARS],
-        "files": [str(p.relative_to(repo_root)) for p in files],
+        "files": [str(p.relative_to(git_root)) for p in files],
         "enclosing_scopes": enclosing_scopes,
         "ast_skeletons": ast_skeletons,
         "associated_tests": associated_tests,

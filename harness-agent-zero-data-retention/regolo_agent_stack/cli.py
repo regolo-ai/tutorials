@@ -10,6 +10,7 @@ from .context import (
     select_pr_context,
     select_branch_context,
     list_git_branches,
+    _get_git_root,
 )
 from .policy import scan_for_secrets
 from .runner import run_benchmark
@@ -370,6 +371,8 @@ def cmd_fix(args):
         ctx = select_branch_context(repo, args.branch)
     elif getattr(args, "scope", "staged") == "branch":
         ctx = select_branch_context(repo, getattr(args, "base", "main"))
+    elif getattr(args, "scope", "staged") == "pr":
+        ctx = select_pr_context(repo, getattr(args, "base", "origin/main"), "HEAD")
     else:
         ctx = select_staged_context(repo)
 
@@ -453,7 +456,8 @@ Context and Diff:
         print(f"📄 File: [bold cyan]{rel_path}[/bold cyan] ({len(code_clean.splitlines())} lines) · {status}")
 
     auto_apply = getattr(args, "apply", False)
-    if not auto_apply and getattr(args, "interactive", True):
+    is_interactive = getattr(args, "interactive", False) and sys.stdin.isatty()
+    if not auto_apply and is_interactive:
         try:
             confirm = input("\nDo you want to apply these fixes directly to the project files? [y/N]: ").strip().lower()
             auto_apply = confirm in ("y", "yes", "s", "si")
@@ -461,9 +465,24 @@ Context and Diff:
             auto_apply = False
 
     if auto_apply:
+        git_root = _get_git_root(repo)
         applied_count = 0
         for rel_path, code in file_matches:
-            dest_file = (repo / rel_path.strip()).resolve()
+            rel_str = rel_path.strip().lstrip("/")
+            dest_file = (git_root / rel_str).resolve()
+            if not dest_file.exists():
+                candidate = (repo / rel_str).resolve()
+                if candidate.exists():
+                    dest_file = candidate
+                else:
+                    matched = next((f for f in ctx.get("files", []) if f.endswith(rel_str) or rel_str.endswith(f)), None)
+                    if matched:
+                        dest_file = (git_root / matched).resolve()
+
+            if not str(dest_file).startswith(str(git_root)):
+                print(f"  ⚠️ Skipping {dest_file} (path outside repository root)")
+                continue
+
             dest_file.parent.mkdir(parents=True, exist_ok=True)
             dest_file.write_text(code.strip() + "\n", encoding="utf-8")
             applied_count += 1
