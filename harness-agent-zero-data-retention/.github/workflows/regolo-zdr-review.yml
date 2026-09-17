@@ -3,6 +3,7 @@ name: "Regolo ZDR Code Review"
 on:
   pull_request:
     types: [opened, synchronize]
+  workflow_dispatch:
 
 jobs:
   review:
@@ -17,8 +18,8 @@ jobs:
           fetch-depth: 0
 
       - name: Run Regolo ZDR Code Review & Auto-Fix
-        # In questo repository usa l'Action locale (./).
-        # In qualsiasi altro progetto esterno si usa: uses: regolo-ai/tutorials/harness-agent-zero-data-retention@main
+        # In this repository, use the local Action (./). 
+        # In any other external project, use: uses: regolo-ai/tutorials/harness-agent-zero-data-retention@main
         uses: ./
         with:
           regolo_api_key: ${{ secrets.REGOLO_API_KEY }}
