@@ -1,0 +1,4 @@
+# Regolo + SoL-Pi Tutorial Dependencies
+python-dotenv>=1.0.0
+rich>=13.7.0
+requests>=2.31.0
