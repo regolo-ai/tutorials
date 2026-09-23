@@ -19,7 +19,10 @@
 It delivers real-time Pull Request audits, pre-flight credential redaction, deterministic AST code auto-fixes, and reproducible A/B harness benchmarking demonstrating that **Harness Engineering matters as much as model scale**.
 
 **Reference article:**
-👉 [How Harness Engineering Beats Model Scale: EU Zero Data Retention Code Review](https://regolo.ai)
+👉 [Why Git Diffs Break Coding Agents & How Targeted AST Context Fixes It](https://regolo.ai/why-git-diffs-break-coding-agents-building-targeted-ast-context-in-python/)
+
+**Reference video:**
+🎬 [Building Target AST Context: Harness Engineering on EU Zero Data Retention Models](https://youtu.be/-dHFOHCj5BI)
 
 ---
 
