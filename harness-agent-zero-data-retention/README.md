@@ -1,15 +1,67 @@
+<div align="center">
+  <img src="https://regolo.ai/wp-content/uploads/2026/06/Regolo_logo_positive.png" alt="Regolo.ai Logo" width="300" />
+</div>
+
 # Regolo CodeOps ZDR — OpenHarness
 
-> **Production Code Review, Automated Fixes & Benchmark Parity on Open Models with EU Zero Data Retention.**
+<div align="center">
+  <img src="https://img.shields.io/badge/Inference-Regolo_EU_ZDR-00FF88?style=flat-square" alt="Inference: Regolo EU ZDR" />
+  <img src="https://img.shields.io/badge/Python-3.11%2B-blue?style=flat-square" alt="Python 3.11+" />
+  <img src="https://img.shields.io/badge/GitHub_Action-Marketplace_Ready-purple?style=flat-square" alt="GitHub Action: Marketplace Ready" />
+  <img src="https://img.shields.io/badge/Open_Models-gpt--oss--120b%2C_Llama--3.3--70B-008000?style=flat-square" alt="Open Models" />
+  <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="License: MIT" />
+</div>
 
-[![Inference](https://img.shields.io/badge/Inference-Regolo_EU_ZDR-00FF88?style=flat-square)](https://regolo.ai)
-[![Python](https://img.shields.io/badge/Python-3.11%2B-blue?style=flat-square)](https://www.python.org)
-[![GitHub Action](https://img.shields.io/badge/GitHub_Action-Marketplace_Ready-purple?style=flat-square)](action.yml)
-[![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
+> **Production Code Review, Automated Fixes & Benchmark Parity on Open Models with EU Zero Data Retention.**
 
 **Regolo CodeOps ZDR (OpenHarness)** is an enterprise-ready coding agent and security reviewer powered by open-weight models (`gpt-oss-120b`, `gpt-oss-20b`, `qwen3.8-27b`, `Llama-3.3-70B`) running on European sovereign infrastructure with verified **Zero Data Retention (ZDR)**.
 
 It delivers real-time Pull Request audits, pre-flight credential redaction, deterministic AST code auto-fixes, and reproducible A/B harness benchmarking demonstrating that **Harness Engineering matters as much as model scale**.
+
+**Reference article:**
+👉 [How Harness Engineering Beats Model Scale: EU Zero Data Retention Code Review](https://regolo.ai)
+
+---
+
+## How to Use
+
+1. Clone this repository: `git clone https://github.com/regolo-ai/tutorials.git`
+2. Navigate to the desired tutorial folder: `cd tutorials/harness-agent-zero-data-retention`
+3. Follow the instructions in this README.md.
+4. Get a free API key from Regolo to run the code: [Sign Up for Free Trial](https://regolo.ai/pricing).
+5. Run the code and see the results in minutes.
+
+> [!IMPORTANT]  
+> ## 🎁 Special Offer: 30 Days Free Trial
+>
+> To power your coding agent, you need an API key. Sign up for Regolo today and get **30 days completely free**, plus a massive **70% discount for the following 3 months!**
+>
+> 🚀 **[CLICK HERE TO GET STARTED AND CLAIM YOUR FREE TRIAL](https://regolo.ai/pricing)** 🚀
+>
+> ---
+> **Explore Regolo:** [Platform](https://regolo.ai) | [Models Library](https://regolo.ai/models-library/) | [Documentation & Guides](https://regolo.ai/docs) | [YouTube](https://www.youtube.com/@regoloai) | [Discord](https://discord.gg/wHxwWCC8)
+
+---
+
+```text
+======================================================================
+ [REGOLO] HARNESS ENGINEERING — A/B BENCHMARK RESULTS
+======================================================================
+ Model:      gpt-oss-120b (same model, both harnesses)
+ Dataset:    Deterministic rate-limiter coding benchmark (task_01)
+ ------------------------------------------------------------------
+ Harness A (Baseline Naive / Unstructured Prompt):
+  Pass Rate:  0% (0/10)     Token Burn: 8,420 tok
+  Failures:   Markdown leakage, syntax errors, hallucinated APIs
+
+ Harness B (Regolo Optimized / XML-AST Contracts):
+  Pass Rate:  100% (10/10)  Token Burn: 5,810 tok
+  Savings:    31% tokens     Zero syntax errors
+
+ ------------------------------------------------------------------
+ VERDICT: Harness Engineering > Model Scale
+======================================================================
+```
 
 ---
 
@@ -25,7 +77,7 @@ The architecture establishes a strict separation between developer interfaces, r
 
 ---
 
-## Context Intelligence: Why Raw Git Diffs Fail and How We Solved It
+## Why Raw Git Diffs Fail and How We Solved It
 
 A primary weakness in mainstream coding assistants and naive code review bots is how context is supplied to the model:
 
@@ -111,7 +163,7 @@ cp .env.example .env
 ./regolo.sh
 ```
 
-*(You can also run `./regolo` directly).*
+*(You can also run `./regolo.sh tui` directly).*
 
 ---
 
@@ -131,7 +183,7 @@ cp .env.example .env
 ┃         Endpoint: https://api.regolo.ai/v1  ·  Model: gpt-oss-120b           ┃
 ┃                                                                              ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-                               MAIN CONTROL PANEL                             
+                                MAIN CONTROL PANEL                             
 ╭────────┬────────────────────────────────────┬────────────────────────────────╮
 │  Key   │ Action                             │ Scope / Details                │
 ├────────┼────────────────────────────────────┼────────────────────────────────┤
@@ -312,6 +364,9 @@ All model invocations are routed to **`https://api.regolo.ai/v1`**:
 
 ---
 
-## License
+## Dependencies
 
-Distributed under the [MIT License](LICENSE).
+- **rich**: Terminal formatting, tables, syntax highlighting, and TUI rendering
+- **openai**: OpenAI-compatible client for communicating with the Regolo API
+- **requests**: HTTP client for additional API interactions
+- **pyyaml**: Parsing YAML configurations and workflow files
