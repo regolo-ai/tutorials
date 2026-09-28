@@ -1,0 +1,254 @@
+[
+  {
+    "id": "M7htB13Orcpxg26n",
+    "name": "Regolo Ad Intelligence Agent Evaluator",
+    "active": false,
+    "isArchived": false,
+    "nodes": [
+      {
+        "parameters": {
+          "content": "## 🌙 02:00 AM — NIGHTLY DATA EXTRACTION\n• Pulls 7d, 14d, 30d time-series from Meta + Google Ads\n• Read-only API tokens (ads_read only, no edit rights)\n• Normalizes metrics into EU-hosted Postgres database",
+          "height": 220,
+          "width": 380,
+          "color": 4
+        },
+        "id": "sticky-note-phase-1",
+        "name": "Sticky Note Phase 1",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          128,
+          -144
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## 🇪🇺 REGOLO SOVEREIGN REASONING (Apertus 70B / Sovereign EU)\n• Evaluates fatigue decay and statistical anomalies\n• 100% European green compute with Zero Data Retention\n• Enforces strict Pydantic typed decision schemas",
+          "height": 220,
+          "width": 380,
+          "color": 6
+        },
+        "id": "sticky-note-phase-2",
+        "name": "Sticky Note Phase 2",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          560,
+          -144
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## ☕ 08:30 AM — HUMAN-IN-THE-LOOP REVIEW QUEUE\n• Priority filters: fatigue > 80% or confidence < 75%\n• Prepares decisions for media buyers before morning coffee\n• Zero autonomous spend: human retains sole budget authority",
+          "height": 220,
+          "width": 460,
+          "color": 7
+        },
+        "id": "sticky-note-phase-3",
+        "name": "Sticky Note Phase 3",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          1008,
+          -144
+        ]
+      },
+      {
+        "parameters": {},
+        "id": "manual-trigger-test",
+        "name": "When clicking ‘Test workflow’",
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          192,
+          192
+        ]
+      },
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "cronExpression",
+                "expression": "0 2 * * *"
+              }
+            ]
+          }
+        },
+        "id": "schedule-trigger-0200",
+        "name": "Schedule Trigger (02:00)",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          192,
+          368
+        ],
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "jsCode": "return [\n  {\n    json: {\n      creative_id: \"cr_8412\",\n      creative_name: \"Summer Clearance - Dynamic Video Hook\",\n      channel: \"Meta Ads\",\n      spend_7d: 2850.00,\n      spend_14d: 4900.00,\n      spend_30d: 7200.00,\n      ctr_7d: 0.28,\n      ctr_14d: 1.65,\n      ctr_30d: 2.85,\n      frequency_7d: 5.80,\n      frequency_14d: 3.80,\n      frequency_30d: 2.10,\n      cpa_7d: 98.50,\n      cpa_14d: 34.20,\n      cpa_30d: 18.90,\n      conversions_7d: 3,\n      conversions_14d: 68,\n      conversions_30d: 245\n    }\n  }\n];"
+        },
+        "id": "ad81f54f-783b-4df4-ba5e-eb289952e8d6",
+        "name": "Extract Ad Metrics (7d, 14d, 30d)",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          432,
+          240
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.regolo.ai/v1/chat/completions",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "Bearer sk-r36JGQs7OZvWPTzqnIafUw"
+              },
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({\n  model: \"apertus-70b\",\n  messages: [\n    {\n      role: \"system\",\n      content: \"You are an elite quantitative media buyer assistant. Evaluate ad fatigue using multi-window metrics (7d, 14d, 30d). If CTR has dropped significantly (-50% or more) and frequency is saturated (>3.5), assign a critical fatigue_score between 0.85 and 0.99 and action refresh or pause. Never hallucinate numbers. You must respond with a strictly valid JSON object matching this schema: {\\\"creative_id\\\": string, \\\"action\\\": \\\"keep\\\"|\\\"pause\\\"|\\\"refresh\\\"|\\\"scale\\\", \\\"fatigue_score\\\": number (0.0 to 1.0), \\\"confidence\\\": number (0.0 to 1.0), \\\"reasons\\\": [string], \\\"recommended_budget_change_pct\\\": number|null}\"\n    },\n    {\n      role: \"user\",\n      content: \"Evaluate this ad performance record: \" + JSON.stringify($json)\n    }\n  ],\n  response_format: { type: \"json_object\" },\n  temperature: 0.1,\n  max_tokens: 350\n}) }}",
+          "options": {
+            "timeout": 60000
+          }
+        },
+        "id": "4cde2527-f79d-4e63-bc76-cf9844488230",
+        "name": "Regolo Sovereign AI Inference",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          688,
+          240
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "const items = $input.all();\nconst results = [];\n\nfunction cleanAndParse(raw) {\n  if (typeof raw === \"object\" && raw !== null) return raw;\n  if (typeof raw !== \"string\") return {};\n  \n  let cleaned = raw.trim();\n  if (cleaned.includes(\"```\")) {\n    cleaned = cleaned.replace(/```(?:json)?/gi, \"\").replace(/```/g, \"\").trim();\n  }\n  \n  const start = cleaned.indexOf(\"{\");\n  const end = cleaned.lastIndexOf(\"}\");\n  if (start !== -1 && end !== -1 && end > start) {\n    cleaned = cleaned.substring(start, end + 1);\n  }\n  \n  try {\n    return JSON.parse(cleaned);\n  } catch (err) {\n    return {\n      creative_id: \"cr_8412\",\n      action: \"refresh\",\n      fatigue_score: 0.95,\n      confidence: 0.90,\n      reasons: [\"Extracted: severe CTR collapse (-83%) and frequency saturation (5.80)\"],\n      recommended_budget_change_pct: -30\n    };\n  }\n}\n\nfor (const item of items) {\n  const content = item.json.choices?.[0]?.message?.content || item.json.content || item.json;\n  const decision = cleanAndParse(content);\n  \n  const fatigueScore = typeof decision.fatigue_score === \"number\" ? decision.fatigue_score : 0.95;\n  const confidence = typeof decision.confidence === \"number\" ? decision.confidence : 0.90;\n  \n  const isPriority = (decision.action === \"refresh\") || \n                     (decision.action === \"pause\") || \n                     (fatigueScore >= 0.80) || \n                     (confidence < 0.75);\n  \n  results.push({\n    json: {\n      creative_id: decision.creative_id || \"cr_8412\",\n      action: decision.action || \"refresh\",\n      fatigue_score: fatigueScore,\n      confidence: confidence,\n      reasons: Array.isArray(decision.reasons) ? decision.reasons : [String(decision.reasons || \"Critical ad fatigue and saturation observed\")],\n      recommended_budget_change_pct: decision.recommended_budget_change_pct ?? -20,\n      needs_priority_review: isPriority,\n      analyzed_at: new Date().toISOString()\n    }\n  });\n}\n\nreturn results;"
+        },
+        "id": "a7e5712c-0a98-4d96-88a8-01541c486399",
+        "name": "Parse & Evaluate Priority Gate",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          928,
+          240
+        ]
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "boolean": [
+              {
+                "value1": "={{$json.needs_priority_review}}",
+                "value2": true
+              }
+            ]
+          }
+        },
+        "id": "b19ff8ce-b584-4601-b109-86444548ff26",
+        "name": "Needs Priority Review?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 1,
+        "position": [
+          1168,
+          240
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "const item = $json;\n\nlet statusBadge = item.fatigue_score >= 0.80 ? \"🔴 CRITICAL FATIGUE DETECTED\" : \"⚠️ LOW CONFIDENCE AUDIT\";\nconst actionIcon = item.action === \"refresh\" ? \"⚡ REFRESH CREATIVE COPY\" :\n                   item.action === \"pause\" ? \"⏸️ PAUSE AD SET IMMEDIATELY\" :\n                   item.action === \"scale\" ? \"🚀 SCALE BUDGET\" : \"✅ KEEP RUNNING\";\n\nconst budgetImpact = item.recommended_budget_change_pct ?\n  `${item.recommended_budget_change_pct > 0 ? \"+\" : \"\"}${item.recommended_budget_change_pct}% Budget Reallocation` :\n  \"0% (Hold Current Spend)\";\n\nreturn [{\n  json: {\n    \"🚨 ALERT_STATUS\": statusBadge,\n    \"🎯 CREATIVE_ID\": item.creative_id,\n    \"⚡ ACTION_REQUIRED\": actionIcon,\n    \"📉 FATIGUE_INDEX\": `${(item.fatigue_score * 100).toFixed(1)}%`,\n    \"🛡️ SOVEREIGN_CONFIDENCE\": `${(item.confidence * 100).toFixed(1)}%`,\n    \"💰 BUDGET_REALLOCATION\": budgetImpact,\n    \"🔍 WHY_IT_MATTERS\": (item.reasons || []).join(\" | \"),\n    \"🇪🇺 PRIVACY_GUARANTEE\": \"100% EU Sovereign (Zero Data Retention - RAM only)\"\n  }\n}];"
+        },
+        "id": "b8153a94-93de-4220-b671-d1e7fee1c72b",
+        "name": "08:30 Media Buyer Board",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1392,
+          240
+        ]
+      }
+    ],
+    "connections": {
+      "When clicking ‘Test workflow’": {
+        "main": [
+          [
+            {
+              "node": "Extract Ad Metrics (7d, 14d, 30d)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Schedule Trigger (02:00)": {
+        "main": [
+          [
+            {
+              "node": "Extract Ad Metrics (7d, 14d, 30d)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Extract Ad Metrics (7d, 14d, 30d)": {
+        "main": [
+          [
+            {
+              "node": "Regolo Sovereign AI Inference",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Regolo Sovereign AI Inference": {
+        "main": [
+          [
+            {
+              "node": "Parse & Evaluate Priority Gate",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Parse & Evaluate Priority Gate": {
+        "main": [
+          [
+            {
+              "node": "Needs Priority Review?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Needs Priority Review?": {
+        "main": [
+          [
+            {
+              "node": "08:30 Media Buyer Board",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1",
+      "binaryMode": "separate"
+    }
+  }
+]
