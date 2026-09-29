@@ -13,6 +13,8 @@
 
 > High-throughput, multi-tier intake triage combining deterministic safety policies, perimeter bi-encoders, and sovereign LLM synthesis with Zero Data Retention.
 
+**Reference Article:** [Right-Sized Models for Insurance Claims Triage](https://regolo.ai/right-sized-models-insurance-claims-triage/)
+
 ⭐ If you like this project, star it on GitHub!
 
 [Overview](#overview) • [Architecture](#architecture) • [Features](#features) • [Prerequisites](#prerequisites) • [Quickstart](#quickstart) • [Usage](#usage) • [Benchmark & Evaluation](#benchmark--evaluation) • [Project Structure](#project-structure) • [Configuration](#configuration) • [Resources](#resources)
@@ -357,6 +359,7 @@ intelligent-insurance-claims-policy-triage/
 
 ## Resources
 
+- [Tutorial Article: Right-Sized Models for Insurance Claims Triage](https://regolo.ai/right-sized-models-insurance-claims-triage/)
 - [Regolo.ai Platform](https://regolo.ai)
 - [Regolo Models Catalog](https://regolo.ai/models-library/)
 - [Regolo Documentation](https://regolo.ai/docs)
