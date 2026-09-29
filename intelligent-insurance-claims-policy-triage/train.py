@@ -17,6 +17,15 @@ from datasets import Dataset, load_dataset
 from setfit import SetFitModel, Trainer, TrainingArguments
 from sklearn.metrics import classification_report, accuracy_score
 
+# -----------------------------------------------------------------------------
+# Training Configuration Parameters
+# -----------------------------------------------------------------------------
+SAMPLES_PER_CLASS = 30       # Training examples extracted per category (Few-shot)
+TEST_SAMPLES_PER_CLASS = 15  # Held-out testing examples per category
+NUM_ITERATIONS = 20          # Number of contrastive pairs generated per sample
+NUM_EPOCHS = 1               # Number of epochs for sentence transformer fine-tuning
+BATCH_SIZE = 16              # Batch size for training and embedding generation
+
 # Canonical categories and their integer IDs
 CATEGORIES = [
     "claims_intake",
@@ -107,7 +116,7 @@ DOMAIN_SUPPLEMENT = [
 ]
 
 
-def prepare_datasets(samples_per_class: int = 25, test_samples_per_class: int = 15):
+def prepare_datasets(samples_per_class: int = SAMPLES_PER_CLASS, test_samples_per_class: int = TEST_SAMPLES_PER_CLASS):
     """
     Downloads and filters the Bitext insurance dataset, maps intents,
     and returns balanced train and test Dataset objects.
@@ -188,7 +197,10 @@ def prepare_datasets(samples_per_class: int = 25, test_samples_per_class: int = 
 
 
 def train_setfit():
-    train_ds, test_ds, raw_test_rows = prepare_datasets(samples_per_class=30, test_samples_per_class=15)
+    train_ds, test_ds, raw_test_rows = prepare_datasets(
+        samples_per_class=SAMPLES_PER_CLASS,
+        test_samples_per_class=TEST_SAMPLES_PER_CLASS,
+    )
 
     model_id = "sentence-transformers/all-MiniLM-L6-v2"
     print(f"\n[2/5] Initializing SetFit model backbone: {model_id}...")
@@ -198,9 +210,9 @@ def train_setfit():
     )
 
     args = TrainingArguments(
-        batch_size=16,
-        num_epochs=1,
-        num_iterations=20,  # Generate 20 contrastive pairs per sample
+        batch_size=BATCH_SIZE,
+        num_epochs=NUM_EPOCHS,
+        num_iterations=NUM_ITERATIONS,  # Generate contrastive pairs per sample
         seed=42,
         show_progress_bar=True,
     )
