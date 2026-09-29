@@ -1,0 +1,95 @@
+checkpoints/
+models/
+
+
+# AI tooling & assistants
+.kilo/
+.cursor/
+
+# Linter and type checker caches
+.ruff_cache/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Machine learning artifacts & run caches
+.cache/
+runs/
+wandb/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# Additional test coverage reports
+.coverage.*
+coverage.xml
+
+# Extra environment files
+.envrc
+.env*.local
+
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+.venv/
+venv/
+ENV/
+env/
+
+# Environment variables and API keys
+.env
+*.env
+!.env.example
+
+# Pytest & test caches
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# IDE & Editor settings
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Operating System files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs and temporary files
+*.log
