@@ -107,7 +107,7 @@
             "parameters": [
               {
                 "name": "Authorization",
-                "value": "Bearer sk-r36JGQs7OZvWPTzqnIafUw"
+                "value": "=Bearer {{$env.REGOLO_API_KEY}}"
               },
               {
                 "name": "Content-Type",

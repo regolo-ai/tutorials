@@ -3,7 +3,7 @@
 
 [project]
 name = "regolo-security-scan"
-path = "/Users/alexgenovese/Desktop/regolo/video/6 - Baco Scanner/demo-vulnerable-app"
+path = "./demo-vulnerable-app"
 languages = ["c", "cpp", "python", "rust", "javascript"]
 
 [output]
@@ -60,20 +60,20 @@ enable_llm_cache = false
 
 [llm.phases.discovery]
 base_url = "https://api.regolo.ai/v1"
-api_key = "sk-RR5SoAJMtt39ffUPvseNqQ"
+api_key = "sk-your-regolo-api-key-here"
 model = "brick-complexity-pro"
 
 [llm.phases.verification]
 base_url = "https://api.regolo.ai/v1"
-api_key = "sk-RR5SoAJMtt39ffUPvseNqQ"
+api_key = "sk-your-regolo-api-key-here"
 model = "brick-complexity-pro"
 
 [llm.phases.aggregation]
 base_url = "https://api.regolo.ai/v1"
-api_key = "sk-RR5SoAJMtt39ffUPvseNqQ"
+api_key = "sk-your-regolo-api-key-here"
 model = "brick-complexity-pro"
 
 [brick]
 base_url = "https://api.regolo.ai/v1"
-api_key = "sk-RR5SoAJMtt39ffUPvseNqQ"
+api_key = "sk-your-regolo-api-key-here"
 model = "brick-complexity-pro"
