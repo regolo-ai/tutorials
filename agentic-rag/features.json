@@ -1,0 +1,38 @@
+[
+  {
+    "id": "setup_environment",
+    "name": "regolo green setup shell script with virtual environment",
+    "description": "checks or creates local virtual environment and installs required python modules",
+    "passes": true
+  },
+  {
+    "id": "local_sqlite_storage",
+    "name": "local sqlite open source storage with flat and hierarchical indices",
+    "description": "persists baseline flat chunks alongside relational parent summaries and child chunks",
+    "passes": true
+  },
+  {
+    "id": "cli_document_ingestion",
+    "name": "command line document ingestion through specified path parameter",
+    "description": "supports document indexing from interactive prompt or --path flag",
+    "passes": true
+  },
+  {
+    "id": "typed_tools_definition",
+    "name": "typed retrieval tools definition for function calling",
+    "description": "exposes search_topic_index, read_chunk_details, and keyword_search",
+    "passes": true
+  },
+  {
+    "id": "hierarchical_agentic_loop",
+    "name": "hierarchical agentic loop with brick-complexity-pro endpoint",
+    "description": "executes structured retrieval tools iteratively until evidence is sufficient",
+    "passes": true
+  },
+  {
+    "id": "empirical_comparison",
+    "name": "empirical verification between baseline and agentic rag",
+    "description": "compares execution latency, retrieved chunk counts, and synthesized answers",
+    "passes": true
+  }
+]

@@ -1,0 +1,10 @@
+date: 2026-10-05
+status: completed full open source implementation of hierarchical agentic rag repository.
+completed items:
+- green branded regolo shell setup script checking and creating local virtual environment.
+- local sqlite open source database with dual flat and parent-child indices.
+- typed retrieval tools and iterative reasoning loop supporting brick-complexity-pro.
+- command line document ingestion with path parameter and empirical evaluation comparison.
+- end to end verification on sample policy files with confirmed 200 ok responses.
+next steps:
+- optional extension with external enterprise tools via model context protocol.
