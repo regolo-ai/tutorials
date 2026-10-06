@@ -29,12 +29,12 @@ Pre-installation security scanner, cryptographic fingerprint locking, and automa
 4. Get a free API key from Regolo to run the code: [Sign Up for Free Trial](https://regolo.ai/pricing).
 5. Run the code and see the results in minutes.
 
-> [!IMPORTANT]  
-> ## 🎁 Special Offer: 30 Days Free Trial
+> [!NOTE]  
+> ## Developer Access: 30-Day Free Trial
 > 
-> To power your AI agent, you need an API key. Sign up for Regolo today and get **30 days completely free**, plus a massive **70% discount for the following 3 months!**
+> Test these models on Regolo's EU-hosted infrastructure with **30 days of free tier access** and an introductory **70% discount for the following 3 months**.
 > 
-> 🚀 **[CLICK HERE TO GET STARTED AND CLAIM YOUR FREE TRIAL](https://regolo.ai/pricing)** 🚀
+> [Get an API Key & Start Free Trial](https://regolo.ai/pricing) · [Documentation](https://regolo.ai/docs) · [Models Library](https://regolo.ai/models-library/)
 > 
 > ---
 > **Explore Regolo:** [Platform](https://regolo.ai) | [Models Library](https://regolo.ai/models-library/) | [Documentation & Guides](https://regolo.ai/docs) | [YouTube](https://www.youtube.com/@regoloai) | [Discord](https://discord.gg/wHxwWCC8)

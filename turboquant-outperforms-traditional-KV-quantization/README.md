@@ -91,12 +91,12 @@ The script reports:
 4. Get a free API key from Regolo to run the code: [Sign Up for Free Trial](https://regolo.ai/pricing).
 5. Run the code and see the results in minutes.
 
-> [!IMPORTANT]  
-> ## 🎁 Special Offer: 30 Days Free Trial
+> [!TIP]  
+> ## Get Started with Regolo
 > 
-> To power your AI agent, you need an API key. Sign up for Regolo today and get **30 days completely free**, plus a massive **70% discount for the following 3 months!**
+> An API key is required to run this tutorial. Create a Regolo account to get **30 days of free access**, followed by a **70% discount on your first 3 months**.
 > 
-> 🚀 **[CLICK HERE TO GET STARTED AND CLAIM YOUR FREE TRIAL](https://regolo.ai/pricing)** 🚀
+> [Create your Regolo account and start building](https://regolo.ai/pricing)
 > 
 > ---
 > **Explore Regolo:** [Platform](https://regolo.ai) | [Models Library](https://regolo.ai/models-library/) | [Documentation & Guides](https://regolo.ai/docs) | [YouTube](https://www.youtube.com/@regoloai) | [Discord](https://discord.gg/wHxwWCC8)
