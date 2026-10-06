@@ -453,8 +453,8 @@ Powered by **[Regolo.ai](https://regolo.ai)**.
 
 ---
 
-### Special Offer: 30 Days Free Trial
+### Developer Access & Free Trial
 
-To power your multi-agent setup, you need an API key. Sign up for Regolo today and get **30 days completely free**, plus a massive **70% discount for the following 3 months!**
+To power your multi-agent setup, an API key is required. Sign up for Regolo to receive **30 days of free access**, followed by a **70% discount on your first 3 months**.
 
-🚀 **[CLICK HERE TO GET STARTED AND CLAIM YOUR FREE TRIAL](https://regolo.ai/pricing)** 🚀
+[Create your Regolo account and start building](https://regolo.ai/pricing)

@@ -36,12 +36,12 @@ A reproducible smoke-test and paired benchmark for SoL-Pi, Pi Coding Agent, and 
    ./run.sh                 # Full 51-task two-arm benchmark
    ```
 
-> [!IMPORTANT]
-> ## 🎁 Special Offer: 30 Days Free Trial
+> [!TIP]
+> ## Start Building with Regolo
 >
-> To power your AI coding agent, you need an API key. Sign up for Regolo today and get **30 days completely free**, plus a massive **70% discount for the following 3 months!**
+> To power your AI coding agent, you need an API key. Sign up for Regolo to receive **30 days of free access** and a **70% discount for your first 3 months**.
 >
-> 🚀 **[CLICK HERE TO GET STARTED AND CLAIM YOUR FREE TRIAL](https://regolo.ai/pricing)** 🚀
+> [Get started with Regolo](https://regolo.ai/pricing)
 >
 > ---
 > **Explore Regolo:** [Platform](https://regolo.ai) | [Models Library](https://regolo.ai/models-library/) | [Documentation & Guides](https://regolo.ai/docs) | [YouTube](https://www.youtube.com/@regoloai) | [Discord](https://discord.gg/wHxwWCC8)
