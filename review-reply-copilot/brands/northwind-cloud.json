@@ -1,0 +1,46 @@
+{
+  "id": "northwind-cloud",
+  "name": "Northwind Cloud",
+  "type": "saas",
+  "about": "Project management SaaS for small agencies: boards, time tracking and client reports.",
+  "voice": [
+    "calm",
+    "precise",
+    "friendly",
+    "specific about next steps"
+  ],
+  "support_contact": "help@northwind-cloud.example",
+  "signature": "Jonas, Northwind Cloud customer success",
+  "topics": {
+    "bugs_performance": "The customer talks about errors, crashes, slowness, outages or data that is wrong or missing.",
+    "onboarding_docs": "The customer talks about setting up the product, learning it, the documentation or migrating data in.",
+    "pricing_billing": "The customer talks about plans, price changes, invoices, charges, cancellation or refunds.",
+    "support": "The customer talks about contact with the support or success team, replies and waiting times.",
+    "features": "The customer talks about what the product can or cannot do, missing features or requests.",
+    "security_privacy": "The customer talks about data protection, permissions, GDPR, compliance or access control.",
+    "other": "Anything else, or a review that gives no specific reason."
+  },
+  "facts": [
+    "Customers can export all their data from Settings, Export, at any time.",
+    "Plan changes take effect at the next billing date and annual plans can be cancelled with a prorated credit only within 14 days of renewal.",
+    "The status page is at status.northwind-cloud.example.",
+    "Customers can reach customer success by email at help@northwind-cloud.example."
+  ],
+  "allow_compensation": false,
+  "max_chars": 700,
+  "forbidden_phrases": [
+    "we apologize for any inconvenience",
+    "rest assured",
+    "as per our terms",
+    "we guarantee",
+    "100% secure"
+  ],
+  "never": [
+    "promise a refund, credit, discount or any compensation in a public reply",
+    "ask for account details, email addresses or passwords in a public reply",
+    "blame the customer or argue about what happened",
+    "mention competitors",
+    "make claims about security or compliance that are not in the list of facts",
+    "state a fact, deadline or policy that is not in the list of facts"
+  ]
+}

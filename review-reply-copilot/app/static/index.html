@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Review Reply Copilot · Regolo</title>
+<link rel="icon" href="/static/img/regolo-icon-light-bg.png">
+<link rel="stylesheet" href="/static/app.css">
+<script src="/static/app.js" defer></script>
+</head>
+<body>
+<header class="top">
+  <div class="top__inner">
+    <div class="brandmark"><img src="/static/img/regolo-logo-light-bg.png" alt="Regolo" height="26"><span class="brandmark__name">Review Reply Copilot</span></div>
+    <div class="top__right">
+      <span class="badge" id="badge-key"><span class="dot"></span><span id="badge-key-text">Checking key</span></span>
+    </div>
+  </div>
+</header>
+
+<main class="page">
+  <section class="intro">
+    <p class="eyebrow">Decide with Clef-Flash · write with an LLM · check with Clef-Flash</p>
+    <h1>Reply to reviews in your client's voice, with a person always in charge.</h1>
+    <p class="lead">Load reviews, let Clef-Flash label sentiment, topic, risk and language, draft a reply with the brand rules, and review the checks before you approve. Nothing is published from here.</p>
+  </section>
+
+  <section class="tiles" aria-label="Usage">
+    <div class="tile"><span class="tile__label">Reviews</span><strong id="m-reviews">0</strong><span class="tile__sub" id="m-analyzed">0 analyzed</span></div>
+    <div class="tile"><span class="tile__label">Clef-Flash analysis</span><strong id="m-decide">0 s</strong><span class="tile__sub" id="m-decide-sub">0 requests · $0.0000</span></div>
+    <div class="tile"><span class="tile__label">Replies</span><strong id="m-drafts">0</strong><span class="tile__sub" id="m-approved">0 approved</span></div>
+    <div class="tile"><span class="tile__label">Writing a reply</span><strong id="m-write">0 s</strong><span class="tile__sub" id="m-write-sub">0 requests · $0.0000</span></div>
+  </section>
+
+  <section class="card step-card connect" id="connect" data-step="1">
+    <h2 class="card__h"><button class="card__toggle" id="toggle-1" type="button" aria-expanded="true" aria-controls="body-1">
+      <span class="step" id="step-1" aria-hidden="true">1</span>
+      <span class="card__titles"><span class="card__title">Connect your Regolo account</span><span class="card__sub">The labels and the replies run on Regolo, so the app needs an API key.</span></span>
+      <span class="step__summary" id="sum-1" hidden></span>
+      <span class="chev" aria-hidden="true">▾</span>
+    </button></h2>
+    <div class="card__body" id="body-1" role="region" aria-labelledby="toggle-1"><div class="inner">
+    <div class="connect__cols">
+      <div class="promo">
+        <span class="badge"><span class="dot"></span>New to Regolo</span>
+        <h3>30 days of free trial for new users</h3>
+        <p>Create an account, get your API key and try this app on your own reviews at no cost during the trial. Inference on Regolo is European and keeps no data after each request.</p>
+        <div class="actions">
+          <a class="btn btn--primary" href="https://regolo.ai/pricing" target="_blank" rel="noopener noreferrer">Create your free account</a>
+        </div>
+        <p class="hint">See the pricing page for the current trial terms.</p>
+      </div>
+      <form class="keyform" id="keyform" autocomplete="off">
+        <label for="api-key">Regolo API key</label>
+        <div class="keyrow">
+          <input id="api-key" type="password" placeholder="Paste your key" spellcheck="false" autocomplete="off" aria-describedby="key-help">
+          <button class="btn" id="key-toggle" type="button" aria-label="Show the key">Show</button>
+        </div>
+        <div class="actions"><button class="btn btn--primary" id="key-save" type="submit">Save and verify key</button></div>
+        <p class="keystate" id="key-state" role="status" aria-live="polite"></p>
+        <p class="hint" id="key-help">The key is checked with Regolo's catalog (no inference runs), then saved in the <code>.env</code> file on this computer. It never goes back to the browser. Create keys in the <a href="https://dashboard.regolo.ai" target="_blank" rel="noopener noreferrer">Regolo dashboard</a>, under Virtual Keys.</p>
+      </form>
+    </div>
+    </div></div>
+  </section>
+
+  <section class="card step-card import" id="import" data-step="2">
+    <h2 class="card__h"><button class="card__toggle" id="toggle-2" type="button" aria-expanded="true" aria-controls="body-2">
+      <span class="step" id="step-2" aria-hidden="true">2</span>
+      <span class="card__titles"><span class="card__title">Bring in reviews</span><span class="card__sub">Use the sample reviews or import a CSV export of your client's reviews. Reviews are stored on this computer.</span></span>
+      <span class="step__summary" id="sum-2" hidden></span>
+      <span class="chev" aria-hidden="true">▾</span>
+    </button></h2>
+    <div class="card__body" id="body-2" role="region" aria-labelledby="toggle-2"><div class="inner">
+    <div class="sources">
+      <article class="source">
+        <h3>Sample reviews</h3>
+        <p class="source__in"><strong>Expects:</strong> nothing. Pick one of the two sample clients and load its synthetic reviews, so you can try the whole flow.</p>
+        <label class="field-stack" for="brand"><span>Sample client</span><select id="brand"></select></label>
+        <p class="hint">Each client has its own brand rules, which shape the replies. A CSV import also goes to the client selected here.</p>
+        <div class="actions"><button class="btn" id="btn-sample" type="button">Load sample reviews</button></div>
+      </article>
+
+      <article class="source">
+        <h3>CSV file</h3>
+        <p class="source__in"><strong>Expects:</strong> a UTF-8 CSV with a header row and one review per row.</p>
+        <ul class="cols">
+          <li><code>text</code><span>required, the review itself</span></li>
+          <li><code>rating</code><span>optional, 1 to 5</span></li>
+          <li><code>title</code><span>optional</span></li>
+          <li><code>author</code><span>optional</span></li>
+          <li><code>date</code><span>optional, any format</span></li>
+        </ul>
+        <p class="hint">Also understood: review, body, content, comment (for text), stars, score, name, reviewer, created, published. Most review tools can export a CSV: check the export options of the one your client uses.</p>
+        <div class="actions">
+          <label class="btn" for="csv-file">Choose CSV file<input id="csv-file" type="file" accept=".csv,text/csv" hidden></label>
+          <a class="btn btn--ghost" href="/api/template.csv" download>Download the template</a>
+        </div>
+      </article>
+
+    </div>
+    </div></div>
+  </section>
+
+  <section class="card step-card analyze" id="analyze" data-step="3">
+    <h2 class="card__h"><button class="card__toggle" id="toggle-3" type="button" aria-expanded="true" aria-controls="body-3">
+      <span class="step" id="step-3" aria-hidden="true">3</span>
+      <span class="card__titles"><span class="card__title">Analyze with Clef-Flash</span><span class="card__sub">Five labels per review: sentiment, topic, whether a person must handle it first, reply priority and language.</span></span>
+      <span class="step__summary" id="sum-3" hidden></span>
+      <span class="chev" aria-hidden="true">▾</span>
+    </button></h2>
+    <div class="card__body" id="body-3" role="region" aria-labelledby="toggle-3"><div class="inner">
+      <div class="actions step3actions">
+        <button class="btn btn--primary" id="btn-analyze" type="button">Analyze with Clef-Flash</button>
+        <button class="btn btn--ghost" id="btn-reset" type="button">Clear this client</button>
+      </div>
+      <p class="ready" id="ready-note" hidden></p>
+      <div class="progress" id="progress" hidden role="status" aria-live="polite">
+        <div class="progress__top"><strong id="progress-title">Clef-Flash is labeling your reviews</strong><span id="progress-count"></span></div>
+        <div class="bar" aria-hidden="true"><span id="progress-bar"></span></div>
+        <p class="hint" id="progress-sub"></p>
+      </div>
+    </div></div>
+  </section>
+
+  <div id="results" hidden>
+  <section class="filters" aria-label="Filters">
+    <div class="chips" id="f-sentiment" role="group" aria-label="Sentiment"></div>
+    <select id="f-topic" aria-label="Topic"><option value="">All topics</option></select>
+    <label class="check"><input type="checkbox" id="f-person"> Needs a person</label>
+    <span class="count" id="f-count"></span>
+  </section>
+
+  <section class="grid">
+    <div class="card list" id="list" aria-live="polite"></div>
+    <aside class="card studio" id="studio" aria-label="Reply studio"></aside>
+  </section>
+
+  </div>
+
+  <p class="foot">Reviews and drafts are stored in a local database on this computer. Inference runs on Regolo, which keeps no data after each request. Costs are estimates from reported tokens and Regolo catalog rates, not an invoice.</p>
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>

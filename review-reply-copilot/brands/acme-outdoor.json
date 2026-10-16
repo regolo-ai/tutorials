@@ -1,0 +1,46 @@
+{
+  "id": "acme-outdoor",
+  "name": "Acme Outdoor",
+  "type": "ecommerce",
+  "about": "Online shop for hiking boots, tents and camping gear, shipping across Europe.",
+  "voice": [
+    "warm",
+    "direct",
+    "plain language",
+    "no corporate phrases"
+  ],
+  "support_contact": "support@acme-outdoor.example",
+  "signature": "Marta, Acme Outdoor support",
+  "topics": {
+    "product_quality": "The customer talks about how the product performs, lasts, fits or is made.",
+    "shipping_delivery": "The customer talks about delivery time, tracking, packaging or a parcel that is late, damaged or lost.",
+    "price_value": "The customer talks about price, discounts, shipping costs or whether the product is worth the money.",
+    "customer_service": "The customer talks about contact with support staff, replies, helpfulness or waiting times.",
+    "billing_refund": "The customer talks about payments, invoices, charges, refunds or returns.",
+    "website_checkout": "The customer talks about the website, the app, search, the cart or the checkout process.",
+    "other": "Anything else, or a review that gives no specific reason."
+  },
+  "facts": [
+    "Returns are accepted within 30 days of delivery for unused items.",
+    "Refunds are processed within 5 to 7 working days after the return is received.",
+    "Standard delivery in Europe takes 3 to 6 working days.",
+    "Customers can reach support by email at support@acme-outdoor.example."
+  ],
+  "allow_compensation": false,
+  "max_chars": 700,
+  "forbidden_phrases": [
+    "we apologize for any inconvenience",
+    "calm down",
+    "as per our policy",
+    "unfortunately you",
+    "free gift",
+    "we guarantee"
+  ],
+  "never": [
+    "promise a refund, replacement, discount or any compensation in a public reply",
+    "ask for an order number, email address, phone number or address in a public reply",
+    "blame the customer or argue about what happened",
+    "mention competitors",
+    "state a fact, deadline or policy that is not in the list of facts"
+  ]
+}
