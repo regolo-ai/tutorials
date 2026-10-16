@@ -1,0 +1,949 @@
+{
+  "metadata": {
+    "date": "2026-10-15T08:55:17Z",
+    "local_hardware": "Apple M1 Ultra (64 GB unified memory, macOS arm64)",
+    "ollama_version": "0.40.4",
+    "regolo_endpoint": "https://api.regolo.ai/v1",
+    "num_documents": 60,
+    "num_queries": 30
+  },
+  "models": {
+    "embeddinggemma-2:270m-bf16-text": {
+      "label": "EmbeddingGemma 2 (270M Text BF16)",
+      "provider": "local_ollama",
+      "native_dim": 768,
+      "ollama_ps": [
+        {
+          "raw": "embeddinggemma-2:270m-bf16-text    afeb999480b2    542 MB    100% GPU     8192       mlx         4 minutes from now",
+          "name": "embeddinggemma-2:270m-bf16-text",
+          "id": "afeb999480b2",
+          "size": "542 MB"
+        },
+        {
+          "raw": "qwen3-embedding:0.6b               ac6da0dfba84    5.8 GB    100% GPU     32768      llamacpp    2 minutes from now",
+          "name": "qwen3-embedding:0.6b",
+          "id": "ac6da0dfba84",
+          "size": "5.8 GB"
+        },
+        {
+          "raw": "embeddinggemma:latest              85462619ee72    685 MB    100% GPU     2048       llamacpp    2 minutes from now",
+          "name": "embeddinggemma:latest",
+          "id": "85462619ee72",
+          "size": "685 MB"
+        }
+      ],
+      "indexing_60_docs_ms": 1593.5,
+      "docs_per_sec": 37.7,
+      "query_latency_ms": {
+        "p50": 23.8,
+        "p95": 26.92,
+        "mean": 23.55
+      },
+      "native_metrics": {
+        "ndcg@10": 95.93,
+        "recall@5": 92.22,
+        "mrr@10": 100.0
+      },
+      "native_by_domain": {
+        "code": {
+          "ndcg@10": 96.51,
+          "recall@5": 95.0,
+          "mrr@10": 100.0
+        },
+        "multilingual": {
+          "ndcg@10": 96.08,
+          "recall@5": 95.0,
+          "mrr@10": 100.0
+        },
+        "tech_docs": {
+          "ndcg@10": 95.21,
+          "recall@5": 86.67,
+          "mrr@10": 100.0
+        }
+      },
+      "unprefixed_query_metrics": {
+        "ndcg@10": 95.36,
+        "recall@5": 87.22,
+        "mrr@10": 100.0
+      },
+      "unprefixed_query_by_domain": {
+        "code": {
+          "ndcg@10": 95.92,
+          "recall@5": 85.0,
+          "mrr@10": 100.0
+        },
+        "multilingual": {
+          "ndcg@10": 95.95,
+          "recall@5": 90.0,
+          "mrr@10": 100.0
+        },
+        "tech_docs": {
+          "ndcg@10": 94.22,
+          "recall@5": 86.67,
+          "mrr@10": 100.0
+        }
+      },
+      "mrl_curve": {
+        "768": {
+          "overall": {
+            "ndcg@10": 95.93,
+            "recall@5": 92.22,
+            "mrr@10": 100.0
+          },
+          "by_domain": {
+            "code": {
+              "ndcg@10": 96.51,
+              "recall@5": 95.0,
+              "mrr@10": 100.0
+            },
+            "multilingual": {
+              "ndcg@10": 96.08,
+              "recall@5": 95.0,
+              "mrr@10": 100.0
+            },
+            "tech_docs": {
+              "ndcg@10": 95.21,
+              "recall@5": 86.67,
+              "mrr@10": 100.0
+            }
+          },
+          "ram_10m_vectors_float32_gb": 28.61,
+          "ram_10m_vectors_int8_gb": 7.15
+        },
+        "512": {
+          "overall": {
+            "ndcg@10": 95.92,
+            "recall@5": 90.56,
+            "mrr@10": 100.0
+          },
+          "by_domain": {
+            "code": {
+              "ndcg@10": 96.11,
+              "recall@5": 90.0,
+              "mrr@10": 100.0
+            },
+            "multilingual": {
+              "ndcg@10": 96.44,
+              "recall@5": 95.0,
+              "mrr@10": 100.0
+            },
+            "tech_docs": {
+              "ndcg@10": 95.21,
+              "recall@5": 86.67,
+              "mrr@10": 100.0
+            }
+          },
+          "ram_10m_vectors_float32_gb": 19.07,
+          "ram_10m_vectors_int8_gb": 4.77
+        },
+        "256": {
+          "overall": {
+            "ndcg@10": 95.95,
+            "recall@5": 87.22,
+            "mrr@10": 100.0
+          },
+          "by_domain": {
+            "code": {
+              "ndcg@10": 96.64,
+              "recall@5": 85.0,
+              "mrr@10": 100.0
+            },
+            "multilingual": {
+              "ndcg@10": 96.03,
+              "recall@5": 85.0,
+              "mrr@10": 100.0
+            },
+            "tech_docs": {
+              "ndcg@10": 95.18,
+              "recall@5": 91.67,
+              "mrr@10": 100.0
+            }
+          },
+          "ram_10m_vectors_float32_gb": 9.54,
+          "ram_10m_vectors_int8_gb": 2.38
+        },
+        "128": {
+          "overall": {
+            "ndcg@10": 94.49,
+            "recall@5": 85.56,
+            "mrr@10": 100.0
+          },
+          "by_domain": {
+            "code": {
+              "ndcg@10": 94.19,
+              "recall@5": 85.0,
+              "mrr@10": 100.0
+            },
+            "multilingual": {
+              "ndcg@10": 94.86,
+              "recall@5": 85.0,
+              "mrr@10": 100.0
+            },
+            "tech_docs": {
+              "ndcg@10": 94.42,
+              "recall@5": 86.67,
+              "mrr@10": 100.0
+            }
+          },
+          "ram_10m_vectors_float32_gb": 4.77,
+          "ram_10m_vectors_int8_gb": 1.19
+        }
+      }
+    },
+    "embeddinggemma:latest": {
+      "label": "EmbeddingGemma 1 (308M Baseline)",
+      "provider": "local_ollama",
+      "native_dim": 768,
+      "ollama_ps": [
+        {
+          "raw": "embeddinggemma-2:270m-bf16-text    afeb999480b2    542 MB    100% GPU     8192       mlx         4 minutes from now",
+          "name": "embeddinggemma-2:270m-bf16-text",
+          "id": "afeb999480b2",
+          "size": "542 MB"
+        },
+        {
+          "raw": "embeddinggemma:latest              85462619ee72    685 MB    100% GPU     2048       llamacpp    4 minutes from now",
+          "name": "embeddinggemma:latest",
+          "id": "85462619ee72",
+          "size": "685 MB"
+        },
+        {
+          "raw": "qwen3-embedding:0.6b               ac6da0dfba84    5.8 GB    100% GPU     32768      llamacpp    2 minutes from now",
+          "name": "qwen3-embedding:0.6b",
+          "id": "ac6da0dfba84",
+          "size": "5.8 GB"
+        }
+      ],
+      "indexing_60_docs_ms": 1205.8,
+      "docs_per_sec": 49.8,
+      "query_latency_ms": {
+        "p50": 24.92,
+        "p95": 26.84,
+        "mean": 24.65
+      },
+      "native_metrics": {
+        "ndcg@10": 97.17,
+        "recall@5": 92.22,
+        "mrr@10": 100.0
+      },
+      "native_by_domain": {
+        "code": {
+          "ndcg@10": 99.09,
+          "recall@5": 100.0,
+          "mrr@10": 100.0
+        },
+        "multilingual": {
+          "ndcg@10": 97.51,
+          "recall@5": 90.0,
+          "mrr@10": 100.0
+        },
+        "tech_docs": {
+          "ndcg@10": 94.91,
+          "recall@5": 86.67,
+          "mrr@10": 100.0
+        }
+      },
+      "unprefixed_query_metrics": {
+        "ndcg@10": 95.79,
+        "recall@5": 87.22,
+        "mrr@10": 100.0
+      },
+      "unprefixed_query_by_domain": {
+        "code": {
+          "ndcg@10": 96.54,
+          "recall@5": 95.0,
+          "mrr@10": 100.0
+        },
+        "multilingual": {
+          "ndcg@10": 97.44,
+          "recall@5": 90.0,
+          "mrr@10": 100.0
+        },
+        "tech_docs": {
+          "ndcg@10": 93.4,
+          "recall@5": 76.67,
+          "mrr@10": 100.0
+        }
+      },
+      "mrl_curve": {
+        "768": {
+          "overall": {
+            "ndcg@10": 97.17,
+            "recall@5": 92.22,
+            "mrr@10": 100.0
+          },
+          "by_domain": {
+            "code": {
+              "ndcg@10": 99.09,
+              "recall@5": 100.0,
+              "mrr@10": 100.0
+            },
+            "multilingual": {
+              "ndcg@10": 97.51,
+              "recall@5": 90.0,
+              "mrr@10": 100.0
+            },
+            "tech_docs": {
+              "ndcg@10": 94.91,
+              "recall@5": 86.67,
+              "mrr@10": 100.0
+            }
+          },
+          "ram_10m_vectors_float32_gb": 28.61,
+          "ram_10m_vectors_int8_gb": 7.15
+        },
+        "512": {
+          "overall": {
+            "ndcg@10": 96.75,
+            "recall@5": 95.0,
+            "mrr@10": 100.0
+          },
+          "by_domain": {
+            "code": {
+              "ndcg@10": 98.73,
+              "recall@5": 100.0,
+              "mrr@10": 100.0
+            },
+            "multilingual": {
+              "ndcg@10": 98.39,
+              "recall@5": 95.0,
+              "mrr@10": 100.0
+            },
+            "tech_docs": {
+              "ndcg@10": 93.12,
+              "recall@5": 90.0,
+              "mrr@10": 100.0
+            }
+          },
+          "ram_10m_vectors_float32_gb": 19.07,
+          "ram_10m_vectors_int8_gb": 4.77
+        },
+        "256": {
+          "overall": {
+            "ndcg@10": 96.11,
+            "recall@5": 90.56,
+            "mrr@10": 100.0
+          },
+          "by_domain": {
+            "code": {
+              "ndcg@10": 98.42,
+              "recall@5": 100.0,
+              "mrr@10": 100.0
+            },
+            "multilingual": {
+              "ndcg@10": 97.54,
+              "recall@5": 95.0,
+              "mrr@10": 100.0
+            },
+            "tech_docs": {
+              "ndcg@10": 92.36,
+              "recall@5": 76.67,
+              "mrr@10": 100.0
+            }
+          },
+          "ram_10m_vectors_float32_gb": 9.54,
+          "ram_10m_vectors_int8_gb": 2.38
+        },
+        "128": {
+          "overall": {
+            "ndcg@10": 94.15,
+            "recall@5": 85.56,
+            "mrr@10": 98.33
+          },
+          "by_domain": {
+            "code": {
+              "ndcg@10": 95.76,
+              "recall@5": 85.0,
+              "mrr@10": 100.0
+            },
+            "multilingual": {
+              "ndcg@10": 97.91,
+              "recall@5": 95.0,
+              "mrr@10": 100.0
+            },
+            "tech_docs": {
+              "ndcg@10": 88.78,
+              "recall@5": 76.67,
+              "mrr@10": 95.0
+            }
+          },
+          "ram_10m_vectors_float32_gb": 4.77,
+          "ram_10m_vectors_int8_gb": 1.19
+        }
+      }
+    },
+    "qwen3-embedding:0.6b": {
+      "label": "Qwen3-Embedding-0.6B (Local)",
+      "provider": "local_ollama",
+      "native_dim": 1024,
+      "ollama_ps": [
+        {
+          "raw": "embeddinggemma:latest              85462619ee72    685 MB    100% GPU     2048       llamacpp    4 minutes from now",
+          "name": "embeddinggemma:latest",
+          "id": "85462619ee72",
+          "size": "685 MB"
+        },
+        {
+          "raw": "qwen3-embedding:0.6b               ac6da0dfba84    5.8 GB    100% GPU     32768      llamacpp    4 minutes from now",
+          "name": "qwen3-embedding:0.6b",
+          "id": "ac6da0dfba84",
+          "size": "5.8 GB"
+        },
+        {
+          "raw": "embeddinggemma-2:270m-bf16-text    afeb999480b2    542 MB    100% GPU     8192       mlx         4 minutes from now",
+          "name": "embeddinggemma-2:270m-bf16-text",
+          "id": "afeb999480b2",
+          "size": "542 MB"
+        }
+      ],
+      "indexing_60_docs_ms": 1846.1,
+      "docs_per_sec": 32.5,
+      "query_latency_ms": {
+        "p50": 33.37,
+        "p95": 42.65,
+        "mean": 33.72
+      },
+      "native_metrics": {
+        "ndcg@10": 97.76,
+        "recall@5": 95.0,
+        "mrr@10": 100.0
+      },
+      "native_by_domain": {
+        "code": {
+          "ndcg@10": 97.9,
+          "recall@5": 95.0,
+          "mrr@10": 100.0
+        },
+        "multilingual": {
+          "ndcg@10": 97.51,
+          "recall@5": 90.0,
+          "mrr@10": 100.0
+        },
+        "tech_docs": {
+          "ndcg@10": 97.89,
+          "recall@5": 100.0,
+          "mrr@10": 100.0
+        }
+      },
+      "unprefixed_query_metrics": {
+        "ndcg@10": 96.48,
+        "recall@5": 92.22,
+        "mrr@10": 98.33
+      },
+      "unprefixed_query_by_domain": {
+        "code": {
+          "ndcg@10": 98.05,
+          "recall@5": 95.0,
+          "mrr@10": 100.0
+        },
+        "multilingual": {
+          "ndcg@10": 97.08,
+          "recall@5": 90.0,
+          "mrr@10": 100.0
+        },
+        "tech_docs": {
+          "ndcg@10": 94.3,
+          "recall@5": 91.67,
+          "mrr@10": 95.0
+        }
+      },
+      "mrl_curve": {
+        "1024": {
+          "overall": {
+            "ndcg@10": 97.76,
+            "recall@5": 95.0,
+            "mrr@10": 100.0
+          },
+          "by_domain": {
+            "code": {
+              "ndcg@10": 97.9,
+              "recall@5": 95.0,
+              "mrr@10": 100.0
+            },
+            "multilingual": {
+              "ndcg@10": 97.51,
+              "recall@5": 90.0,
+              "mrr@10": 100.0
+            },
+            "tech_docs": {
+              "ndcg@10": 97.89,
+              "recall@5": 100.0,
+              "mrr@10": 100.0
+            }
+          },
+          "ram_10m_vectors_float32_gb": 38.15,
+          "ram_10m_vectors_int8_gb": 9.54
+        },
+        "768": {
+          "overall": {
+            "ndcg@10": 98.1,
+            "recall@5": 95.0,
+            "mrr@10": 100.0
+          },
+          "by_domain": {
+            "code": {
+              "ndcg@10": 98.73,
+              "recall@5": 95.0,
+              "mrr@10": 100.0
+            },
+            "multilingual": {
+              "ndcg@10": 97.44,
+              "recall@5": 90.0,
+              "mrr@10": 100.0
+            },
+            "tech_docs": {
+              "ndcg@10": 98.13,
+              "recall@5": 100.0,
+              "mrr@10": 100.0
+            }
+          },
+          "ram_10m_vectors_float32_gb": 28.61,
+          "ram_10m_vectors_int8_gb": 7.15
+        },
+        "512": {
+          "overall": {
+            "ndcg@10": 98.14,
+            "recall@5": 93.33,
+            "mrr@10": 100.0
+          },
+          "by_domain": {
+            "code": {
+              "ndcg@10": 99.13,
+              "recall@5": 95.0,
+              "mrr@10": 100.0
+            },
+            "multilingual": {
+              "ndcg@10": 97.44,
+              "recall@5": 90.0,
+              "mrr@10": 100.0
+            },
+            "tech_docs": {
+              "ndcg@10": 97.85,
+              "recall@5": 95.0,
+              "mrr@10": 100.0
+            }
+          },
+          "ram_10m_vectors_float32_gb": 19.07,
+          "ram_10m_vectors_int8_gb": 4.77
+        },
+        "256": {
+          "overall": {
+            "ndcg@10": 97.54,
+            "recall@5": 95.0,
+            "mrr@10": 100.0
+          },
+          "by_domain": {
+            "code": {
+              "ndcg@10": 99.09,
+              "recall@5": 95.0,
+              "mrr@10": 100.0
+            },
+            "multilingual": {
+              "ndcg@10": 97.59,
+              "recall@5": 95.0,
+              "mrr@10": 100.0
+            },
+            "tech_docs": {
+              "ndcg@10": 95.94,
+              "recall@5": 95.0,
+              "mrr@10": 100.0
+            }
+          },
+          "ram_10m_vectors_float32_gb": 9.54,
+          "ram_10m_vectors_int8_gb": 2.38
+        },
+        "128": {
+          "overall": {
+            "ndcg@10": 96.8,
+            "recall@5": 93.33,
+            "mrr@10": 100.0
+          },
+          "by_domain": {
+            "code": {
+              "ndcg@10": 98.26,
+              "recall@5": 95.0,
+              "mrr@10": 100.0
+            },
+            "multilingual": {
+              "ndcg@10": 97.15,
+              "recall@5": 90.0,
+              "mrr@10": 100.0
+            },
+            "tech_docs": {
+              "ndcg@10": 94.99,
+              "recall@5": 95.0,
+              "mrr@10": 100.0
+            }
+          },
+          "ram_10m_vectors_float32_gb": 4.77,
+          "ram_10m_vectors_int8_gb": 1.19
+        }
+      }
+    },
+    "Qwen3-Embedding-8B": {
+      "label": "Qwen3-Embedding-8B (Regolo API)",
+      "provider": "regolo_api",
+      "native_dim": 4096,
+      "ollama_ps": [],
+      "indexing_60_docs_ms": 7777.2,
+      "docs_per_sec": 7.7,
+      "query_latency_ms": {
+        "p50": 490.93,
+        "p95": 1502.33,
+        "mean": 606.93
+      },
+      "native_metrics": {
+        "ndcg@10": 98.21,
+        "recall@5": 98.33,
+        "mrr@10": 100.0
+      },
+      "native_by_domain": {
+        "code": {
+          "ndcg@10": 99.45,
+          "recall@5": 100.0,
+          "mrr@10": 100.0
+        },
+        "multilingual": {
+          "ndcg@10": 97.9,
+          "recall@5": 95.0,
+          "mrr@10": 100.0
+        },
+        "tech_docs": {
+          "ndcg@10": 97.27,
+          "recall@5": 100.0,
+          "mrr@10": 100.0
+        }
+      },
+      "unprefixed_query_metrics": {
+        "ndcg@10": 96.72,
+        "recall@5": 93.89,
+        "mrr@10": 100.0
+      },
+      "unprefixed_query_by_domain": {
+        "code": {
+          "ndcg@10": 98.82,
+          "recall@5": 95.0,
+          "mrr@10": 100.0
+        },
+        "multilingual": {
+          "ndcg@10": 97.18,
+          "recall@5": 95.0,
+          "mrr@10": 100.0
+        },
+        "tech_docs": {
+          "ndcg@10": 94.15,
+          "recall@5": 91.67,
+          "mrr@10": 100.0
+        }
+      },
+      "mrl_curve": {
+        "4096": {
+          "overall": {
+            "ndcg@10": 98.21,
+            "recall@5": 98.33,
+            "mrr@10": 100.0
+          },
+          "by_domain": {
+            "code": {
+              "ndcg@10": 99.45,
+              "recall@5": 100.0,
+              "mrr@10": 100.0
+            },
+            "multilingual": {
+              "ndcg@10": 97.9,
+              "recall@5": 95.0,
+              "mrr@10": 100.0
+            },
+            "tech_docs": {
+              "ndcg@10": 97.27,
+              "recall@5": 100.0,
+              "mrr@10": 100.0
+            }
+          },
+          "ram_10m_vectors_float32_gb": 152.59,
+          "ram_10m_vectors_int8_gb": 38.15
+        },
+        "1024": {
+          "overall": {
+            "ndcg@10": 97.7,
+            "recall@5": 96.67,
+            "mrr@10": 100.0
+          },
+          "by_domain": {
+            "code": {
+              "ndcg@10": 99.64,
+              "recall@5": 100.0,
+              "mrr@10": 100.0
+            },
+            "multilingual": {
+              "ndcg@10": 98.51,
+              "recall@5": 95.0,
+              "mrr@10": 100.0
+            },
+            "tech_docs": {
+              "ndcg@10": 94.95,
+              "recall@5": 95.0,
+              "mrr@10": 100.0
+            }
+          },
+          "ram_10m_vectors_float32_gb": 38.15,
+          "ram_10m_vectors_int8_gb": 9.54
+        },
+        "768": {
+          "overall": {
+            "ndcg@10": 97.29,
+            "recall@5": 96.67,
+            "mrr@10": 100.0
+          },
+          "by_domain": {
+            "code": {
+              "ndcg@10": 99.33,
+              "recall@5": 100.0,
+              "mrr@10": 100.0
+            },
+            "multilingual": {
+              "ndcg@10": 97.71,
+              "recall@5": 95.0,
+              "mrr@10": 100.0
+            },
+            "tech_docs": {
+              "ndcg@10": 94.84,
+              "recall@5": 95.0,
+              "mrr@10": 100.0
+            }
+          },
+          "ram_10m_vectors_float32_gb": 28.61,
+          "ram_10m_vectors_int8_gb": 7.15
+        },
+        "512": {
+          "overall": {
+            "ndcg@10": 97.52,
+            "recall@5": 95.0,
+            "mrr@10": 100.0
+          },
+          "by_domain": {
+            "code": {
+              "ndcg@10": 99.45,
+              "recall@5": 100.0,
+              "mrr@10": 100.0
+            },
+            "multilingual": {
+              "ndcg@10": 98.58,
+              "recall@5": 95.0,
+              "mrr@10": 100.0
+            },
+            "tech_docs": {
+              "ndcg@10": 94.53,
+              "recall@5": 90.0,
+              "mrr@10": 100.0
+            }
+          },
+          "ram_10m_vectors_float32_gb": 19.07,
+          "ram_10m_vectors_int8_gb": 4.77
+        },
+        "256": {
+          "overall": {
+            "ndcg@10": 97.6,
+            "recall@5": 95.0,
+            "mrr@10": 100.0
+          },
+          "by_domain": {
+            "code": {
+              "ndcg@10": 99.09,
+              "recall@5": 100.0,
+              "mrr@10": 100.0
+            },
+            "multilingual": {
+              "ndcg@10": 97.9,
+              "recall@5": 95.0,
+              "mrr@10": 100.0
+            },
+            "tech_docs": {
+              "ndcg@10": 95.81,
+              "recall@5": 90.0,
+              "mrr@10": 100.0
+            }
+          },
+          "ram_10m_vectors_float32_gb": 9.54,
+          "ram_10m_vectors_int8_gb": 2.38
+        },
+        "128": {
+          "overall": {
+            "ndcg@10": 97.27,
+            "recall@5": 93.33,
+            "mrr@10": 100.0
+          },
+          "by_domain": {
+            "code": {
+              "ndcg@10": 99.09,
+              "recall@5": 100.0,
+              "mrr@10": 100.0
+            },
+            "multilingual": {
+              "ndcg@10": 97.71,
+              "recall@5": 95.0,
+              "mrr@10": 100.0
+            },
+            "tech_docs": {
+              "ndcg@10": 95.02,
+              "recall@5": 85.0,
+              "mrr@10": 100.0
+            }
+          },
+          "ram_10m_vectors_float32_gb": 4.77,
+          "ram_10m_vectors_int8_gb": 1.19
+        }
+      }
+    }
+  },
+  "api_native_mrl_verification": {
+    "512": {
+      "returned_dim": 512,
+      "overall": {
+        "ndcg@10": 97.52,
+        "recall@5": 95.0,
+        "mrr@10": 100.0
+      },
+      "by_domain": {
+        "code": {
+          "ndcg@10": 99.45,
+          "recall@5": 100.0,
+          "mrr@10": 100.0
+        },
+        "multilingual": {
+          "ndcg@10": 98.58,
+          "recall@5": 95.0,
+          "mrr@10": 100.0
+        },
+        "tech_docs": {
+          "ndcg@10": 94.53,
+          "recall@5": 90.0,
+          "mrr@10": 100.0
+        }
+      }
+    },
+    "256": {
+      "returned_dim": 256,
+      "overall": {
+        "ndcg@10": 97.6,
+        "recall@5": 95.0,
+        "mrr@10": 100.0
+      },
+      "by_domain": {
+        "code": {
+          "ndcg@10": 99.09,
+          "recall@5": 100.0,
+          "mrr@10": 100.0
+        },
+        "multilingual": {
+          "ndcg@10": 97.9,
+          "recall@5": 95.0,
+          "mrr@10": 100.0
+        },
+        "tech_docs": {
+          "ndcg@10": 95.81,
+          "recall@5": 90.0,
+          "mrr@10": 100.0
+        }
+      }
+    }
+  },
+  "two_stage_reranking": {
+    "embeddinggemma-2:270m-bf16-text": {
+      "first_stage_model": "embeddinggemma-2:270m-bf16-text",
+      "reranker_model": "Qwen3-Reranker-4B",
+      "candidates_reranked": 15,
+      "rerank_latency_ms": {
+        "p50": 332.24,
+        "p95": 895.86,
+        "mean": 400.63
+      },
+      "overall": {
+        "ndcg@10": 96.84,
+        "recall@5": 95.56,
+        "mrr@10": 100.0
+      },
+      "by_domain": {
+        "code": {
+          "ndcg@10": 98.42,
+          "recall@5": 100.0,
+          "mrr@10": 100.0
+        },
+        "multilingual": {
+          "ndcg@10": 98.46,
+          "recall@5": 95.0,
+          "mrr@10": 100.0
+        },
+        "tech_docs": {
+          "ndcg@10": 93.64,
+          "recall@5": 91.67,
+          "mrr@10": 100.0
+        }
+      }
+    },
+    "qwen3-embedding:0.6b": {
+      "first_stage_model": "qwen3-embedding:0.6b",
+      "reranker_model": "Qwen3-Reranker-4B",
+      "candidates_reranked": 15,
+      "rerank_latency_ms": {
+        "p50": 324.01,
+        "p95": 841.74,
+        "mean": 396.38
+      },
+      "overall": {
+        "ndcg@10": 96.84,
+        "recall@5": 95.56,
+        "mrr@10": 100.0
+      },
+      "by_domain": {
+        "code": {
+          "ndcg@10": 98.42,
+          "recall@5": 100.0,
+          "mrr@10": 100.0
+        },
+        "multilingual": {
+          "ndcg@10": 97.54,
+          "recall@5": 95.0,
+          "mrr@10": 100.0
+        },
+        "tech_docs": {
+          "ndcg@10": 94.56,
+          "recall@5": 91.67,
+          "mrr@10": 100.0
+        }
+      }
+    },
+    "Qwen3-Embedding-8B": {
+      "first_stage_model": "Qwen3-Embedding-8B",
+      "reranker_model": "Qwen3-Reranker-4B",
+      "candidates_reranked": 15,
+      "rerank_latency_ms": {
+        "p50": 271.74,
+        "p95": 449.84,
+        "mean": 303.65
+      },
+      "overall": {
+        "ndcg@10": 97.12,
+        "recall@5": 93.89,
+        "mrr@10": 100.0
+      },
+      "by_domain": {
+        "code": {
+          "ndcg@10": 98.33,
+          "recall@5": 95.0,
+          "mrr@10": 100.0
+        },
+        "multilingual": {
+          "ndcg@10": 98.46,
+          "recall@5": 95.0,
+          "mrr@10": 100.0
+        },
+        "tech_docs": {
+          "ndcg@10": 94.56,
+          "recall@5": 91.67,
+          "mrr@10": 100.0
+        }
+      }
+    }
+  }
+}
