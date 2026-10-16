@@ -1,0 +1,546 @@
+{
+  "documents": [
+    {
+      "id": "code_01",
+      "domain": "code",
+      "title": "Token bucket rate limiter with Redis Lua script",
+      "text": "def acquire_token(redis_client, key: str, capacity: int, refill_rate: float, now: float) -> bool:\n    lua = '''\n    local data = redis.call('HMGET', KEYS[1], 'tokens', 'last_updated')\n    local tokens = tonumber(data[1]) or tonumber(ARGV[1])\n    local last = tonumber(data[2]) or tonumber(ARGV[3])\n    local elapsed = math.max(0, tonumber(ARGV[3]) - last)\n    tokens = math.min(tonumber(ARGV[1]), tokens + elapsed * tonumber(ARGV[2]))\n    if tokens < 1.0 then return 0 end\n    redis.call('HMSET', KEYS[1], 'tokens', tokens - 1.0, 'last_updated', ARGV[3])\n    return 1\n    '''\n    return bool(redis_client.eval(lua, 1, key, capacity, refill_rate, now))"
+    },
+    {
+      "id": "code_02",
+      "domain": "code",
+      "title": "Sliding window counter rate limiter in memory",
+      "text": "from collections import deque\nimport time\n\nclass InMemorySlidingWindowLimiter:\n    def __init__(self, max_requests: int, window_seconds: float):\n        self.max_requests = max_requests\n        self.window = window_seconds\n        self.hits: dict[str, deque[float]] = {}\n\n    def allow(self, client_id: str) -> bool:\n        now = time.monotonic()\n        q = self.hits.setdefault(client_id, deque())\n        while q and now - q[0] > self.window:\n            q.popleft()\n        if len(q) >= self.max_requests:\n            return False\n        q.append(now)\n        return True"
+    },
+    {
+      "id": "code_03",
+      "domain": "code",
+      "title": "Async exponential backoff retry with full jitter",
+      "text": "import asyncio\nimport random\nfrom typing import Callable, TypeVar, Awaitable\n\nT = TypeVar('T')\n\nasync def retry_with_full_jitter(\n    fn: Callable[[], Awaitable[T]],\n    max_attempts: int = 5,\n    base_delay: float = 0.2,\n    cap_delay: float = 10.0,\n) -> T:\n    for attempt in range(max_attempts):\n        try:\n            return await fn()\n        except (TimeoutError, ConnectionError):\n            if attempt == max_attempts - 1:\n                raise\n            ceiling = min(cap_delay, base_delay * (2 ** attempt))\n            await asyncio.sleep(random.uniform(0, ceiling))"
+    },
+    {
+      "id": "code_04",
+      "domain": "code",
+      "title": "Synchronous fixed-interval retry decorator",
+      "text": "import time\nimport functools\n\ndef fixed_retry(retries: int = 3, delay_sec: float = 1.0):\n    def decorator(func):\n        @functools.wraps(func)\n        def wrapper(*args, **kwargs):\n            last_err = None\n            for _ in range(retries):\n                try:\n                    return func(*args, **kwargs)\n                except Exception as exc:\n                    last_err = exc\n                    time.sleep(delay_sec)\n            raise last_err\n        return wrapper\n    return decorator"
+    },
+    {
+      "id": "code_05",
+      "domain": "code",
+      "title": "Matryoshka embedding truncation and L2 normalization",
+      "text": "import numpy as np\n\ndef slice_and_normalize_mrl(embeddings: np.ndarray, target_dim: int) -> np.ndarray:\n    if target_dim > embeddings.shape[-1]:\n        raise ValueError(f'target_dim {target_dim} exceeds native dim {embeddings.shape[-1]}')\n    sliced = embeddings[..., :target_dim].astype(np.float32)\n    norms = np.linalg.norm(sliced, ord=2, axis=-1, keepdims=True)\n    norms = np.maximum(norms, 1e-12)\n    return sliced / norms"
+    },
+    {
+      "id": "code_06",
+      "domain": "code",
+      "title": "PCA dimensionality reduction with scikit-learn",
+      "text": "from sklearn.decomposition import PCA\nimport numpy as np\n\ndef fit_pca_projection(train_vectors: np.ndarray, out_dim: int) -> tuple[PCA, np.ndarray]:\n    pca = PCA(n_components=out_dim, whiten=True, random_state=42)\n    projected = pca.fit_transform(train_vectors)\n    return pca, projected"
+    },
+    {
+      "id": "code_07",
+      "domain": "code",
+      "title": "Reciprocal Rank Fusion (RRF) for hybrid BM25 + dense retrieval",
+      "text": "def reciprocal_rank_fusion(ranked_lists: list[list[str]], k: int = 60, top_n: int = 10) -> list[tuple[str, float]]:\n    scores: dict[str, float] = {}\n    for ranking in ranked_lists:\n        for rank_idx, doc_id in enumerate(ranking, start=1):\n            scores[doc_id] = scores.get(doc_id, 0.0) + 1.0 / (k + rank_idx)\n    return sorted(scores.items(), key=lambda item: item[1], reverse=True)[:top_n]"
+    },
+    {
+      "id": "code_08",
+      "domain": "code",
+      "title": "Min-max linear score combination for two retrievers",
+      "text": "def linear_score_merge(bm25_scores: dict[str, float], dense_scores: dict[str, float], alpha: float = 0.5) -> list[str]:\n    def norm(d: dict[str, float]) -> dict[str, float]:\n        if not d: return {}\n        lo, hi = min(d.values()), max(d.values())\n        span = (hi - lo) or 1.0\n        return {k: (v - lo) / span for k, v in d.items()}\n    nb, nd = norm(bm25_scores), norm(dense_scores)\n    keys = set(nb) | set(nd)\n    combined = {k: alpha * nb.get(k, 0.0) + (1 - alpha) * nd.get(k, 0.0) for k in keys}\n    return sorted(combined, key=combined.get, reverse=True)"
+    },
+    {
+      "id": "code_09",
+      "domain": "code",
+      "title": "Streaming Server-Sent Events (SSE) parser for OpenAI chat completions",
+      "text": "import json\nfrom typing import Iterator\n\ndef iter_sse_deltas(byte_lines: Iterator[bytes]) -> Iterator[str]:\n    for raw in byte_lines:\n        line = raw.decode('utf-8', errors='replace').strip()\n        if not line or line.startswith(':') or not line.startswith('data:'):\n            continue\n        payload = line[5:].strip()\n        if payload == '[DONE]':\n            break\n        chunk = json.loads(payload)\n        choices = chunk.get('choices') or []\n        if choices:\n            delta = choices[0].get('delta', {}).get('content')\n            if delta:\n                yield delta"
+    },
+    {
+      "id": "code_10",
+      "domain": "code",
+      "title": "WebSocket frame broadcaster for live notifications",
+      "text": "import asyncio\n\nclass WebSocketHub:\n    def __init__(self):\n        self.connections: set = set()\n\n    async def broadcast_json(self, message: str) -> None:\n        dead = set()\n        for ws in list(self.connections):\n            try:\n                await ws.send_str(message)\n            except Exception:\n                dead.add(ws)\n        self.connections -= dead"
+    },
+    {
+      "id": "code_11",
+      "domain": "code",
+      "title": "AST-based Python function chunker for code RAG",
+      "text": "import ast\n\ndef extract_python_functions(source: str, file_path: str) -> list[dict]:\n    tree = ast.parse(source)\n    lines = source.splitlines()\n    chunks = []\n    for node in ast.walk(tree):\n        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):\n            snippet = '\\n'.join(lines[node.lineno - 1 : node.end_lineno])\n            doc = ast.get_docstring(node) or ''\n            chunks.append({'file': file_path, 'name': node.name, 'docstring': doc, 'code': snippet})\n    return chunks"
+    },
+    {
+      "id": "code_12",
+      "domain": "code",
+      "title": "Fixed character sliding window text splitter",
+      "text": "def split_text_sliding_window(text: str, chunk_size: int = 800, overlap: int = 120) -> list[str]:\n    if chunk_size <= overlap:\n        raise ValueError('chunk_size must be greater than overlap')\n    step = chunk_size - overlap\n    return [text[i : i + chunk_size] for i in range(0, max(1, len(text)), step)]"
+    },
+    {
+      "id": "code_13",
+      "domain": "code",
+      "title": "PostgreSQL pgvector HNSW cosine nearest-neighbor query with metadata filter",
+      "text": "def query_pgvector_hnsw(conn, tenant_id: str, query_vec: list[float], top_k: int = 10, ef_search: int = 80) -> list[tuple[str, float]]:\n    with conn.cursor() as cur:\n        cur.execute('SET LOCAL hnsw.ef_search = %s;', (ef_search,))\n        cur.execute(\n            '''\n            SELECT doc_id, 1 - (embedding <=> %s::vector) AS cosine_sim\n            FROM document_chunks\n            WHERE tenant_id = %s\n            ORDER BY embedding <=> %s::vector\n            LIMIT %s;\n            ''',\n            (query_vec, tenant_id, query_vec, top_k),\n        )\n        return cur.fetchall()"
+    },
+    {
+      "id": "code_14",
+      "domain": "code",
+      "title": "SQLite FTS5 BM25 full-text search query",
+      "text": "import sqlite3\n\ndef search_fts5_bm25(db_path: str, phrase: str, limit: int = 10) -> list[tuple[str, float]]:\n    with sqlite3.connect(db_path) as conn:\n        rows = conn.execute(\n            'SELECT doc_id, bm25(docs_fts) AS score FROM docs_fts WHERE docs_fts MATCH ? ORDER BY score LIMIT ?',\n            (phrase, limit),\n        ).fetchall()\n        return rows"
+    },
+    {
+      "id": "code_15",
+      "domain": "code",
+      "title": "HMAC-SHA256 webhook signature verification in constant time",
+      "text": "import hmac\nimport hashlib\n\ndef verify_webhook_signature(payload_bytes: bytes, header_sig: str, secret: str) -> bool:\n    if not header_sig.startswith('sha256='):\n        return False\n    expected = hmac.new(secret.encode('utf-8'), payload_bytes, hashlib.sha256).hexdigest()\n    provided = header_sig.split('=', 1)[1].strip()\n    return hmac.compare_digest(expected, provided)"
+    },
+    {
+      "id": "code_16",
+      "domain": "code",
+      "title": "JWT RS256 bearer token decoder without signature check",
+      "text": "import base64\nimport json\n\ndef peek_jwt_claims_unverified(token: str) -> dict:\n    parts = token.split('.')\n    if len(parts) != 3:\n        raise ValueError('Malformed JWT')\n    padded = parts[1] + '=' * (-len(parts[1]) % 4)\n    return json.loads(base64.urlsafe_b64decode(padded.encode('ascii')))"
+    },
+    {
+      "id": "code_17",
+      "domain": "code",
+      "title": "Circuit breaker state machine for upstream LLM endpoints",
+      "text": "import time\n\nclass CircuitBreaker:\n    def __init__(self, failure_threshold: int = 5, recovery_timeout: float = 30.0):\n        self.failure_threshold = failure_threshold\n        self.recovery_timeout = recovery_timeout\n        self.failures = 0\n        self.opened_at: float | None = None\n\n    def allow_request(self) -> bool:\n        if self.opened_at is None:\n            return True\n        if time.monotonic() - self.opened_at >= self.recovery_timeout:\n            return True  # half-open probe\n        return False\n\n    def record_success(self) -> None:\n        self.failures = 0\n        self.opened_at = None\n\n    def record_failure(self) -> None:\n        self.failures += 1\n        if self.failures >= self.failure_threshold:\n            self.opened_at = time.monotonic()"
+    },
+    {
+      "id": "code_18",
+      "domain": "code",
+      "title": "PII redaction filter for Italian tax codes (Codice Fiscale) and IBANs",
+      "text": "import re\n\nCF_PATTERN = re.compile(r'\\b[A-Z]{6}\\d{2}[A-Z]\\d{2}[A-Z]\\d{3}[A-Z]\\b', re.IGNORECASE)\nIBAN_PATTERN = re.compile(r'\\bIT\\d{2}[A-Z]\\d{10}[0-9A-Z]{12}\\b', re.IGNORECASE)\n\ndef redact_italian_pii(text: str) -> str:\n    redacted = CF_PATTERN.sub('[REDACTED_CF]', text)\n    return IBAN_PATTERN.sub('[REDACTED_IBAN]', redacted)"
+    },
+    {
+      "id": "code_19",
+      "domain": "code",
+      "title": "Regolo two-stage retrieval client: embedding + cross-encoder reranking",
+      "text": "import urllib.request, json\n\ndef rerank_with_qwen3(api_key: str, query: str, docs: list[str], top_n: int = 5) -> list[dict]:\n    task = 'Given a technical search query, retrieve relevant passages that answer the query'\n    payload = {\n        'model': 'Qwen3-Reranker-4B',\n        'query': f'<Instruct>: {task}\\n<Query>: {query}',\n        'documents': [f'<Document>: {d}' for d in docs],\n        'top_n': top_n,\n    }\n    req = urllib.request.Request(\n        'https://api.regolo.ai/v1/rerank',\n        data=json.dumps(payload).encode('utf-8'),\n        headers={'Authorization': f'Bearer {api_key}', 'Content-Type': 'application/json'},\n    )\n    with urllib.request.urlopen(req, timeout=20) as resp:\n        return json.loads(resp.read().decode('utf-8'))['results']"
+    },
+    {
+      "id": "code_20",
+      "domain": "code",
+      "title": "Cosine similarity matrix computation in pure NumPy",
+      "text": "import numpy as np\n\ndef pairwise_cosine_matrix(queries: np.ndarray, corpus: np.ndarray) -> np.ndarray:\n    q_norm = queries / np.maximum(np.linalg.norm(queries, axis=1, keepdims=True), 1e-12)\n    c_norm = corpus / np.maximum(np.linalg.norm(corpus, axis=1, keepdims=True), 1e-12)\n    return q_norm @ c_norm.T"
+    },
+    {
+      "id": "multi_01",
+      "domain": "multilingual",
+      "title": "Zero Data Retention (ZDR) Architecture on European GPU Clusters",
+      "text": "Under Regolo's Zero Data Retention policy, incoming prompts, embeddings, and completion tokens are processed exclusively in volatile GPU and host RAM inside ISO-27001 certified European data centers. No request payloads, vector outputs, or model activations are written to persistent disk, application logs, or training datasets, satisfying strict GDPR Article 28 processor obligations for healthcare and financial workloads."
+    },
+    {
+      "id": "multi_02",
+      "domain": "multilingual",
+      "title": "Standard 30-Day Abuse Monitoring Log Retention Policy",
+      "text": "By default, US commercial inference APIs retain prompt and completion logs on encrypted disks for up to 30 days to run automated trust-and-safety classifiers and human abuse review. Customers requiring immediate deletion must negotiate an enterprise zero-retention addendum."
+    },
+    {
+      "id": "multi_03",
+      "domain": "multilingual",
+      "title": "Obblighi di trasparenza Articolo 50 dell'EU AI Act per sistemi generativi",
+      "text": "L'Articolo 50 del Regolamento Europeo sull'Intelligenza Artificiale (EU AI Act, applicabile dal 2 agosto 2026) impone ai fornitori e deployer di sistemi AI che interagiscono direttamente con persone fisiche di informare in modo chiaro l'utente che sta dialogando con un sistema automatizzato. Inoltre, i contenuti audio, immagine, video o testo generati sinteticamente devono includere una marcatura leggibile dalle macchine (watermarking o metadati crittografici C2PA)."
+    },
+    {
+      "id": "multi_04",
+      "domain": "multilingual",
+      "title": "Requisiti per sistemi AI ad alto rischio nell'Allegato III (Risorse Umane e Credito)",
+      "text": "I sistemi di intelligenza artificiale utilizzati per la selezione del personale, lo screening dei curriculum o la valutazione del merito creditizio rientrano nell'Allegato III dell'EU AI Act come sistemi ad alto rischio. Richiedono valutazione di conformità, gestione del rischio continua, supervisione umana obbligatoria e registrazione nel database europeo prima della messa in servizio."
+    },
+    {
+      "id": "multi_05",
+      "domain": "multilingual",
+      "title": "DORA Regulation: ICT Third-Party Risk and Exit Strategies for Financial Entities",
+      "text": "The Digital Operational Resilience Act (DORA, Regulation EU 2022/2554) requires European banks, insurance companies, and investment firms to maintain a register of all ICT third-party dependencies, including cloud LLM inference providers. For critical or important functions, entities must implement tested exit strategies, multi-vendor portability using open-weight checkpoints, and strict incident reporting within 4 hours of classification."
+    },
+    {
+      "id": "multi_06",
+      "domain": "multilingual",
+      "title": "NIS2 Directive Supply Chain Cybersecurity and Incident Notification Timeline",
+      "text": "Under the NIS2 Directive, essential and important entities across energy, transport, health, and digital infrastructure must submit an early warning to their national CSIRT within 24 hours of becoming aware of a significant cybersecurity incident, followed by a detailed notification within 72 hours."
+    },
+    {
+      "id": "multi_07",
+      "domain": "multilingual",
+      "title": "Garante Privacy: conservazione dei metadati delle email aziendali dei dipendenti",
+      "text": "Il documento di indirizzo del Garante per la protezione dei dati personali stabilisce che i datori di lavoro pubblici e privati possono conservare i metadati della posta elettronica dei dipendenti (orari, mittenti, destinatari, oggetto) per un periodo massimo di 21 giorni per sole esigenze di sicurezza informatica. Il superamento di tale soglia richiede uno specifico accordo sindacale o l'autorizzazione dell'Ispettorato Nazionale del Lavoro ai sensi dell'articolo 4 dello Statuto dei Lavoratori."
+    },
+    {
+      "id": "multi_08",
+      "domain": "multilingual",
+      "title": "Conservazione sostitutiva a norma delle fatture elettroniche per 10 anni",
+      "text": "Ai sensi dell'articolo 2220 del Codice Civile e delle regole tecniche AgID, le scritture contabili e le fatture elettroniche transitate dal Sistema di Interscambio (SdI) devono essere sottoposte a conservazione digitale sostitutiva per 10 anni, garantendo integrità e autenticità tramite firma digitale e marca temporale."
+    },
+    {
+      "id": "multi_09",
+      "domain": "multilingual",
+      "title": "Sanità digitale e Fascicolo Sanitario Elettronico 2.0: pseudonimizzazione dei referti per RAG clinico",
+      "text": "Nelle pipeline di recupero documentale (RAG) applicate ai referti ospedalieri e al Fascicolo Sanitario Elettronico (FSE 2.0), i dati identificativi diretti del paziente (nome, codice fiscale, numero nosologico) devono essere rimossi o pseudonimizzati all'ingresso prima della generazione degli embedding vettoriali, mantenendo la tabella di raccordo separata in un enclave protetto dell'azienda sanitaria."
+    },
+    {
+      "id": "multi_10",
+      "domain": "multilingual",
+      "title": "Prenotazione online CUP regionale e pagamento ticket sanitario con PagoPA",
+      "text": "Il portale regionale del Centro Unico di Prenotazione (CUP) consente ai cittadini assistiti di prenotare visite specialistiche con ricetta dematerializzata NRE e di saldare il relativo ticket sanitario tramite avviso PagoPA o app IO."
+    },
+    {
+      "id": "multi_11",
+      "domain": "multilingual",
+      "title": "Cross-Border Data Transfers After Schrems II and US CLOUD Act Exposure",
+      "text": "Even when a US hyperscaler hosts GPU servers physically in Frankfurt or Milan, the parent corporation remains subject to extraterritorial warrants under the US CLOUD Act (18 U.S.C. § 2713). European public sector and defense procurers mitigate this jurisdictional exposure by contracting exclusively with EU-headquartered providers whose corporate control resides entirely within European Union member states."
+    },
+    {
+      "id": "multi_12",
+      "domain": "multilingual",
+      "title": "Multi-Region Active-Active DNS Failover with Anycast Routing",
+      "text": "Anycast BGP routing announces the same IP prefix from multiple European points of presence, automatically steering client TLS handshakes to the nearest healthy edge pop in under 50 milliseconds during a fiber cut."
+    },
+    {
+      "id": "multi_13",
+      "domain": "multilingual",
+      "title": "Calcolo del TCO: GPU dedicate on-premise contro API serverless open-weight gestite",
+      "text": "Acquistare due nodi con 8 GPU H200 comporta oltre 450.000 euro di CapEx iniziale più costi fissi di energia, raffreddamento e presidio MLOps h24, ma il tasso medio di utilizzo aziendale nei carichi RAG e di back-office è spesso inferiore al 18% (ore diurne feriali). L'uso di API serverless gestite su modelli open-weight permette di pagare solo i token o le richieste effettive, passando a istanze GPU dedicate solo quando il traffico continuativo supera il punto di pareggio."
+    },
+    {
+      "id": "multi_14",
+      "domain": "multilingual",
+      "title": "Ammortamento fiscale dei beni strumentali materiali e iperammortamento Transizione 5.0",
+      "text": "Il piano Transizione 5.0 riconosce un credito d'imposta scaglionato per le imprese che effettuano nuovi investimenti in strutture produttive ubicate nel territorio dello Stato, a condizione che si certifichi una riduzione dei consumi energetici di almeno il 3% dell'unità produttiva."
+    },
+    {
+      "id": "multi_15",
+      "domain": "multilingual",
+      "title": "Clausole di Service Level Agreement (SLA): differenza tra disponibilità mensile e latenza TTFT p95",
+      "text": "Un contratto enterprise per l'inferenza AI non può limitarsi a garantire il 99,9% di uptime HTTP dell'endpoint: un server che risponde HTTP 200 impiegando 14 secondi per il primo token rende inutilizzabile un agente vocale o di customer care. Lo SLA tecnico deve vincolare esplicitamente la latenza Time-To-First-Token (TTFT) al 95° percentile (p95) e il throughput minimo in token al secondo."
+    },
+    {
+      "id": "multi_16",
+      "domain": "multilingual",
+      "title": "Penali contrattuali per ritardata consegna nelle gare d'appalto pubbliche (Codice degli Appalti)",
+      "text": "Ai sensi del D.Lgs. 36/2023, i contratti di appalto prevedono penali per il ritardo nell'esecuzione delle prestazioni contrattuali commisurate ai giorni di ritardo e proporzionali all'importo contrattuale, comunque non superiori complessivamente al 10% dell'ammontare netto."
+    },
+    {
+      "id": "multi_17",
+      "domain": "multilingual",
+      "title": "Green AI Infrastructure: Geothermal and Hydroelectric Powered Inference in Europe",
+      "text": "Training and serving large language models significantly increases Scope 3 carbon emissions for enterprise software buyers. Regolo runs its GPU clusters in European facilities powered by 100% certified renewable hydroelectric and geothermal energy with free-cooling architectures (PUE below 1.2), providing auditable carbon accounting for corporate CSRD sustainability reports."
+    },
+    {
+      "id": "multi_18",
+      "domain": "multilingual",
+      "title": "Compensazione volontaria delle emissioni tramite crediti di carbonio forestali (Voluntary Carbon Market)",
+      "text": "Le aziende che utilizzano data center alimentati da combustibili fossili possono acquistare certificati VER (Verified Emission Reductions) legati a progetti di riforestazione per compensare formalmente le emissioni residue a fine esercizio."
+    },
+    {
+      "id": "multi_19",
+      "domain": "multilingual",
+      "title": "Qualificazione ACN per servizi Cloud della Pubblica Amministrazione Italiana",
+      "text": "Per erogare servizi SaaS, PaaS o IaaS alle pubbliche amministrazioni italiane in conformità alla Strategia Cloud Italia, i fornitori devono ottenere la qualificazione dell'Agenzia per la Cybersicurezza Nazionale (ACN) secondo i livelli di criticità dei dati trattati (Ordinario, Critico, Strategico)."
+    },
+    {
+      "id": "multi_20",
+      "domain": "multilingual",
+      "title": "Autenticazione federata tramite SPID e Carta d'Identità Elettronica (CIE) con OpenID Connect",
+      "text": "I servizi digitali delle pubbliche amministrazioni integrano l'accesso dei cittadini mediante i protocolli SAML2 e OpenID Connect (OIDC) verso gli Identity Provider accreditati SPID e il gateway ministeriale Entra con CIE."
+    },
+    {
+      "id": "tech_01",
+      "domain": "tech_docs",
+      "title": "EmbeddingGemma 2 Architecture: 270M Text Path vs 740M Multimodal Checkpoint",
+      "text": "EmbeddingGemma 2 is built on the Gemma 4 architecture with a total parameter count of 740M across text, vision, and audio encoders. However, its modular design allows text-only RAG pipelines to load only the 270M-parameter text tower (or 440M for text+vision, 570M for text+audio), producing 768-dimensional vectors with Matryoshka Representation Learning (MRL) truncation down to 512, 256, and 128 dimensions."
+    },
+    {
+      "id": "tech_02",
+      "domain": "tech_docs",
+      "title": "EmbeddingGemma 1 (308M) Text-Only Architecture and 2K Context Window",
+      "text": "The original EmbeddingGemma 1 model is a 308M-parameter text-only bidirectional encoder based on Gemma 3 with a 2048-token context window. It scores 61.15 on MTEB Multilingual v2 and 68.76 on MTEB Code v1, without native vision or audio encoders."
+    },
+    {
+      "id": "tech_03",
+      "domain": "tech_docs",
+      "title": "Qwen3-Embedding Series (0.6B, 4B, 8B): 32K Context Window and MTEB Scores",
+      "text": "The Qwen3-Embedding family offers 0.6B (1024d), 4B (2560d), and 8B (4096d) causal-attention embedding models with a 32,768-token context window and instruction-aware encoding. On MTEB Multilingual v2, Qwen3-Embedding-0.6B scores 64.33 and Qwen3-Embedding-8B reaches 70.58; on MTEB Code v1, Qwen3-Embedding-8B achieves 80.68."
+    },
+    {
+      "id": "tech_04",
+      "domain": "tech_docs",
+      "title": "Regolo /v1/embeddings Endpoint: Native MRL dimensions Pass-Through",
+      "text": "When calling POST https://api.regolo.ai/v1/embeddings with model 'Qwen3-Embedding-8B', you can pass the integer parameter 'dimensions' (for example 1024, 512, or 256). Regolo forwards 'dimensions' straight to the underlying model without server-side truncation; models trained with Matryoshka Representation Learning slice and L2-renormalize the output vector natively."
+    },
+    {
+      "id": "tech_05",
+      "domain": "tech_docs",
+      "title": "Regolo /v1/rerank Endpoint: Cross-Encoder Prompt Template for Qwen3-Reranker-4B",
+      "text": "Qwen3-Reranker-4B on Regolo's /v1/rerank endpoint is a 4B-parameter cross-encoder with a 14,000-token input limit priced at 0.01 EUR per query. To achieve calibrated relevance scores, the query must be formatted as '<Instruct>: {task}\\n<Query>: {query}' and each candidate string in the documents array must be prefixed with '<Document>: '."
+    },
+    {
+      "id": "tech_06",
+      "domain": "tech_docs",
+      "title": "Bi-Encoder vs Cross-Encoder Attention Mechanics in Two-Stage Retrieval",
+      "text": "A bi-encoder embeds queries and documents independently into fixed vectors so millions of candidates can be searched in sub-10ms via HNSW approximate nearest neighbor indexes, at the cost of losing token-level cross-attention. A cross-encoder concatenates the query and candidate document into a single sequence and runs full self-attention across every query-document token pair, recovering fine-grained semantic interactions on the top 10 to 50 candidates."
+    },
+    {
+      "id": "tech_07",
+      "domain": "tech_docs",
+      "title": "Baidu Unlimited-OCR: Reference Sliding Window Attention (R-SWA) and Constant KV Cache",
+      "text": "Standard autoregressive VLM-OCR models suffer from linear KV cache growth and quadratic attention slowdowns when transcribing multi-page PDFs. Unlimited-OCR replaces full decoder self-attention with Reference Sliding Window Attention (R-SWA), attending only to compressed visual tokens of the current page plus a fixed working-memory window, keeping the KV cache constant across dozens of pages and scoring 93.23% on OmniDocBench v1.5."
+    },
+    {
+      "id": "tech_08",
+      "domain": "tech_docs",
+      "title": "DeepSeek-OCR-2 on Regolo API: Grounding Tokens and Markdown Extraction",
+      "text": "DeepSeek-OCR-2 is served on Regolo via POST https://api.regolo.ai/v1/chat/completions at 0.02 EUR per request in FP16. Setting 'skip_special_tokens': False preserves layout grounding tags such as <|grounding|> and <|ref|>, whereas setting 'skip_special_tokens': True strips spatial coordinates and returns clean Markdown text."
+    },
+    {
+      "id": "tech_09",
+      "domain": "tech_docs",
+      "title": "Visual Document Embeddings (MMEB VisDoc) vs OCR-Then-Embed Pipelines",
+      "text": "Multimodal embeddings like EmbeddingGemma 2 (67.84 NDCG@5 on MMEB v2 VisDoc) encode page screenshots directly into a 768d vector, indexing charts and visual layouts without running OCR first. However, single-vector page embeddings compress an entire page into 768 floats and frequently miss exact part numbers, clauses, or dense tables unless paired with an OCR-to-Markdown stage like DeepSeek-OCR-2."
+    },
+    {
+      "id": "tech_10",
+      "domain": "tech_docs",
+      "title": "Vector Index Memory Calculation: Float32 vs Int8 Scalar Quantization in Qdrant",
+      "text": "In an in-memory HNSW vector index, raw float32 storage consumes 4 bytes per dimension plus roughly 64–128 bytes of graph link overhead per vector. For 10 million chunks, 4096-dimensional float32 vectors require 163.8 GB of raw vector RAM, whereas truncating to 512 dimensions via MRL reduces raw vector RAM to 20.48 GB (and 5.12 GB with int8 scalar quantization)."
+    },
+    {
+      "id": "tech_11",
+      "domain": "tech_docs",
+      "title": "Binary Quantization (1-bit Sign Packing) Failure Modes on Low-Dimensional Vectors",
+      "text": "Binary quantization packs each float dimension into a single sign bit (0 or 1) and uses Hamming distance via XOR + POPCNT, achieving a 32x memory reduction on 1536d or 4096d embeddings with oversampling. On compact 128d or 256d vectors, 1-bit quantization causes severe recall collapse (>18% NDCG drop) because there are too few hyperplanes to preserve angular granularity."
+    },
+    {
+      "id": "tech_12",
+      "domain": "tech_docs",
+      "title": "vLLM PagedAttention and Prefix Caching for High-Throughput Embedding Serving",
+      "text": "vLLM partitions the KV cache into fixed-size non-contiguous blocks managed by a virtual memory page table, eliminating external fragmentation. When serving instruction-aware embeddings where thousands of queries share the same system instruction prefix, Automatic Prefix Caching (APC) reuses the precomputed KV blocks of the instruction header."
+    },
+    {
+      "id": "tech_13",
+      "domain": "tech_docs",
+      "title": "DFlash Block Diffusion Speculative Decoding on vLLM",
+      "text": "DFlash accelerates autoregressive LLM generation by using a lightweight block-diffusion drafter to propose 8 to 16 candidate tokens in parallel in a single forward pass, which the target model verifies simultaneously, yielding up to 3x decoding throughput on code and math workloads."
+    },
+    {
+      "id": "tech_14",
+      "domain": "tech_docs",
+      "title": "Brick Semantic Router: Complexity Classification Between Small and Frontier Models",
+      "text": "Brick is an open-source semantic router that evaluates prompt complexity in under 15 milliseconds and routes routine extraction, classification, and formatting calls to fast compact models (like Clef-Flash or Qwen3.5-9B) while escalating multi-step architecture or hard debugging tasks to 27B–120B reasoning models."
+    },
+    {
+      "id": "tech_15",
+      "domain": "tech_docs",
+      "title": "System-One Non-Autoregressive Classifier Models vs Generative Decoders",
+      "text": "System-one models replace token-by-token autoregressive generation with a single forward pass that outputs calibrated probability distributions over a fixed schema in 70 to 500 milliseconds, eliminating JSON syntax hallucinations in high-volume ticket triage and guardrailing."
+    },
+    {
+      "id": "tech_16",
+      "domain": "tech_docs",
+      "title": "MCP (Model Context Protocol) Tool Poisoning and Indirect Prompt Injection Defenses",
+      "text": "Malicious MCP servers can embed hidden instructions inside tool descriptions or schema docstrings that hijack an AI agent's tool-calling loop. Defenses require pinning cryptographic hashes of tool schemas at registration time, stripping untrusted instructions from tool outputs, and enforcing human-in-the-loop approval for state-mutating calls."
+    },
+    {
+      "id": "tech_17",
+      "domain": "tech_docs",
+      "title": "MiniCPM-V 4.7 (35B-A3B MoE): Lookahead Expert Scheduling vs Server VRAM Reality",
+      "text": "MiniCPM-V 4.7 35B-A3B is a Mixture-of-Experts vision-language model that activates ~3B parameters per token. While Lookahead Expert Scheduling (LES) and aggressive Flash-storage streaming allow it to run in ~3 GB RAM on an iPhone at 13 tokens/s, high-concurrency GPU server deployment still requires loading all 35B parameters into VRAM (~18–22 GB in 4-bit AWQ/Q4 or ~70 GB in BF16)."
+    },
+    {
+      "id": "tech_18",
+      "domain": "tech_docs",
+      "title": "EmbeddingGemma 2 MRL Truncation Degradation on Multimodal vs Text Tasks",
+      "text": "According to the EmbeddingGemma 2 model card, truncating text embeddings from 768d to 128d via MRL reduces MTEB Multilingual v2 only slightly (from 61.36 to 59.62) and MTEB Code v1 from 78.68 to 76.42. In contrast, visual and audio tasks suffer steeper drops at 128d: MMEB v2 Image Hit@1 falls from 57.28 to 51.00 and VisDoc NDCG@5 drops from 67.84 to 62.66."
+    },
+    {
+      "id": "tech_19",
+      "domain": "tech_docs",
+      "title": "Asymmetric Instruction Prefix Mismatch: Why Identical Prompts Break Embedding Benchmarks",
+      "text": "Modern embedding models are trained with strict asymmetric templates: EmbeddingGemma 2 expects 'task: search result | query: {q}' on queries and 'title: {t} | text: {d}' on documents, whereas Qwen3-Embedding expects 'Instruct: {task}\\nQuery:{q}' on queries and raw unprefixed text on documents. Feeding raw unprefixed queries or applying document prefixes to Qwen3 degrades retrieval NDCG@10 by 4 to 9 points."
+    },
+    {
+      "id": "tech_20",
+      "domain": "tech_docs",
+      "title": "Late Interaction ColBERT Multi-Vector Indexing vs Single-Vector Bi-Encoders",
+      "text": "ColBERT stores one 128d vector per token rather than pooling an entire passage into a single vector, computing MaxSim late interaction at query time. While this improves out-of-domain recall on fine-grained entities, it multiplies vector index storage by 40x to 100x compared to a single-vector MRL bi-encoder."
+    }
+  ],
+  "queries": [
+    {
+      "id": "q_code_01",
+      "domain": "code",
+      "query": "atomic distributed rate limiter in Redis using Lua to refill tokens based on elapsed time",
+      "qrels": {"code_01": 2, "code_02": 1}
+    },
+    {
+      "id": "q_code_02",
+      "domain": "code",
+      "query": "async retry helper in Python with exponential backoff and randomized full jitter on network timeouts",
+      "qrels": {"code_03": 2, "code_04": 1}
+    },
+    {
+      "id": "q_code_03",
+      "domain": "code",
+      "query": "slice Matryoshka (MRL) embedding vectors to a smaller dimension and L2 renormalize in NumPy",
+      "qrels": {"code_05": 2, "code_20": 1}
+    },
+    {
+      "id": "q_code_04",
+      "domain": "code",
+      "query": "combine BM25 and dense vector rankings without score calibration using Reciprocal Rank Fusion",
+      "qrels": {"code_07": 2, "code_08": 1}
+    },
+    {
+      "id": "q_code_05",
+      "domain": "code",
+      "query": "parse streaming Server-Sent Events data lines and yield incremental content deltas until [DONE]",
+      "qrels": {"code_09": 2}
+    },
+    {
+      "id": "q_code_06",
+      "domain": "code",
+      "query": "split Python source files into function-level chunks with docstrings using the ast module",
+      "qrels": {"code_11": 2, "code_12": 1}
+    },
+    {
+      "id": "q_code_07",
+      "domain": "code",
+      "query": "pgvector HNSW cosine similarity search filtered by tenant_id with custom ef_search in psycopg",
+      "qrels": {"code_13": 2, "code_14": 1}
+    },
+    {
+      "id": "q_code_08",
+      "domain": "code",
+      "query": "verify webhook HMAC-SHA256 signature header against raw request body using constant-time comparison",
+      "qrels": {"code_15": 2}
+    },
+    {
+      "id": "q_code_09",
+      "domain": "code",
+      "query": "circuit breaker class that trips open after consecutive failures and probes recovery after a cooldown",
+      "qrels": {"code_17": 2, "code_03": 1}
+    },
+    {
+      "id": "q_code_10",
+      "domain": "code",
+      "query": "regex sanitizer to mask Italian Codice Fiscale and IT IBAN numbers in text before sending to an LLM",
+      "qrels": {"code_18": 2, "multi_09": 1}
+    },
+    {
+      "id": "q_multi_01",
+      "domain": "multilingual",
+      "query": "Come funziona la politica Zero Data Retention di Regolo per non salvare prompt o vettori su disco in conformità al GDPR?",
+      "qrels": {"multi_01": 2, "multi_02": 1}
+    },
+    {
+      "id": "q_multi_02",
+      "domain": "multilingual",
+      "query": "What are the EU AI Act Article 50 transparency and machine-readable watermarking rules taking effect in August 2026?",
+      "qrels": {"multi_03": 2, "multi_04": 1}
+    },
+    {
+      "id": "q_multi_03",
+      "domain": "multilingual",
+      "query": "Quali sono gli obblighi del regolamento DORA per banche e assicurazioni sull'uso di fornitori terzi di inferenza AI e strategie di exit?",
+      "qrels": {"multi_05": 2, "multi_06": 1}
+    },
+    {
+      "id": "q_multi_04",
+      "domain": "multilingual",
+      "query": "Italian Garante Privacy maximum retention period in days for employee email metadata without union agreement",
+      "qrels": {"multi_07": 2, "multi_08": 1}
+    },
+    {
+      "id": "q_multi_05",
+      "domain": "multilingual",
+      "query": "How should Italian hospitals pseudonymize patient identifiers before generating RAG embeddings on electronic health records (FSE 2.0)?",
+      "qrels": {"multi_09": 2, "code_18": 1}
+    },
+    {
+      "id": "q_multi_06",
+      "domain": "multilingual",
+      "query": "Perché i server europei di un cloud provider americano restano comunque esposti al US CLOUD Act?",
+      "qrels": {"multi_11": 2, "multi_01": 1}
+    },
+    {
+      "id": "q_multi_07",
+      "domain": "multilingual",
+      "query": "When is managed serverless open-weight API inference cheaper than buying dedicated on-premise H200 GPUs for enterprise RAG?",
+      "qrels": {"multi_13": 2}
+    },
+    {
+      "id": "q_multi_08",
+      "domain": "multilingual",
+      "query": "Why HTTP uptime SLA is not enough for enterprise LLM APIs and why p95 Time-To-First-Token (TTFT) must be in the contract",
+      "qrels": {"multi_15": 2}
+    },
+    {
+      "id": "q_multi_09",
+      "domain": "multilingual",
+      "query": "Come ridurre le emissioni Scope 3 CSRD dell'inferenza AI usando data center europei alimentati da energia idroelettrica e geotermica?",
+      "qrels": {"multi_17": 2, "multi_18": 1}
+    },
+    {
+      "id": "q_multi_10",
+      "domain": "multilingual",
+      "query": "Requirements for ACN cloud qualification to provide SaaS or AI infrastructure to Italian public administration",
+      "qrels": {"multi_19": 2}
+    },
+    {
+      "id": "q_tech_01",
+      "domain": "tech_docs",
+      "query": "How many parameters does EmbeddingGemma 2 load for text-only retrieval versus the full multimodal checkpoint?",
+      "qrels": {"tech_01": 2, "tech_02": 1}
+    },
+    {
+      "id": "q_tech_02",
+      "domain": "tech_docs",
+      "query": "Compare MTEB Multilingual v2 and MTEB Code v1 benchmark scores between EmbeddingGemma 2, EmbeddingGemma 1, and Qwen3-Embedding-0.6B and 8B",
+      "qrels": {"tech_03": 2, "tech_01": 1, "tech_02": 1}
+    },
+    {
+      "id": "q_tech_03",
+      "domain": "tech_docs",
+      "query": "How does Regolo's /v1/embeddings API handle the dimensions parameter for Matryoshka (MRL) models like Qwen3-Embedding-8B?",
+      "qrels": {"tech_04": 2, "code_05": 1}
+    },
+    {
+      "id": "q_tech_04",
+      "domain": "tech_docs",
+      "query": "What prompt tags (<Instruct>, <Query>, <Document>) are required when calling Qwen3-Reranker-4B on Regolo's /v1/rerank endpoint?",
+      "qrels": {"tech_05": 2, "code_19": 1}
+    },
+    {
+      "id": "q_tech_05",
+      "domain": "tech_docs",
+      "query": "How does Baidu Unlimited-OCR keep KV cache memory constant across multi-page PDFs compared to standard VLM decoders?",
+      "qrels": {"tech_07": 2, "tech_08": 1}
+    },
+    {
+      "id": "q_tech_06",
+      "domain": "tech_docs",
+      "query": "When does direct visual document embedding (VisDoc) fail compared to running DeepSeek-OCR-2 before text embedding?",
+      "qrels": {"tech_09": 2, "tech_08": 1}
+    },
+    {
+      "id": "q_tech_07",
+      "domain": "tech_docs",
+      "query": "How much vector index RAM do 10 million chunks require at 4096 dimensions versus 512 MRL dimensions in Qdrant?",
+      "qrels": {"tech_10": 2, "tech_11": 1}
+    },
+    {
+      "id": "q_tech_08",
+      "domain": "tech_docs",
+      "query": "Why does 1-bit binary quantization break down when applied to low-dimensional 128d or 256d embeddings?",
+      "qrels": {"tech_11": 2, "tech_10": 1}
+    },
+    {
+      "id": "q_tech_09",
+      "domain": "tech_docs",
+      "query": "Why does MiniCPM-V 4.7 35B-A3B still require 18-22 GB of server GPU VRAM despite having only 3B active parameters?",
+      "qrels": {"tech_17": 2}
+    },
+    {
+      "id": "q_tech_10",
+      "domain": "tech_docs",
+      "query": "How much does EmbeddingGemma 2 accuracy drop when truncating MRL vectors to 128 dimensions on visual documents versus text and code?",
+      "qrels": {"tech_18": 2, "tech_01": 1}
+    }
+  ]
+}
