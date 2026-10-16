@@ -18,7 +18,7 @@ Answering every review takes time, and a templated reply can do more harm than n
 Try Regolo: https://regolo.ai
 30 day free trial for new users: https://regolo.ai/pricing
 Source Code: https://github.com/regolo-ai/tutorials/tree/main/review-reply-copilot
-Regolo Docs: https://regolo.ai/docs
+Regolo Docs: https://docs.regolo.ai
 
 Key architecture and workflow
 • Connect a Regolo account: the API key is verified against the model catalog and stored only in a local .env file
