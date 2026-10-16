@@ -1,0 +1,61 @@
+TITLE OPTIONS
+1. AI review responses with guardrails: Clef-Flash, an LLM and a person
+2. Reply to customer reviews with AI, with a person always in charge
+3. Build an open source AI review reply copilot with Clef-Flash on Regolo
+
+THUMBNAIL TEXT
+Main line: AI review replies
+Accent line (green): with a human check
+Small badge: Clef-Flash on Regolo
+Shorter alternative: Reviews answered, human approved
+
+DESCRIPTION (paste as is)
+Draft replies to customer reviews in your client's voice with Clef-Flash, an LLM and a person who approves every answer.
+
+What we cover in this tutorial
+Answering every review takes time, and a templated reply can do more harm than no reply at all. In this video we walk through Review Reply Copilot, an open source app where Clef-Flash labels each review and checks each draft, a chat model writes the reply with the client's brand rules, and nothing is published until a person approves it.
+
+Try Regolo: https://regolo.ai
+30 day free trial for new users: https://regolo.ai/pricing
+Source Code: https://github.com/regolo-ai/tutorials/tree/main/review-reply-copilot
+Regolo Docs: https://regolo.ai/docs
+
+Key architecture and workflow
+• Connect a Regolo account: the API key is verified against the model catalog and stored only in a local .env file
+• One brand profile per client: voice, topics, the only facts a reply may state, forbidden phrases
+• Clef-Flash labels every review: sentiment, topic, escalation, reply priority and language, eight requests in parallel
+• A chat model (qwen3.8-27b) drafts the reply in the client's voice
+• Guardrails on every draft: rule checks plus Clef-Flash yes or no checks for compensation promises, blame, personal data, tone, competitors and unsupported claims
+• Risky reviews (injuries, legal threats, privacy requests) get a neutral holding reply and go to a person
+• Measured in this run (October 15, 2026, 37 synthetic sample reviews, one run): 37 reviews labeled in 3.0 s for $0.0047, replies drafted and checked in 1.7 s on average
+• Stack: Python • FastAPI • SQLite • vanilla JS • Clef-Flash and qwen3.8-27b on Regolo EU cloud
+
+Video chapters
+00:00 Why review replies need guardrails
+00:18 Welcome
+00:28 The app at first launch
+00:45 Step 1: connect your Regolo account
+01:11 Step 2: choose a client and bring in reviews
+01:40 Step 3: analyze with Clef-Flash
+02:09 Filter the labeled reviews
+02:20 The reply studio
+02:35 Rule checks and Clef-Flash checks
+02:57 Approve and copy
+03:10 Reviews that need a person
+03:26 Results and how to try it yourself
+
+Connect with Regolo
+
+Website: https://regolo.ai
+
+Discord: https://discord.gg/regolo
+
+X / Twitter: https://x.com/regolo_ai
+
+LinkedIn: https://linkedin.com/company/regolo-ai
+
+
+#AIAgents #CustomerReviews #LLM #ReviewManagement #Ecommerce #OpenSource #AIAutomation #Regolo
+
+SHORT POST (for sharing the video)
+We recorded a 4 minute walkthrough of Review Reply Copilot: Clef-Flash labels 37 reviews in 3 seconds for under half a cent, a chat model drafts each reply in the client's voice, and nothing goes out until a person approves it.
