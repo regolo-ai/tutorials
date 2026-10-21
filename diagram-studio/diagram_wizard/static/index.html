@@ -1,0 +1,493 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Regolo Diagram Studio</title>
+<link rel="icon" type="image/png" href="/static/regolo-icon-light-bg.png">
+<style>
+@font-face{font-family:"Space Grotesk";font-weight:300 700;src:url(/static/fonts/space-grotesk-latin.woff2) format("woff2")}
+:root{
+  --bg:#f6f8f7; --surface:#fff; --line:#e3e8e5; --ink:#0b0b0b; --body:#334155; --muted:#5b6472;
+  --green:#05df72; --green-ink:#047a3f; --green-soft:rgba(5,223,114,.12); --green-line:rgba(5,223,114,.45);
+  --neg:#c62828; --neg-bg:#fdecec; --warn:#a35a00; --warn-bg:#fff4e0;
+  --shadow:0 1px 2px rgba(11,11,11,.04),0 8px 24px rgba(11,11,11,.05); --r:14px;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{font-family:"Space Grotesk",system-ui,sans-serif;color:var(--body);-webkit-font-smoothing:antialiased;min-height:100vh;
+  background:var(--bg) radial-gradient(1200px 640px at 88% -12%,rgba(5,223,114,.16),transparent 62%) no-repeat}
+a{color:var(--green-ink)}
+:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+button,input{font:inherit;color:inherit}
+
+/* header */
+header{display:flex;align-items:center;gap:16px;padding:18px 32px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.72);backdrop-filter:blur(8px);position:sticky;top:0;z-index:5}
+header img{height:26px;display:block}
+.sep{width:1px;height:24px;background:var(--line)}
+.product{font-weight:600;color:var(--ink);font-size:17px}
+.trial{margin-left:auto;display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-weight:700;font-size:13px;letter-spacing:.04em;text-transform:uppercase;
+  color:var(--green-ink);border:1.5px solid var(--green-line);background:var(--green-soft);padding:9px 16px;border-radius:999px;transition:background .15s}
+.trial:hover{background:rgba(5,223,114,.22)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px rgba(5,223,114,.7);flex:none}
+
+/* layout */
+.shell{display:grid;grid-template-columns:300px minmax(0,1fr);gap:28px;max-width:1240px;margin:0 auto;padding:32px}
+nav[role=tablist]{display:flex;flex-direction:column;gap:8px;align-self:start;position:sticky;top:92px}
+.tab{display:flex;align-items:center;gap:14px;text-align:left;width:100%;padding:14px 16px;border-radius:var(--r);border:1px solid transparent;background:transparent;cursor:pointer;transition:background .15s,border-color .15s}
+.tab:hover:not(:disabled){background:rgba(255,255,255,.7)}
+.tab:disabled{cursor:not-allowed;opacity:.5}
+.tab[aria-selected=true]{background:var(--surface);border-color:var(--line);box-shadow:var(--shadow)}
+.num{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:14px;border:1.5px solid var(--line);background:#fff;color:var(--muted);flex:none}
+.tab[aria-selected=true] .num{border-color:var(--green);background:var(--green);color:#000}
+.tab.done .num{border-color:var(--green-line);background:var(--green-soft);color:var(--green-ink)}
+.tab .t{display:block;font-weight:700;color:var(--ink);font-size:15px}
+.tab .s{display:block;font-size:13px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:190px}
+.promo{margin-top:12px;padding:18px;border-radius:var(--r);border:1.5px solid var(--green-line);background:linear-gradient(180deg,var(--green-soft),rgba(255,255,255,.7))}
+.promo b{display:block;color:var(--ink);font-size:16px;margin-bottom:4px}
+.promo p{margin:0 0 12px;font-size:14px;line-height:1.45}
+.oss{display:flex;align-items:center;gap:12px;margin-top:12px;padding:14px 16px;border-radius:var(--r);border:1px solid var(--line);background:rgba(255,255,255,.7);text-decoration:none;color:var(--body);transition:border-color .15s,background .15s}
+.oss:hover{border-color:var(--green-line);background:#fff}
+.oss svg{width:22px;height:22px;flex:none;fill:var(--ink)}
+.oss b{display:block;color:var(--ink);font-size:14px}
+.oss span{display:block;font-size:12.5px;color:var(--muted);margin-top:1px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:999px;padding:13px 24px;font-weight:700;font-size:15px;cursor:pointer;text-decoration:none;transition:transform .1s,box-shadow .15s,background .15s}
+.btn.primary{background:var(--green);color:#000;box-shadow:0 6px 18px rgba(5,223,114,.28)}
+.btn.primary:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 10px 24px rgba(5,223,114,.36)}
+.btn.primary:disabled{background:#cfd8d3;box-shadow:none;cursor:not-allowed;color:#6b7570}
+.btn.ghost{background:#fff;color:var(--ink);border:1.5px solid var(--line)}
+.btn.ghost:hover{border-color:var(--green-line)}
+.btn.sm{padding:9px 16px;font-size:14px}
+
+/* panel */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:36px;min-height:520px}
+.panel[hidden]{display:none}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--green-ink)}
+h1{margin:10px 0 8px;font-size:34px;letter-spacing:-.03em;color:var(--ink);line-height:1.1}
+.lead{margin:0 0 26px;font-size:17px;line-height:1.5;max-width:640px}
+label.f{display:block;font-weight:700;color:var(--ink);font-size:14px;margin-bottom:8px}
+.field{display:flex;gap:8px;max-width:560px}.field.wide{max-width:760px}
+input[type=password],input[type=text]{flex:1;min-width:0;padding:14px 16px;border-radius:12px;border:1.5px solid var(--line);background:#fff;font-size:16px}
+input:focus{border-color:var(--green);outline:2px solid rgba(5,223,114,.3)}
+.hint{font-size:13px;color:var(--muted);margin:10px 0 0;max-width:560px;line-height:1.5}
+.err{display:none;margin-top:16px;padding:12px 16px;border-radius:12px;background:var(--neg-bg);color:var(--neg);font-size:14px;font-weight:600;max-width:560px}
+.err.show{display:block}
+.note{padding:12px 16px;border-radius:12px;background:var(--warn-bg);color:var(--warn);font-size:14px;line-height:1.45;margin:0 0 18px}
+.actions{display:flex;gap:12px;align-items:center;margin-top:28px;flex-wrap:wrap}
+.spin{width:16px;height:16px;border-radius:50%;border:2.5px solid rgba(0,0,0,.2);border-top-color:#000;animation:spin .8s linear infinite;display:none}
+.loading .spin{display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* models */
+.modelbar{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.count{font-size:13px;font-weight:700;color:var(--green-ink);background:var(--green-soft);border:1px solid var(--green-line);border-radius:999px;padding:5px 12px}
+.models{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;max-height:380px;overflow:auto;padding:4px}
+.opt{position:relative;display:block;cursor:pointer}
+.opt input{position:absolute;opacity:0;inset:0;width:100%;height:100%;margin:0;cursor:pointer}
+.opt .card{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:12px;border:1.5px solid var(--line);background:#fff;transition:border-color .15s,background .15s}
+.opt:hover .card{border-color:var(--green-line)}
+.opt input:checked + .card{border-color:var(--green);background:var(--green-soft);box-shadow:0 0 0 3px rgba(5,223,114,.18)}
+.opt input:focus-visible + .card{outline:2px solid var(--green);outline-offset:2px}
+.radio{width:18px;height:18px;border-radius:50%;border:2px solid #b8c2bc;flex:none;display:grid;place-items:center}
+.opt input:checked + .card .radio{border-color:var(--green-ink)}
+.opt input:checked + .card .radio::after{content:"";width:8px;height:8px;border-radius:50%;background:var(--green-ink)}
+.mname{font-weight:700;color:var(--ink);font-size:15px;min-width:0;overflow-wrap:anywhere}
+.tag{margin-left:auto;flex:none;white-space:nowrap;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--green-ink)}
+
+/* run modes */
+.modes{display:grid;grid-template-columns:1fr;gap:10px}
+.mode .card{display:block;padding:16px 18px}
+.mode .h{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--ink);font-size:15px}
+.mode .d{display:block;margin:6px 0 0 28px;max-width:640px;font-size:13px;line-height:1.45;color:var(--muted)}
+.mode input:disabled + .card{opacity:.5;cursor:not-allowed}
+.mode .tag{margin-left:auto}
+/* project */
+.drop{display:flex;align-items:center;gap:18px;padding:20px;border-radius:var(--r);border:1.5px dashed var(--green-line);background:var(--green-soft);flex-wrap:wrap}
+.drop .info{flex:1;min-width:200px}
+.drop b{color:var(--ink);display:block;font-size:16px}
+.drop span.m{font-size:14px;color:var(--muted)}
+details{margin-top:10px;font-size:13px;color:var(--muted)}
+details ul{margin:8px 0 0;padding-left:18px;max-height:140px;overflow:auto;line-height:1.6;font-family:ui-monospace,Menlo,monospace;font-size:12px}
+h2{font-size:15px;margin:28px 0 12px;color:var(--ink)}
+.types{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.type .card{display:block;padding:10px;border-radius:12px;border:1.5px solid var(--line);background:#fff;transition:border-color .15s,box-shadow .15s}
+.type:hover .card{border-color:var(--green-line)}
+.type input:checked + .card{border-color:var(--green);background:var(--green-soft);box-shadow:0 0 0 3px rgba(5,223,114,.18)}
+.type input:focus-visible + .card{outline:2px solid var(--green);outline-offset:2px}
+.prev{aspect-ratio:2/1;border-radius:8px;background:#050807;border:1px solid rgba(5,223,114,.25);overflow:hidden;display:grid;place-items:center}
+.prev img{width:100%;height:100%;object-fit:contain;display:block}
+.type .n{display:flex;align-items:center;gap:8px;margin:10px 4px 2px;font-weight:700;color:var(--ink);font-size:15px}
+.type .code{font-size:11px;font-weight:700;letter-spacing:.05em;color:var(--green-ink);background:var(--green-soft);border:1px solid var(--green-line);border-radius:999px;padding:2px 8px}
+.type .d{margin:0 4px 6px;font-size:13px;line-height:1.4;color:var(--muted)}
+
+/* cost and speed */
+.perf{width:100%;border-collapse:collapse;font-size:14px;margin:6px 0 0}
+.perf th{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);text-align:left;padding:8px 12px;border-bottom:1.5px solid var(--line)}
+.perf td{padding:11px 12px;border-bottom:1px solid var(--line);color:var(--ink)}
+.perf td.n,.perf th.n{text-align:right;font-variant-numeric:tabular-nums}
+.perf.small{font-size:13px}.perf.small td{padding:8px 12px}
+.delta{display:inline-block;font-weight:700;padding:3px 10px;border-radius:999px;background:#eef2f0;color:var(--muted)}
+.delta.good{background:var(--green-soft);border:1px solid var(--green-line);color:var(--green-ink)}
+.perfcard{border:1px solid var(--line);border-radius:var(--r);padding:20px 22px;margin:0 0 20px;background:#fbfdfc}
+.perfcard h2{margin:0 0 4px}
+.perfcard .foot{font-size:12.5px;line-height:1.5;color:var(--muted);margin:12px 0 0}
+.perfcard details{margin-top:12px}
+.perfcard summary{cursor:pointer;font-weight:700;color:var(--ink);font-size:13px}
+.tot{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.tot .pill{font-size:13px}
+/* progress + result */
+.bar{height:12px;border-radius:999px;background:#e8eeea;overflow:hidden;margin:6px 0 22px}
+.bar i{display:block;height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,#05df72,#58e388);box-shadow:0 0 14px rgba(5,223,114,.55);transition:width .7s ease}
+.steps{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.steps li{display:flex;align-items:center;gap:12px;font-size:15px;color:var(--muted)}
+.steps li .mk{width:22px;height:22px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-size:12px;font-weight:700;flex:none}
+.steps li.on{color:var(--ink);font-weight:700}
+.steps li.on .mk{border-color:var(--green);animation:pulse 1.2s ease-in-out infinite}
+.steps li.ok{color:var(--ink)}
+.steps li.ok .mk{background:var(--green);border-color:var(--green);color:#000}
+@keyframes pulse{50%{box-shadow:0 0 0 6px rgba(5,223,114,.2)}}
+.seg{display:inline-flex;padding:4px;border-radius:999px;background:#eef2f0;border:1px solid var(--line);margin-bottom:16px}
+.seg button{border:0;background:transparent;padding:9px 18px;border-radius:999px;font-weight:700;font-size:14px;color:var(--muted);cursor:pointer}
+.seg button[aria-selected=true]{background:#fff;color:var(--ink);box-shadow:var(--shadow)}
+.canvas{background:#050807;border:1.5px solid rgba(74,222,128,.45);border-radius:14px;padding:16px;overflow:auto}
+.canvas svg{display:block;width:100%;height:auto;min-width:640px}
+pre.md{margin:0;padding:20px;border-radius:14px;background:#0b0f0d;color:#e2e8f0;font-family:ui-monospace,Menlo,monospace;font-size:13px;line-height:1.6;overflow:auto;max-height:560px;white-space:pre-wrap;word-break:break-word;border:1.5px solid rgba(74,222,128,.35)}
+.meta{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 16px}
+.pill{font-size:12px;font-weight:700;padding:5px 12px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--muted)}
+.pill.g{border-color:var(--green-line);background:var(--green-soft);color:var(--green-ink)}
+.cta{margin-top:26px;display:flex;align-items:center;gap:16px;padding:18px 20px;border-radius:var(--r);border:1.5px solid var(--green-line);background:var(--green-soft);flex-wrap:wrap}
+.cta b{color:var(--ink)}
+.cta span{flex:1;min-width:200px;font-size:14px}
+.toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);background:#0b0b0b;color:#fff;padding:12px 20px;border-radius:999px;font-weight:600;font-size:14px;opacity:0;pointer-events:none;transition:.25s}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media (max-width:900px){
+  .shell{grid-template-columns:1fr;padding:16px;gap:16px}
+  nav[role=tablist]{position:static;flex-direction:row;overflow-x:auto;gap:6px;padding-bottom:4px}
+  .tab{width:auto;flex:none;padding:10px 14px}.tab .s{display:none}.promo,.oss{display:none}
+  .panel{padding:22px 18px;min-height:0}h1{font-size:28px}
+  header{padding:14px 16px;gap:10px}.product,.sep{display:none}.trial{font-size:12px;padding:8px 12px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <img src="/static/regolo-logo-light-bg.png" alt="Regolo.ai">
+  <span class="sep"></span><span class="product">Diagram Studio</span>
+  <a class="trial" href="https://regolo.ai/pricing" target="_blank" rel="noopener"><i class="dot"></i>Free account · 30 day trial</a>
+</header>
+
+<div class="shell">
+  <nav role="tablist" aria-orientation="vertical" aria-label="Wizard steps">
+    <button class="tab" role="tab" id="tab1" aria-controls="p1" aria-selected="true"><span class="num">1</span><span><span class="t">Connect</span><span class="s" id="s1">Regolo API key</span></span></button>
+    <button class="tab" role="tab" id="tab2" aria-controls="p2" aria-selected="false" disabled><span class="num">2</span><span><span class="t">Model</span><span class="s" id="s2">Choose a model</span></span></button>
+    <button class="tab" role="tab" id="tab3" aria-controls="p3" aria-selected="false" disabled><span class="num">3</span><span><span class="t">Project</span><span class="s" id="s3">Folder and diagram</span></span></button>
+    <button class="tab" role="tab" id="tab4" aria-controls="p4" aria-selected="false" disabled><span class="num">4</span><span><span class="t">Result</span><span class="s" id="s4">Diagram and knowledge base</span></span></button>
+    <div class="promo">
+      <b>No Regolo account yet?</b>
+      <p>New users get a 30 day free trial. Create your account and paste your key here.</p>
+      <a class="btn primary sm" href="https://regolo.ai/pricing" target="_blank" rel="noopener">Start free trial</a>
+    </div>
+    <a class="oss" href="https://github.com/cathrynlavery/diagram-design" target="_blank" rel="noopener">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+      <div><b>diagram-design</b><span>Open source diagram engine · MIT</span></div>
+    </a>
+  </nav>
+
+  <main>
+    <!-- 1 connect -->
+    <section class="panel" id="p1" role="tabpanel" aria-labelledby="tab1">
+      <span class="eyebrow"><i class="dot"></i>Step 1 of 4</span>
+      <h1>Connect your Regolo account</h1>
+      <p class="lead">Paste your API key. We use it to list the models you can run and to draw your diagram on Regolo's EU infrastructure.</p>
+      <form id="keyform" autocomplete="off">
+        <label class="f" for="key">Regolo API key</label>
+        <div class="field">
+          <input id="key" type="password" placeholder="sk-…" spellcheck="false" autocapitalize="off" required>
+          <button type="button" class="btn ghost sm" id="show" aria-pressed="false">Show</button>
+        </div>
+        <p class="hint">The key stays in this browser tab, is sent only to this local app and to api.regolo.ai, and is never saved to disk.</p>
+        <div class="err" id="err1" role="alert"></div>
+        <div class="actions">
+          <button class="btn primary" id="verify" type="submit"><span class="spin"></span><span id="verifyL">Verify and continue</span></button>
+          <a href="https://regolo.ai/pricing" target="_blank" rel="noopener">Don't have a key? Get 30 days free</a>
+        </div>
+      </form>
+    </section>
+
+    <!-- 2 model -->
+    <section class="panel" id="p2" role="tabpanel" aria-labelledby="tab2" hidden>
+      <span class="eyebrow"><i class="dot"></i>Step 2 of 4</span>
+      <h1>Choose a model and a run mode</h1>
+      <p class="lead">These are the chat models available for your key right now. A larger model usually draws a more faithful diagram; a smaller one is faster and cheaper. Then decide how Regolo should run it.</p>
+      <div class="modelbar"><span class="count" id="mcount"></span></div>
+      <div class="models" id="models" role="radiogroup" aria-label="Models"></div>
+      <h2>Run mode</h2>
+      <div class="modes" id="modes" role="radiogroup" aria-label="Run mode"></div>
+      <div class="actions"><button class="btn primary" id="to3" type="button">Continue</button><button class="btn ghost" id="back1" type="button">Back</button></div>
+    </section>
+
+    <!-- 3 project -->
+    <section class="panel" id="p3" role="tabpanel" aria-labelledby="tab3" hidden>
+      <span class="eyebrow"><i class="dot"></i>Step 3 of 4</span>
+      <h1>Pick a project and a diagram</h1>
+      <p class="lead">Choose the folder to analyse, then the kind of diagram you want. The app reads the project on your computer, skips everything in .gitignore, and sends the model only a compact skeleton of the main code and config files.</p>
+      <label class="f" for="path">Project folder</label>
+      <div class="field wide">
+        <input id="path" type="text" placeholder="/Users/you/projects/my-app" spellcheck="false" autocapitalize="off" autocomplete="off">
+        <button class="btn ghost sm" id="browse" type="button">Choose folder…</button>
+      </div>
+      <p class="hint" id="folderMeta">Pick a folder with the dialog or paste its path. Files excluded by the project's .gitignore are skipped.</p>
+      <details id="fileDetails" hidden><summary id="fileSummary">Files that will be analysed</summary><ul id="fileList"></ul></details>
+      <h2>Diagram type</h2>
+      <div class="types" id="types" role="radiogroup" aria-label="Diagram types"></div>
+      <div class="err" id="err3" role="alert"></div>
+      <div class="actions"><button class="btn primary" id="generate" type="button" disabled>Generate diagram</button><button class="btn ghost" id="back2" type="button">Back</button></div>
+    </section>
+
+    <!-- 4 result -->
+    <section class="panel" id="p4" role="tabpanel" aria-labelledby="tab4" hidden>
+      <div id="working">
+        <span class="eyebrow"><i class="dot"></i>Step 4 of 4</span>
+        <h1>Drawing your diagram</h1>
+        <p class="lead" id="workingLead">This usually takes under a minute.</p>
+        <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="barWrap"><i id="barFill"></i></div>
+        <ol class="steps" id="steps" aria-live="polite">
+          <li data-k="scan"><span class="mk"></span>Reading the project files</li>
+          <li data-k="topology"><span class="mk"></span>Extracting components and connections</li>
+          <li data-k="diagram"><span class="mk"></span>Drawing the diagram on the 4px grid</li>
+          <li data-k="markdown"><span class="mk"></span>Writing the knowledge base for agents</li>
+        </ol>
+        <div class="err" id="err4" role="alert"></div>
+        <div class="actions" id="errActions" hidden><button class="btn primary" id="retry" type="button">Back to project</button></div>
+      </div>
+      <div id="done" hidden>
+        <span class="eyebrow"><i class="dot"></i>Done</span>
+        <h1 id="doneTitle">Your diagram is ready</h1>
+        <div class="meta" id="meta"></div>
+        <div class="perfcard" id="perf"></div>
+        <p class="note" id="fallbackNote" hidden></p>
+        <div class="seg" id="runseg" role="tablist" aria-label="Which run" hidden></div>
+        <div class="seg" role="tablist" aria-label="Result view">
+          <button role="tab" id="rt1" aria-selected="true">Diagram</button>
+          <button role="tab" id="rt2" aria-selected="false">Knowledge base (Markdown)</button>
+        </div>
+        <div id="rv1"><div class="canvas" id="canvas"></div>
+          <div class="actions"><button class="btn primary sm" id="dlHtml" type="button">Download HTML</button><button class="btn ghost sm" id="dlSvg" type="button">Download SVG</button></div></div>
+        <div id="rv2" hidden><pre class="md" id="md" tabindex="0"></pre>
+          <div class="actions"><button class="btn primary sm" id="cpMd" type="button">Copy Markdown</button><button class="btn ghost sm" id="dlMd" type="button">Download .md</button></div>
+          <p class="hint">Drop this file in your repository (for example <code>docs/architecture.md</code>) or paste it into an agent's context as project knowledge.</p></div>
+        <div class="cta"><span><b>Enjoying Regolo?</b> New accounts include a 30 day free trial, no card needed to look around.</span><a class="btn primary sm" href="https://regolo.ai/pricing" target="_blank" rel="noopener">Create free account</a></div>
+        <div class="actions"><button class="btn ghost" id="again" type="button">Make another diagram</button></div>
+      </div>
+    </section>
+  </main>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const S = {key: "", models: [], model: "", path: "", selected: [], project: "", type: "", result: null, unlocked: 1, mode: "routed", router: "", routerOk: false, runIdx: 0};
+const esc = (t) => String(t).replace(/[&<>"']/g, (c) => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
+
+/* ---- tabs ---- */
+function go(n) {
+  $$("[role=tabpanel]").forEach((p, i) => p.hidden = i + 1 !== n);
+  $$("nav .tab").forEach((t, i) => { t.setAttribute("aria-selected", i + 1 === n); t.classList.toggle("done", i + 1 < S.unlocked && i + 1 !== n); });
+  window.scrollTo({top: 0, behavior: "smooth"});
+}
+function unlock(n) { S.unlocked = Math.max(S.unlocked, n); $$("nav .tab").forEach((t, i) => t.disabled = i + 1 > S.unlocked); }
+$$("nav .tab").forEach((t, i) => t.addEventListener("click", () => go(i + 1)));
+$("nav").addEventListener("keydown", (e) => {
+  if (!["ArrowDown", "ArrowUp"].includes(e.key)) return;
+  const tabs = $$("nav .tab:not(:disabled)"), i = tabs.indexOf(document.activeElement);
+  if (i < 0) return; e.preventDefault();
+  tabs[(i + (e.key === "ArrowDown" ? 1 : tabs.length - 1)) % tabs.length].focus();
+});
+const toast = (m) => { const t = $("#toast"); t.textContent = m; t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 2200); };
+const showErr = (id, m) => { const e = $(id); e.textContent = m || ""; e.classList.toggle("show", !!m); };
+async function api(path, body) {
+  const r = await fetch(path, {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(body)});
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.error || `Request failed (${r.status})`);
+  return j;
+}
+
+/* ---- step 1 ---- */
+$("#show").addEventListener("click", (e) => {
+  const k = $("#key"), on = k.type === "password"; k.type = on ? "text" : "password";
+  e.target.textContent = on ? "Hide" : "Show"; e.target.setAttribute("aria-pressed", on);
+});
+$("#keyform").addEventListener("submit", async (e) => {
+  e.preventDefault(); showErr("#err1");
+  const b = $("#verify"); b.disabled = true; b.classList.add("loading"); $("#verifyL").textContent = "Checking key…";
+  try {
+    const key = $("#key").value.trim();
+    const j = await api("/api/models", {api_key: key});
+    S.key = key; S.models = j.models; S.model = S.model && j.models.includes(S.model) ? S.model : j.default;
+    S.router = j.router; S.routerOk = j.router_available; if (!S.routerOk && S.mode !== "single") S.mode = "single";
+    $("#s1").textContent = "Key verified"; renderModels(); renderModes(); unlock(2); go(2);
+  } catch (err) { showErr("#err1", err.message); }
+  finally { b.disabled = false; b.classList.remove("loading"); $("#verifyL").textContent = "Verify and continue"; }
+});
+
+/* ---- step 2 ---- */
+function renderModels() {
+  $("#mcount").textContent = `${S.models.length} models available`;
+  $("#models").innerHTML = S.models.map((m) => `<label class="opt"><input type="radio" name="model" value="${esc(m)}" ${m === S.model ? "checked" : ""}>
+    <span class="card"><span class="radio"></span><span class="mname">${esc(m)}</span>${m === "qwen3.5-122b" ? '<span class="tag">Recommended</span>' : ""}</span></label>`).join("");
+  $$("#models input").forEach((i) => i.addEventListener("change", () => { S.model = i.value; $("#s2").textContent = S.model; }));
+  $("#s2").textContent = S.model;
+}
+$("#to3").addEventListener("click", () => { unlock(3); go(3); });
+$("#back1").addEventListener("click", () => go(1));
+
+const MODES = [
+  ["routed", "Regolo routing", "Recommended", "Extraction runs on the router model {router}, fast and cheap. Drawing and the knowledge base run on the model you chose."],
+  ["single", "Single model", "", "Every step runs on the model you chose."],
+  ["compare", "Compare on my repo", "Uses more tokens", "Runs your project twice in parallel: whole files on one model, then the compressed skeleton with routing. Tokens, time and cost side by side."]];
+function renderModes() {
+  $("#modes").innerHTML = MODES.map(([id, name, tag, d]) => {
+    const off = id !== "single" && !S.routerOk;
+    return `<label class="opt mode"><input type="radio" name="mode" value="${id}" ${S.mode === id ? "checked" : ""} ${off ? "disabled" : ""}>
+      <span class="card"><span class="h"><span class="radio"></span>${name}${tag ? `<span class="tag">${tag}</span>` : ""}</span>
+      <span class="d">${esc(d.replace("{router}", S.router || "brick-complexity-pro"))}${off ? " Not available for this key." : ""}</span></span></label>`;
+  }).join("");
+  $$("#modes input").forEach((i) => i.addEventListener("change", () => { S.mode = i.value; }));
+}
+
+/* ---- step 3 ---- */
+let scanSeq = 0;
+async function scan(path) {
+  const seq = ++scanSeq; S.path = ""; S.selected = []; syncGenerate(); showErr("#err3");
+  if (!path.trim()) { $("#fileDetails").hidden = true; return; }
+  $("#folderMeta").textContent = "Reading the project…";
+  try {
+    const j = await api("/api/scan", {path});
+    if (seq !== scanSeq) return;
+    S.path = j.root; S.project = j.name; S.selected = j.selected; $("#path").value = j.root;
+    const how = j.mode === "git" ? "git ls-files, so .gitignore is applied" : j.mode === ".gitignore files" ? ".gitignore files applied" : "no .gitignore found, built-in ignore list used";
+    $("#folderMeta").textContent = j.selected.length
+      ? `${j.total.toLocaleString()} files after ignore rules (${how}) · ${j.readable.toLocaleString()} readable · ${j.selected.length} selected for analysis`
+      : `${j.total.toLocaleString()} files after ignore rules, but none are code or config files this tool can read.`;
+    $("#fileSummary").textContent = `${j.selected.length} files that will be analysed`;
+    $("#fileList").innerHTML = j.selected.map((f) => `<li>${esc(f)}</li>`).join(""); $("#fileDetails").hidden = !j.selected.length;
+    $("#s3").textContent = j.name; syncGenerate();
+  } catch (err) { if (seq !== scanSeq) return; $("#folderMeta").textContent = ""; $("#fileDetails").hidden = true; showErr("#err3", err.message); }
+}
+$("#browse").addEventListener("click", async () => {
+  const b = $("#browse"); b.disabled = true; b.textContent = "Waiting for dialog…";
+  try { const j = await api("/api/pick-folder", {}); if (j.path) await scan(j.path); }
+  catch (err) { showErr("#err3", err.message); }
+  finally { b.disabled = false; b.textContent = "Choose folder…"; }
+});
+$("#path").addEventListener("change", (e) => scan(e.target.value));
+$("#path").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); scan(e.target.value); } });
+async function loadTypes() {
+  const types = await (await fetch("/api/types")).json();
+  S.type = S.type || types[0].code;
+  $("#types").innerHTML = types.map((t) => `<label class="opt type"><input type="radio" name="dtype" value="${t.code}" ${t.code === S.type ? "checked" : ""}>
+    <span class="card"><span class="prev"><img src="/api/preview/${t.code}.svg" alt="Preview of the ${esc(t.name)} layout" loading="lazy"></span>
+    <span class="n"><span class="code">${t.code}</span>${esc(t.name)}</span><span class="d">${esc(t.description)}</span></span></label>`).join("");
+  $$("#types input").forEach((i) => i.addEventListener("change", () => { S.type = i.value; syncGenerate(); }));
+}
+const syncGenerate = () => $("#generate").disabled = !(S.path && S.selected.length && S.type);
+$("#back2").addEventListener("click", () => go(2));
+
+/* ---- step 4 ---- */
+const STAGES = ["scan", "topology", "diagram", "markdown"], CEIL = {scan: 17, topology: 37, diagram: 77, markdown: 97};
+let timer = null, shown = 0;
+function paint(stage, pct) {
+  shown = Math.max(shown, pct); const i = STAGES.indexOf(stage);
+  $$("#steps li").forEach((li, n) => { li.className = n < i || stage === "done" ? "ok" : n === i ? "on" : ""; $(".mk", li).textContent = li.className === "ok" ? "✓" : ""; });
+  $("#barFill").style.width = shown + "%"; $("#barWrap").setAttribute("aria-valuenow", Math.round(shown));
+}
+$("#generate").addEventListener("click", async () => {
+  showErr("#err3"); showErr("#err4"); $("#errActions").hidden = true; shown = 0;
+  try {
+    const j = await api("/api/generate", {api_key: S.key, model: S.model, type_code: S.type, path: S.path, mode: S.mode});
+    $("#workingLead").textContent = S.mode === "compare" ? "Two runs in parallel, so you can compare them. This usually takes under a minute." : "This usually takes under a minute."; $("#working").hidden = false; $("#done").hidden = true; unlock(4); go(4); $("#s4").textContent = "Working…"; paint("scan", 4);
+    poll(j.job_id);
+  } catch (err) { showErr("#err3", err.message); }
+});
+function poll(id) {
+  clearInterval(timer);
+  let stage = "scan";
+  timer = setInterval(async () => {
+    try {
+      const j = await (await fetch("/api/jobs/" + id)).json();
+      if (j.status === "error") { clearInterval(timer); $(".bar").style.opacity = .4; showErr("#err4", j.error); $("#errActions").hidden = false; $("#s4").textContent = "Failed"; return; }
+      if (j.status === "done") { clearInterval(timer); paint("done", 100); setTimeout(() => showResult(j.result), 500); return; }
+      stage = j.stage; paint(stage, Math.max(j.progress, shown < CEIL[stage] - 1 ? shown + 0.7 : shown));
+    } catch (e) { /* transient, keep polling */ }
+  }, 700);
+}
+$("#retry").addEventListener("click", () => { $(".bar").style.opacity = 1; go(3); });
+
+const blobUrl = (text, type) => URL.createObjectURL(new Blob([text], {type}));
+function save(text, type, name) { const a = document.createElement("a"); a.href = blobUrl(text, type); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); }
+const slug = () => (S.result?.project || S.project || "project").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+const fmtN = (n) => Number(n).toLocaleString("en-US");
+const fmtEur = (v) => v == null ? "n/a" : "€" + (v < 0.01 ? v.toFixed(4) : v.toFixed(3));
+const fmtS = (v) => Number(v).toFixed(1) + " s";
+const pctTxt = (p) => p == null ? "n/a" : (p > 0 ? "+" : p < 0 ? "−" : "") + Math.abs(p).toFixed(0) + "%";
+const delta = (p) => `<span class="delta ${p != null && p < 0 ? "good" : ""}">${pctTxt(p)}</span>`;
+const stageTable = (run) => `<table class="perf small"><thead><tr><th>Step</th><th>Model</th><th class="n">Tokens in / out</th><th class="n">Time</th><th class="n">Cost</th></tr></thead><tbody>${
+  run.stages.map((s) => `<tr><td>${esc(s.stage)}</td><td>${esc(s.model)}</td><td class="n">${fmtN(s.prompt_tokens)} / ${fmtN(s.completion_tokens)}</td><td class="n">${fmtS(s.latency_s)}</td><td class="n">${fmtEur(s.cost_eur)}</td></tr>`).join("")}</tbody></table>`;
+function renderPerf(r) {
+  const unpriced = [...new Set(r.runs.flatMap((x) => x.totals.unpriced_models))];
+  const priceNote = unpriced.length ? ` No price is set for ${unpriced.map(esc).join(", ")}, so its cost shows as n/a (edit prices.json).` : " Costs use the pay-as-you-go prices in prices.json.";
+  if (r.compare) {
+    const [a, d] = r.runs.map((x) => x.totals), c = r.compare;
+    const row = (name, x, y, f, p) => `<tr><td>${name}</td><td class="n">${f(x)}</td><td class="n">${f(y)}</td><td class="n">${delta(p)}</td></tr>`;
+    $("#perf").innerHTML = `<h2>Cost and speed on your repo</h2>
+      <table class="perf"><thead><tr><th></th><th class="n">Baseline</th><th class="n">Optimized</th><th class="n">Change</th></tr></thead><tbody>
+      ${row("Prompt tokens", a.prompt_tokens, d.prompt_tokens, fmtN, c.prompt_tokens_pct)}${row("Total tokens", a.total_tokens, d.total_tokens, fmtN, c.total_tokens_pct)}
+      ${row("Time", a.wall_s, d.wall_s, fmtS, c.wall_pct)}${row("Cost", a.cost_eur, d.cost_eur, fmtEur, c.cost_pct)}</tbody></table>
+      <details><summary>Per step</summary><h2 style="font-size:13px;margin:12px 0 4px">Baseline</h2>${stageTable(r.runs[0])}<h2 style="font-size:13px;margin:12px 0 4px">Optimized</h2>${stageTable(r.runs[1])}</details>
+      <p class="foot">One run each, started in parallel, on your files. Baseline: the same files uncompressed (first 12 KB of each) with ${esc(r.model)} for every step. Optimized: compressed skeleton, extraction on ${esc(r.router)}, drawing and write-up on ${esc(r.model)}. Token counts and times are measured; they vary between runs.${priceNote}</p>`;
+  } else {
+    const run = r.runs[0], t = run.totals, comp = run.compact ? `The model received ${fmtN(run.scan.sent_chars)} of ${fmtN(run.scan.raw_chars)} characters (${pctTxt(-run.scan.reduction_pct)}).` : "";
+    $("#perf").innerHTML = `<h2>Cost and speed</h2>
+      <div class="tot"><span class="pill g">${fmtN(t.total_tokens)} tokens</span><span class="pill">${fmtN(t.prompt_tokens)} in · ${fmtN(t.completion_tokens)} out</span><span class="pill">${fmtS(t.wall_s)} total</span><span class="pill">${fmtEur(t.cost_eur)}</span></div>
+      <details><summary>Per step</summary>${stageTable(run)}</details>
+      <p class="foot">${comp} ${run.routed ? `Extraction ran on ${esc(r.router)}.` : "Every step ran on one model."}${priceNote}</p>`;
+  }
+}
+function showRun(i) {
+  S.runIdx = i; const r = S.result, run = r.runs[i];
+  $$("#runseg button").forEach((b, n) => b.setAttribute("aria-selected", n === i));
+  $("#canvas").innerHTML = run.svg; $("#md").textContent = run.markdown;
+  $("#meta").innerHTML = [`<span class="pill g">${esc(r.model)}</span>`, `<span class="pill">${run.scan.files} files read of ${r.scope.total.toLocaleString()}</span>`,
+    `<span class="pill">${r.scope.mode === "git" ? ".gitignore applied (git)" : r.scope.mode === ".gitignore files" ? ".gitignore applied" : "built-in ignore list"}</span>`,
+    `<span class="pill">${fmtS(run.totals.wall_s)}</span>`, `<span class="pill">${fmtN(run.totals.total_tokens)} tokens</span>`].join("");
+  const notes = [];
+  if (run.router_retry) notes.push(`The ${r.router} component list was unusable, so extraction was repeated on ${r.model}. Both steps are counted in the cost.`);
+  if (run.router_fallback) notes.push(`${r.router} was not available for this key, so extraction ran on ${r.model}.`);
+  if (run.svg_source === "fallback") notes.push("The model's SVG did not follow the requested layout, so Regolo's built-in 4px layout drew the diagram from the extracted components.");
+  if (run.topology_source === "fallback") notes.push("The model did not return a usable component list, so components come from file names. Try a larger model for a more faithful diagram.");
+  if (run.kb_source === "fallback") notes.push("The knowledge base is a plain component table because the model's write-up was unusable.");
+  $("#fallbackNote").hidden = !notes.length; $("#fallbackNote").textContent = notes.join(" ");
+}
+function showResult(r) {
+  S.result = r; $("#working").hidden = true; $("#done").hidden = false; $("#s4").textContent = r.type.name;
+  $("#doneTitle").textContent = `${r.project}: ${r.type.name}`;
+  const seg = $("#runseg"); seg.hidden = r.runs.length < 2;
+  seg.innerHTML = r.runs.map((x, n) => `<button role="tab" aria-selected="false" data-i="${n}">${esc(x.label)}${x.label === "Baseline" ? " · whole files" : " · compressed + routing"}</button>`).join("");
+  $$("#runseg button").forEach((b) => b.addEventListener("click", () => showRun(+b.dataset.i)));
+  renderPerf(r); showRun(r.runs.length - 1); rview(1);
+}
+function rview(n) { [1, 2].forEach((i) => { $("#rv" + i).hidden = i !== n; $("#rt" + i).setAttribute("aria-selected", i === n); }); }
+$("#rt1").addEventListener("click", () => rview(1)); $("#rt2").addEventListener("click", () => rview(2));
+$("#dlHtml").addEventListener("click", () => save(S.result.runs[S.runIdx].html, "text/html", `regolo-diagram-${S.result.type.code}-${slug()}.html`));
+$("#dlSvg").addEventListener("click", () => save(S.result.runs[S.runIdx].svg, "image/svg+xml", `regolo-diagram-${S.result.type.code}-${slug()}.svg`));
+$("#dlMd").addEventListener("click", () => save(S.result.runs[S.runIdx].markdown, "text/markdown", `${slug()}-knowledge-base.md`));
+$("#cpMd").addEventListener("click", async () => { try { await navigator.clipboard.writeText(S.result.runs[S.runIdx].markdown); toast("Markdown copied"); } catch { toast("Copy failed: select the text and copy it"); } });
+$("#again").addEventListener("click", () => go(3));
+
+loadTypes();
+</script>
+</body>
+</html>
