@@ -10,7 +10,7 @@
 [![Prompt Tokens](https://img.shields.io/badge/Prompt_Tokens--71%25-7c3aed?style=flat-square)](#2-token-cost-and-time-impact-october-21-2026)
 [![Tests](https://img.shields.io/badge/Unit_Tests-Passing-success?style=flat-square)](#automated-test-suite)
 
-> A local web app that turns a project folder into an architecture diagram and a Markdown knowledge base for your AI agents, and measures what the model calls cost: `.gitignore` aware folder reading, input compression and Regolo model routing, compared side by side against sending whole files. Built on the open source [diagram-design](https://github.com/cathrynlavery/diagram-design) project (MIT).
+> A local web app that turns a project folder into an architecture diagram and a Markdown knowledge base for your AI agents, and measures what the model calls cost: `.gitignore` aware folder reading, input compression and Regolo model routing, compared side by side against sending whole files. Inspired by the diagram taxonomy and 4px-grid editorial concepts of the open source [diagram-design](https://github.com/cathrynlavery/diagram-design) project by Cathryn Lavery (MIT).
 
 **Reference Article:** [Getting started with diagram-design and regolo: turn any codebase into interactive architecture maps](https://regolo.ai/getting-started-diagram-design-regolo-architecture-maps/)
 
@@ -409,6 +409,12 @@ Tunable constants live at the top of `diagram_wizard/server.py`: `MAX_FILES` (fi
 
 ---
 
-## License
+## License & Third-Party Notices
 
-MIT, like the rest of the `regolo-ai/tutorials` repository. The diagram types and the editorial style come from [diagram-design](https://github.com/cathrynlavery/diagram-design) (MIT). Fonts: Space Grotesk (SIL Open Font License). The Regolo name and logo belong to Regolo.
+MIT, like the rest of the `regolo-ai/tutorials` repository. Fonts: Space Grotesk (SIL Open Font License). The Regolo name and logo belong to Regolo.
+
+### Third-Party Notices
+
+This repository is an independent Python implementation (web app, terminal TUI, and benchmark runner) and does not bundle or redistribute code from `diagram-design`. Its six diagram type categories and 4px-grid editorial layout concepts are inspired by [cathrynlavery/diagram-design](https://github.com/cathrynlavery/diagram-design) (and the terminal TUI optionally invokes `npx skills add cathrynlavery/diagram-design` from the official upstream repository):
+
+- **diagram-design** — Copyright (c) 2025 Cathryn Lavery ([littlemight.com](https://littlemight.com)), licensed under the [MIT License](https://github.com/cathrynlavery/diagram-design/blob/main/LICENSE).
