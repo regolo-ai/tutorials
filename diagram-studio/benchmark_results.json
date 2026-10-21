@@ -1,0 +1,929 @@
+{
+  "date": "2026-10-20",
+  "configurations": [
+    {
+      "name": "A. Baseline (Uncompressed + Pinned qwen3.5-122b)",
+      "accuracy_pct": 100.0,
+      "prompt_tokens": 27508,
+      "completion_tokens": 5070,
+      "total_tokens": 32578,
+      "latency_p50_s": 7.88,
+      "wall_time_s": 8.09,
+      "cost_per_1000_sessions": {
+        "private_workhorse_usd": 105.72,
+        "zai_glm53_direct_usd": 60.82,
+        "regolo_payg_eur": 48.8,
+        "regolo_core_standard_eur": 2.12,
+        "regolo_core_promo_3mo_eur": 0.64
+      },
+      "items": [
+        {
+          "id": "t1",
+          "category": "topology",
+          "layer1_selected_files": [
+            "infra/docker-compose.yml",
+            "db/schema.sql",
+            "src/gateway_routes.py",
+            "src/worker_consumers.py"
+          ],
+          "layer1_chars": 19544,
+          "layer2_chars": 19544,
+          "layer2_step_reduction_pct": 0.0,
+          "layer2_char_reduction_pct": 0.0,
+          "actions": [],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 4575,
+          "completion_tokens": 900,
+          "total_tokens": 5475,
+          "latency_s": 7.868
+        },
+        {
+          "id": "t2",
+          "category": "topology",
+          "layer1_selected_files": [
+            "infra/docker-compose.yml",
+            "db/schema.sql",
+            "src/gateway_routes.py",
+            "src/worker_consumers.py"
+          ],
+          "layer1_chars": 19544,
+          "layer2_chars": 19544,
+          "layer2_step_reduction_pct": 0.0,
+          "layer2_char_reduction_pct": 0.0,
+          "actions": [],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 4574,
+          "completion_tokens": 900,
+          "total_tokens": 5474,
+          "latency_s": 7.877
+        },
+        {
+          "id": "t3",
+          "category": "schema",
+          "layer1_selected_files": [
+            "infra/docker-compose.yml",
+            "db/schema.sql",
+            "src/gateway_routes.py",
+            "src/worker_consumers.py"
+          ],
+          "layer1_chars": 19544,
+          "layer2_chars": 19544,
+          "layer2_step_reduction_pct": 0.0,
+          "layer2_char_reduction_pct": 0.0,
+          "actions": [],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 4577,
+          "completion_tokens": 900,
+          "total_tokens": 5477,
+          "latency_s": 7.877
+        },
+        {
+          "id": "t4",
+          "category": "schema",
+          "layer1_selected_files": [
+            "infra/docker-compose.yml",
+            "db/schema.sql",
+            "src/gateway_routes.py",
+            "src/worker_consumers.py"
+          ],
+          "layer1_chars": 19544,
+          "layer2_chars": 19544,
+          "layer2_step_reduction_pct": 0.0,
+          "layer2_char_reduction_pct": 0.0,
+          "actions": [],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 4575,
+          "completion_tokens": 570,
+          "total_tokens": 5145,
+          "latency_s": 5.254
+        },
+        {
+          "id": "t5",
+          "category": "svg_map",
+          "layer1_selected_files": [
+            "infra/docker-compose.yml",
+            "db/schema.sql",
+            "src/gateway_routes.py",
+            "src/worker_consumers.py"
+          ],
+          "layer1_chars": 19544,
+          "layer2_chars": 19544,
+          "layer2_step_reduction_pct": 0.0,
+          "layer2_char_reduction_pct": 0.0,
+          "actions": [],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 4606,
+          "completion_tokens": 900,
+          "total_tokens": 5506,
+          "latency_s": 7.878
+        },
+        {
+          "id": "t6",
+          "category": "svg_map",
+          "layer1_selected_files": [
+            "infra/docker-compose.yml",
+            "db/schema.sql",
+            "src/gateway_routes.py",
+            "src/worker_consumers.py"
+          ],
+          "layer1_chars": 19544,
+          "layer2_chars": 19544,
+          "layer2_step_reduction_pct": 0.0,
+          "layer2_char_reduction_pct": 0.0,
+          "actions": [],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 4601,
+          "completion_tokens": 900,
+          "total_tokens": 5501,
+          "latency_s": 8.085
+        }
+      ]
+    },
+    {
+      "name": "B. Local Topology Compression Only",
+      "accuracy_pct": 100.0,
+      "prompt_tokens": 3394,
+      "completion_tokens": 5400,
+      "total_tokens": 8794,
+      "latency_p50_s": 7.88,
+      "wall_time_s": 7.88,
+      "cost_per_1000_sessions": {
+        "private_workhorse_usd": 60.79,
+        "zai_glm53_direct_usd": 28.51,
+        "regolo_payg_eur": 26.07,
+        "regolo_core_standard_eur": 0.57,
+        "regolo_core_promo_3mo_eur": 0.17
+      },
+      "items": [
+        {
+          "id": "t1",
+          "category": "topology",
+          "layer1_selected_files": [
+            "infra/docker-compose.yml",
+            "src/gateway_routes.py",
+            "src/worker_consumers.py"
+          ],
+          "layer1_chars": 14240,
+          "layer2_chars": 1342,
+          "layer2_step_reduction_pct": 90.6,
+          "layer2_char_reduction_pct": 93.1,
+          "actions": [
+            {
+              "compressor": "yaml_topology_stripper",
+              "raw_chars": 5312,
+              "compressed_chars": 596,
+              "reduction_pct": 88.8,
+              "detail": "stripped 74 comment/logging lines; kept service, port & dependency edges",
+              "path": "infra/docker-compose.yml"
+            },
+            {
+              "compressor": "ast_route_skeleton",
+              "raw_chars": 4553,
+              "compressed_chars": 403,
+              "reduction_pct": 91.1,
+              "detail": "stripped 63 docstring/comment lines; kept route signatures & service calls",
+              "path": "src/gateway_routes.py"
+            },
+            {
+              "compressor": "ast_route_skeleton",
+              "raw_chars": 4375,
+              "compressed_chars": 226,
+              "reduction_pct": 94.8,
+              "detail": "stripped 62 docstring/comment lines; kept route signatures & service calls",
+              "path": "src/worker_consumers.py"
+            }
+          ],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 537,
+          "completion_tokens": 900,
+          "total_tokens": 1437,
+          "latency_s": 7.88
+        },
+        {
+          "id": "t2",
+          "category": "topology",
+          "layer1_selected_files": [
+            "infra/docker-compose.yml",
+            "src/gateway_routes.py",
+            "src/worker_consumers.py"
+          ],
+          "layer1_chars": 14240,
+          "layer2_chars": 1342,
+          "layer2_step_reduction_pct": 90.6,
+          "layer2_char_reduction_pct": 93.1,
+          "actions": [
+            {
+              "compressor": "yaml_topology_stripper",
+              "raw_chars": 5312,
+              "compressed_chars": 596,
+              "reduction_pct": 88.8,
+              "detail": "stripped 74 comment/logging lines; kept service, port & dependency edges",
+              "path": "infra/docker-compose.yml"
+            },
+            {
+              "compressor": "ast_route_skeleton",
+              "raw_chars": 4553,
+              "compressed_chars": 403,
+              "reduction_pct": 91.1,
+              "detail": "stripped 63 docstring/comment lines; kept route signatures & service calls",
+              "path": "src/gateway_routes.py"
+            },
+            {
+              "compressor": "ast_route_skeleton",
+              "raw_chars": 4375,
+              "compressed_chars": 226,
+              "reduction_pct": 94.8,
+              "detail": "stripped 62 docstring/comment lines; kept route signatures & service calls",
+              "path": "src/worker_consumers.py"
+            }
+          ],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 536,
+          "completion_tokens": 900,
+          "total_tokens": 1436,
+          "latency_s": 7.878
+        },
+        {
+          "id": "t3",
+          "category": "schema",
+          "layer1_selected_files": [
+            "db/schema.sql",
+            "src/gateway_routes.py",
+            "src/worker_consumers.py"
+          ],
+          "layer1_chars": 14232,
+          "layer2_chars": 1242,
+          "layer2_step_reduction_pct": 91.3,
+          "layer2_char_reduction_pct": 93.6,
+          "actions": [
+            {
+              "compressor": "sql_fk_extractor",
+              "raw_chars": 5304,
+              "compressed_chars": 507,
+              "reduction_pct": 90.4,
+              "detail": "stripped 71 SQL comment/audit lines; preserved tables, primary keys & foreign keys",
+              "path": "db/schema.sql"
+            },
+            {
+              "compressor": "ast_route_skeleton",
+              "raw_chars": 4553,
+              "compressed_chars": 403,
+              "reduction_pct": 91.1,
+              "detail": "stripped 63 docstring/comment lines; kept route signatures & service calls",
+              "path": "src/gateway_routes.py"
+            },
+            {
+              "compressor": "ast_route_skeleton",
+              "raw_chars": 4375,
+              "compressed_chars": 226,
+              "reduction_pct": 94.8,
+              "detail": "stripped 62 docstring/comment lines; kept route signatures & service calls",
+              "path": "src/worker_consumers.py"
+            }
+          ],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 444,
+          "completion_tokens": 900,
+          "total_tokens": 1344,
+          "latency_s": 7.871
+        },
+        {
+          "id": "t4",
+          "category": "schema",
+          "layer1_selected_files": [
+            "db/schema.sql",
+            "src/gateway_routes.py",
+            "src/worker_consumers.py"
+          ],
+          "layer1_chars": 14232,
+          "layer2_chars": 1242,
+          "layer2_step_reduction_pct": 91.3,
+          "layer2_char_reduction_pct": 93.6,
+          "actions": [
+            {
+              "compressor": "sql_fk_extractor",
+              "raw_chars": 5304,
+              "compressed_chars": 507,
+              "reduction_pct": 90.4,
+              "detail": "stripped 71 SQL comment/audit lines; preserved tables, primary keys & foreign keys",
+              "path": "db/schema.sql"
+            },
+            {
+              "compressor": "ast_route_skeleton",
+              "raw_chars": 4553,
+              "compressed_chars": 403,
+              "reduction_pct": 91.1,
+              "detail": "stripped 63 docstring/comment lines; kept route signatures & service calls",
+              "path": "src/gateway_routes.py"
+            },
+            {
+              "compressor": "ast_route_skeleton",
+              "raw_chars": 4375,
+              "compressed_chars": 226,
+              "reduction_pct": 94.8,
+              "detail": "stripped 62 docstring/comment lines; kept route signatures & service calls",
+              "path": "src/worker_consumers.py"
+            }
+          ],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 442,
+          "completion_tokens": 900,
+          "total_tokens": 1342,
+          "latency_s": 7.879
+        },
+        {
+          "id": "t5",
+          "category": "svg_map",
+          "layer1_selected_files": [
+            "infra/docker-compose.yml",
+            "db/schema.sql",
+            "src/gateway_routes.py",
+            "src/worker_consumers.py"
+          ],
+          "layer1_chars": 19544,
+          "layer2_chars": 1879,
+          "layer2_step_reduction_pct": 90.4,
+          "layer2_char_reduction_pct": 90.4,
+          "actions": [
+            {
+              "compressor": "yaml_topology_stripper",
+              "raw_chars": 5312,
+              "compressed_chars": 596,
+              "reduction_pct": 88.8,
+              "detail": "stripped 74 comment/logging lines; kept service, port & dependency edges",
+              "path": "infra/docker-compose.yml"
+            },
+            {
+              "compressor": "sql_fk_extractor",
+              "raw_chars": 5304,
+              "compressed_chars": 507,
+              "reduction_pct": 90.4,
+              "detail": "stripped 71 SQL comment/audit lines; preserved tables, primary keys & foreign keys",
+              "path": "db/schema.sql"
+            },
+            {
+              "compressor": "ast_route_skeleton",
+              "raw_chars": 4553,
+              "compressed_chars": 403,
+              "reduction_pct": 91.1,
+              "detail": "stripped 63 docstring/comment lines; kept route signatures & service calls",
+              "path": "src/gateway_routes.py"
+            },
+            {
+              "compressor": "ast_route_skeleton",
+              "raw_chars": 4375,
+              "compressed_chars": 226,
+              "reduction_pct": 94.8,
+              "detail": "stripped 62 docstring/comment lines; kept route signatures & service calls",
+              "path": "src/worker_consumers.py"
+            }
+          ],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 720,
+          "completion_tokens": 900,
+          "total_tokens": 1620,
+          "latency_s": 7.877
+        },
+        {
+          "id": "t6",
+          "category": "svg_map",
+          "layer1_selected_files": [
+            "infra/docker-compose.yml",
+            "db/schema.sql",
+            "src/gateway_routes.py",
+            "src/worker_consumers.py"
+          ],
+          "layer1_chars": 19544,
+          "layer2_chars": 1879,
+          "layer2_step_reduction_pct": 90.4,
+          "layer2_char_reduction_pct": 90.4,
+          "actions": [
+            {
+              "compressor": "yaml_topology_stripper",
+              "raw_chars": 5312,
+              "compressed_chars": 596,
+              "reduction_pct": 88.8,
+              "detail": "stripped 74 comment/logging lines; kept service, port & dependency edges",
+              "path": "infra/docker-compose.yml"
+            },
+            {
+              "compressor": "sql_fk_extractor",
+              "raw_chars": 5304,
+              "compressed_chars": 507,
+              "reduction_pct": 90.4,
+              "detail": "stripped 71 SQL comment/audit lines; preserved tables, primary keys & foreign keys",
+              "path": "db/schema.sql"
+            },
+            {
+              "compressor": "ast_route_skeleton",
+              "raw_chars": 4553,
+              "compressed_chars": 403,
+              "reduction_pct": 91.1,
+              "detail": "stripped 63 docstring/comment lines; kept route signatures & service calls",
+              "path": "src/gateway_routes.py"
+            },
+            {
+              "compressor": "ast_route_skeleton",
+              "raw_chars": 4375,
+              "compressed_chars": 226,
+              "reduction_pct": 94.8,
+              "detail": "stripped 62 docstring/comment lines; kept route signatures & service calls",
+              "path": "src/worker_consumers.py"
+            }
+          ],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 715,
+          "completion_tokens": 900,
+          "total_tokens": 1615,
+          "latency_s": 7.859
+        }
+      ]
+    },
+    {
+      "name": "C. Regolo Brick Complexity Pro Routing Only",
+      "accuracy_pct": 83.3,
+      "prompt_tokens": 27516,
+      "completion_tokens": 2017,
+      "total_tokens": 29533,
+      "latency_p50_s": 1.01,
+      "wall_time_s": 6.29,
+      "cost_per_1000_sessions": {
+        "private_workhorse_usd": 75.2,
+        "zai_glm53_direct_usd": 47.4,
+        "regolo_payg_eur": 18.68,
+        "regolo_core_standard_eur": 1.92,
+        "regolo_core_promo_3mo_eur": 0.58
+      },
+      "items": [
+        {
+          "id": "t1",
+          "category": "topology",
+          "layer1_selected_files": [
+            "infra/docker-compose.yml",
+            "db/schema.sql",
+            "src/gateway_routes.py",
+            "src/worker_consumers.py"
+          ],
+          "layer1_chars": 19544,
+          "layer2_chars": 19544,
+          "layer2_step_reduction_pct": 0.0,
+          "layer2_char_reduction_pct": 0.0,
+          "actions": [],
+          "model": "brick-complexity-pro",
+          "reasoning_effort": "none",
+          "passed": true,
+          "prompt_tokens": 4577,
+          "completion_tokens": 64,
+          "total_tokens": 4641,
+          "latency_s": 0.976
+        },
+        {
+          "id": "t2",
+          "category": "topology",
+          "layer1_selected_files": [
+            "infra/docker-compose.yml",
+            "db/schema.sql",
+            "src/gateway_routes.py",
+            "src/worker_consumers.py"
+          ],
+          "layer1_chars": 19544,
+          "layer2_chars": 19544,
+          "layer2_step_reduction_pct": 0.0,
+          "layer2_char_reduction_pct": 0.0,
+          "actions": [],
+          "model": "brick-complexity-pro",
+          "reasoning_effort": "none",
+          "passed": true,
+          "prompt_tokens": 4576,
+          "completion_tokens": 74,
+          "total_tokens": 4650,
+          "latency_s": 1.049
+        },
+        {
+          "id": "t3",
+          "category": "schema",
+          "layer1_selected_files": [
+            "infra/docker-compose.yml",
+            "db/schema.sql",
+            "src/gateway_routes.py",
+            "src/worker_consumers.py"
+          ],
+          "layer1_chars": 19544,
+          "layer2_chars": 19544,
+          "layer2_step_reduction_pct": 0.0,
+          "layer2_char_reduction_pct": 0.0,
+          "actions": [],
+          "model": "brick-complexity-pro",
+          "reasoning_effort": "none",
+          "passed": false,
+          "prompt_tokens": 4579,
+          "completion_tokens": 57,
+          "total_tokens": 4636,
+          "latency_s": 0.932
+        },
+        {
+          "id": "t4",
+          "category": "schema",
+          "layer1_selected_files": [
+            "infra/docker-compose.yml",
+            "db/schema.sql",
+            "src/gateway_routes.py",
+            "src/worker_consumers.py"
+          ],
+          "layer1_chars": 19544,
+          "layer2_chars": 19544,
+          "layer2_step_reduction_pct": 0.0,
+          "layer2_char_reduction_pct": 0.0,
+          "actions": [],
+          "model": "brick-complexity-pro",
+          "reasoning_effort": "none",
+          "passed": true,
+          "prompt_tokens": 4577,
+          "completion_tokens": 22,
+          "total_tokens": 4599,
+          "latency_s": 0.647
+        },
+        {
+          "id": "t5",
+          "category": "svg_map",
+          "layer1_selected_files": [
+            "infra/docker-compose.yml",
+            "db/schema.sql",
+            "src/gateway_routes.py",
+            "src/worker_consumers.py"
+          ],
+          "layer1_chars": 19544,
+          "layer2_chars": 19544,
+          "layer2_step_reduction_pct": 0.0,
+          "layer2_char_reduction_pct": 0.0,
+          "actions": [],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 4606,
+          "completion_tokens": 900,
+          "total_tokens": 5506,
+          "latency_s": 6.288
+        },
+        {
+          "id": "t6",
+          "category": "svg_map",
+          "layer1_selected_files": [
+            "infra/docker-compose.yml",
+            "db/schema.sql",
+            "src/gateway_routes.py",
+            "src/worker_consumers.py"
+          ],
+          "layer1_chars": 19544,
+          "layer2_chars": 19544,
+          "layer2_step_reduction_pct": 0.0,
+          "layer2_char_reduction_pct": 0.0,
+          "actions": [],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 4601,
+          "completion_tokens": 900,
+          "total_tokens": 5501,
+          "latency_s": 6.283
+        }
+      ]
+    },
+    {
+      "name": "D. Full Stack (Local Topology Compression + Regolo Brick Pro)",
+      "accuracy_pct": 100.0,
+      "prompt_tokens": 3402,
+      "completion_tokens": 2219,
+      "total_tokens": 5621,
+      "latency_p50_s": 1.92,
+      "wall_time_s": 5.51,
+      "cost_per_1000_sessions": {
+        "private_workhorse_usd": 28.99,
+        "zai_glm53_direct_usd": 14.53,
+        "regolo_payg_eur": 9.36,
+        "regolo_core_standard_eur": 0.37,
+        "regolo_core_promo_3mo_eur": 0.11
+      },
+      "items": [
+        {
+          "id": "t1",
+          "category": "topology",
+          "layer1_selected_files": [
+            "infra/docker-compose.yml",
+            "src/gateway_routes.py",
+            "src/worker_consumers.py"
+          ],
+          "layer1_chars": 14240,
+          "layer2_chars": 1342,
+          "layer2_step_reduction_pct": 90.6,
+          "layer2_char_reduction_pct": 93.1,
+          "actions": [
+            {
+              "compressor": "yaml_topology_stripper",
+              "raw_chars": 5312,
+              "compressed_chars": 596,
+              "reduction_pct": 88.8,
+              "detail": "stripped 74 comment/logging lines; kept service, port & dependency edges",
+              "path": "infra/docker-compose.yml"
+            },
+            {
+              "compressor": "ast_route_skeleton",
+              "raw_chars": 4553,
+              "compressed_chars": 403,
+              "reduction_pct": 91.1,
+              "detail": "stripped 63 docstring/comment lines; kept route signatures & service calls",
+              "path": "src/gateway_routes.py"
+            },
+            {
+              "compressor": "ast_route_skeleton",
+              "raw_chars": 4375,
+              "compressed_chars": 226,
+              "reduction_pct": 94.8,
+              "detail": "stripped 62 docstring/comment lines; kept route signatures & service calls",
+              "path": "src/worker_consumers.py"
+            }
+          ],
+          "model": "brick-complexity-pro",
+          "reasoning_effort": "none",
+          "passed": true,
+          "prompt_tokens": 539,
+          "completion_tokens": 81,
+          "total_tokens": 620,
+          "latency_s": 0.811
+        },
+        {
+          "id": "t2",
+          "category": "topology",
+          "layer1_selected_files": [
+            "infra/docker-compose.yml",
+            "src/gateway_routes.py",
+            "src/worker_consumers.py"
+          ],
+          "layer1_chars": 14240,
+          "layer2_chars": 1342,
+          "layer2_step_reduction_pct": 90.6,
+          "layer2_char_reduction_pct": 93.1,
+          "actions": [
+            {
+              "compressor": "yaml_topology_stripper",
+              "raw_chars": 5312,
+              "compressed_chars": 596,
+              "reduction_pct": 88.8,
+              "detail": "stripped 74 comment/logging lines; kept service, port & dependency edges",
+              "path": "infra/docker-compose.yml"
+            },
+            {
+              "compressor": "ast_route_skeleton",
+              "raw_chars": 4553,
+              "compressed_chars": 403,
+              "reduction_pct": 91.1,
+              "detail": "stripped 63 docstring/comment lines; kept route signatures & service calls",
+              "path": "src/gateway_routes.py"
+            },
+            {
+              "compressor": "ast_route_skeleton",
+              "raw_chars": 4375,
+              "compressed_chars": 226,
+              "reduction_pct": 94.8,
+              "detail": "stripped 62 docstring/comment lines; kept route signatures & service calls",
+              "path": "src/worker_consumers.py"
+            }
+          ],
+          "model": "brick-complexity-pro",
+          "reasoning_effort": "none",
+          "passed": true,
+          "prompt_tokens": 538,
+          "completion_tokens": 164,
+          "total_tokens": 702,
+          "latency_s": 2.391
+        },
+        {
+          "id": "t3",
+          "category": "schema",
+          "layer1_selected_files": [
+            "db/schema.sql",
+            "src/gateway_routes.py",
+            "src/worker_consumers.py"
+          ],
+          "layer1_chars": 14232,
+          "layer2_chars": 1242,
+          "layer2_step_reduction_pct": 91.3,
+          "layer2_char_reduction_pct": 93.6,
+          "actions": [
+            {
+              "compressor": "sql_fk_extractor",
+              "raw_chars": 5304,
+              "compressed_chars": 507,
+              "reduction_pct": 90.4,
+              "detail": "stripped 71 SQL comment/audit lines; preserved tables, primary keys & foreign keys",
+              "path": "db/schema.sql"
+            },
+            {
+              "compressor": "ast_route_skeleton",
+              "raw_chars": 4553,
+              "compressed_chars": 403,
+              "reduction_pct": 91.1,
+              "detail": "stripped 63 docstring/comment lines; kept route signatures & service calls",
+              "path": "src/gateway_routes.py"
+            },
+            {
+              "compressor": "ast_route_skeleton",
+              "raw_chars": 4375,
+              "compressed_chars": 226,
+              "reduction_pct": 94.8,
+              "detail": "stripped 62 docstring/comment lines; kept route signatures & service calls",
+              "path": "src/worker_consumers.py"
+            }
+          ],
+          "model": "brick-complexity-pro",
+          "reasoning_effort": "none",
+          "passed": true,
+          "prompt_tokens": 446,
+          "completion_tokens": 152,
+          "total_tokens": 598,
+          "latency_s": 1.355
+        },
+        {
+          "id": "t4",
+          "category": "schema",
+          "layer1_selected_files": [
+            "db/schema.sql",
+            "src/gateway_routes.py",
+            "src/worker_consumers.py"
+          ],
+          "layer1_chars": 14232,
+          "layer2_chars": 1242,
+          "layer2_step_reduction_pct": 91.3,
+          "layer2_char_reduction_pct": 93.6,
+          "actions": [
+            {
+              "compressor": "sql_fk_extractor",
+              "raw_chars": 5304,
+              "compressed_chars": 507,
+              "reduction_pct": 90.4,
+              "detail": "stripped 71 SQL comment/audit lines; preserved tables, primary keys & foreign keys",
+              "path": "db/schema.sql"
+            },
+            {
+              "compressor": "ast_route_skeleton",
+              "raw_chars": 4553,
+              "compressed_chars": 403,
+              "reduction_pct": 91.1,
+              "detail": "stripped 63 docstring/comment lines; kept route signatures & service calls",
+              "path": "src/gateway_routes.py"
+            },
+            {
+              "compressor": "ast_route_skeleton",
+              "raw_chars": 4375,
+              "compressed_chars": 226,
+              "reduction_pct": 94.8,
+              "detail": "stripped 62 docstring/comment lines; kept route signatures & service calls",
+              "path": "src/worker_consumers.py"
+            }
+          ],
+          "model": "brick-complexity-pro",
+          "reasoning_effort": "none",
+          "passed": true,
+          "prompt_tokens": 444,
+          "completion_tokens": 22,
+          "total_tokens": 466,
+          "latency_s": 1.441
+        },
+        {
+          "id": "t5",
+          "category": "svg_map",
+          "layer1_selected_files": [
+            "infra/docker-compose.yml",
+            "db/schema.sql",
+            "src/gateway_routes.py",
+            "src/worker_consumers.py"
+          ],
+          "layer1_chars": 19544,
+          "layer2_chars": 1879,
+          "layer2_step_reduction_pct": 90.4,
+          "layer2_char_reduction_pct": 90.4,
+          "actions": [
+            {
+              "compressor": "yaml_topology_stripper",
+              "raw_chars": 5312,
+              "compressed_chars": 596,
+              "reduction_pct": 88.8,
+              "detail": "stripped 74 comment/logging lines; kept service, port & dependency edges",
+              "path": "infra/docker-compose.yml"
+            },
+            {
+              "compressor": "sql_fk_extractor",
+              "raw_chars": 5304,
+              "compressed_chars": 507,
+              "reduction_pct": 90.4,
+              "detail": "stripped 71 SQL comment/audit lines; preserved tables, primary keys & foreign keys",
+              "path": "db/schema.sql"
+            },
+            {
+              "compressor": "ast_route_skeleton",
+              "raw_chars": 4553,
+              "compressed_chars": 403,
+              "reduction_pct": 91.1,
+              "detail": "stripped 63 docstring/comment lines; kept route signatures & service calls",
+              "path": "src/gateway_routes.py"
+            },
+            {
+              "compressor": "ast_route_skeleton",
+              "raw_chars": 4375,
+              "compressed_chars": 226,
+              "reduction_pct": 94.8,
+              "detail": "stripped 62 docstring/comment lines; kept route signatures & service calls",
+              "path": "src/worker_consumers.py"
+            }
+          ],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 720,
+          "completion_tokens": 900,
+          "total_tokens": 1620,
+          "latency_s": 5.505
+        },
+        {
+          "id": "t6",
+          "category": "svg_map",
+          "layer1_selected_files": [
+            "infra/docker-compose.yml",
+            "db/schema.sql",
+            "src/gateway_routes.py",
+            "src/worker_consumers.py"
+          ],
+          "layer1_chars": 19544,
+          "layer2_chars": 1879,
+          "layer2_step_reduction_pct": 90.4,
+          "layer2_char_reduction_pct": 90.4,
+          "actions": [
+            {
+              "compressor": "yaml_topology_stripper",
+              "raw_chars": 5312,
+              "compressed_chars": 596,
+              "reduction_pct": 88.8,
+              "detail": "stripped 74 comment/logging lines; kept service, port & dependency edges",
+              "path": "infra/docker-compose.yml"
+            },
+            {
+              "compressor": "sql_fk_extractor",
+              "raw_chars": 5304,
+              "compressed_chars": 507,
+              "reduction_pct": 90.4,
+              "detail": "stripped 71 SQL comment/audit lines; preserved tables, primary keys & foreign keys",
+              "path": "db/schema.sql"
+            },
+            {
+              "compressor": "ast_route_skeleton",
+              "raw_chars": 4553,
+              "compressed_chars": 403,
+              "reduction_pct": 91.1,
+              "detail": "stripped 63 docstring/comment lines; kept route signatures & service calls",
+              "path": "src/gateway_routes.py"
+            },
+            {
+              "compressor": "ast_route_skeleton",
+              "raw_chars": 4375,
+              "compressed_chars": 226,
+              "reduction_pct": 94.8,
+              "detail": "stripped 62 docstring/comment lines; kept route signatures & service calls",
+              "path": "src/worker_consumers.py"
+            }
+          ],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 715,
+          "completion_tokens": 900,
+          "total_tokens": 1615,
+          "latency_s": 5.512
+        }
+      ]
+    }
+  ]
+}
