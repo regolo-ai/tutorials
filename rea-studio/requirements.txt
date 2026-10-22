@@ -1,0 +1,12 @@
+# Regolo Diagram Studio (diagram_wizard/), regolo_diagram_tui.py, benchmark.py and topology_extractor.py
+# use the Python standard library only: there is nothing to pip install.
+#
+#   Python >= 3.10        (uses `str | None` and str.removeprefix)
+#
+# Optional programs on your PATH (not pip packages):
+#   git                   exact .gitignore handling when the project is a git repo (otherwise the .gitignore files are parsed)
+#   npx                   to install the diagram-design skill: npx skills add cathrynlavery/diagram-design
+#   osascript | zenity    native "Choose folder" dialog on macOS | Linux (you can always paste the path instead)
+#
+# Run:   python3 diagram_wizard/server.py
+# Tests: python3 test_benchmark.py   and   python3 -m unittest diagram_wizard/test_server.py
