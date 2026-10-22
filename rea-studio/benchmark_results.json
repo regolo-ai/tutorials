@@ -1,0 +1,761 @@
+{
+  "date": "2026-10-20",
+  "configurations": [
+    {
+      "name": "A. Baseline (Unfiltered REA Dumps + Pinned qwen3.5-122b)",
+      "accuracy_pct": 100.0,
+      "prompt_tokens": 91808,
+      "completion_tokens": 5182,
+      "total_tokens": 96990,
+      "latency_p50_s": 8.23,
+      "wall_time_s": 8.24,
+      "cost_per_1000_sessions": {
+        "private_workhorse_usd": 235.44,
+        "zai_glm53_direct_usd": 151.33,
+        "regolo_payg_eur": 113.57,
+        "regolo_core_standard_eur": 6.3,
+        "regolo_core_promo_3mo_eur": 1.89
+      },
+      "items": [
+        {
+          "id": "r1",
+          "category": "triage",
+          "layer1_selected_files": [
+            "rea_dumps/electron_ipc_evidence.json",
+            "rea_dumps/native_binary_symbols.json"
+          ],
+          "layer1_chars": 41537,
+          "layer2_chars": 41537,
+          "layer2_step_reduction_pct": 0.0,
+          "layer2_char_reduction_pct": 0.0,
+          "actions": [],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 15296,
+          "completion_tokens": 900,
+          "total_tokens": 16196,
+          "latency_s": 8.234
+        },
+        {
+          "id": "r2",
+          "category": "triage",
+          "layer1_selected_files": [
+            "rea_dumps/electron_ipc_evidence.json",
+            "rea_dumps/native_binary_symbols.json"
+          ],
+          "layer1_chars": 41537,
+          "layer2_chars": 41537,
+          "layer2_step_reduction_pct": 0.0,
+          "layer2_char_reduction_pct": 0.0,
+          "actions": [],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 15305,
+          "completion_tokens": 900,
+          "total_tokens": 16205,
+          "latency_s": 8.235
+        },
+        {
+          "id": "r3",
+          "category": "triage",
+          "layer1_selected_files": [
+            "rea_dumps/electron_ipc_evidence.json",
+            "rea_dumps/native_binary_symbols.json"
+          ],
+          "layer1_chars": 41537,
+          "layer2_chars": 41537,
+          "layer2_step_reduction_pct": 0.0,
+          "layer2_char_reduction_pct": 0.0,
+          "actions": [],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 15293,
+          "completion_tokens": 900,
+          "total_tokens": 16193,
+          "latency_s": 8.234
+        },
+        {
+          "id": "r4",
+          "category": "triage",
+          "layer1_selected_files": [
+            "rea_dumps/electron_ipc_evidence.json",
+            "rea_dumps/native_binary_symbols.json"
+          ],
+          "layer1_chars": 41537,
+          "layer2_chars": 41537,
+          "layer2_step_reduction_pct": 0.0,
+          "layer2_char_reduction_pct": 0.0,
+          "actions": [],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 15291,
+          "completion_tokens": 900,
+          "total_tokens": 16191,
+          "latency_s": 8.236
+        },
+        {
+          "id": "r5",
+          "category": "reconstruct",
+          "layer1_selected_files": [
+            "rea_dumps/electron_ipc_evidence.json",
+            "rea_dumps/native_binary_symbols.json"
+          ],
+          "layer1_chars": 41537,
+          "layer2_chars": 41537,
+          "layer2_step_reduction_pct": 0.0,
+          "layer2_char_reduction_pct": 0.0,
+          "actions": [],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 15314,
+          "completion_tokens": 682,
+          "total_tokens": 15996,
+          "latency_s": 6.494
+        },
+        {
+          "id": "r6",
+          "category": "reconstruct",
+          "layer1_selected_files": [
+            "rea_dumps/electron_ipc_evidence.json",
+            "rea_dumps/native_binary_symbols.json"
+          ],
+          "layer1_chars": 41537,
+          "layer2_chars": 41537,
+          "layer2_step_reduction_pct": 0.0,
+          "layer2_char_reduction_pct": 0.0,
+          "actions": [],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 15309,
+          "completion_tokens": 900,
+          "total_tokens": 16209,
+          "latency_s": 8.235
+        }
+      ]
+    },
+    {
+      "name": "B. Local REA IPC/Symbol Sieve Only",
+      "accuracy_pct": 100.0,
+      "prompt_tokens": 2102,
+      "completion_tokens": 5400,
+      "total_tokens": 7502,
+      "latency_p50_s": 8.33,
+      "wall_time_s": 8.33,
+      "cost_per_1000_sessions": {
+        "private_workhorse_usd": 58.2,
+        "zai_glm53_direct_usd": 26.7,
+        "regolo_payg_eur": 24.78,
+        "regolo_core_standard_eur": 0.49,
+        "regolo_core_promo_3mo_eur": 0.15
+      },
+      "items": [
+        {
+          "id": "r1",
+          "category": "triage",
+          "layer1_selected_files": [
+            "rea_dumps/electron_ipc_evidence.json",
+            "rea_dumps/native_binary_symbols.json"
+          ],
+          "layer1_chars": 41537,
+          "layer2_chars": 909,
+          "layer2_step_reduction_pct": 97.8,
+          "layer2_char_reduction_pct": 97.8,
+          "actions": [
+            {
+              "compressor": "rea_ipc_bridge_filter",
+              "raw_chars": 21983,
+              "compressed_chars": 399,
+              "reduction_pct": 98.2,
+              "detail": "collapsed 160 UI/vendor IPC channels; preserved 2 preload & main-process handlers",
+              "path": "rea_dumps/electron_ipc_evidence.json"
+            },
+            {
+              "compressor": "rea_symbol_table_sieve",
+              "raw_chars": 19554,
+              "compressed_chars": 390,
+              "reduction_pct": 98.0,
+              "detail": "stripped 160 stdlib/runtime symbols; preserved 2 domain & crypto symbols",
+              "path": "rea_dumps/native_binary_symbols.json"
+            }
+          ],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 345,
+          "completion_tokens": 900,
+          "total_tokens": 1245,
+          "latency_s": 8.312
+        },
+        {
+          "id": "r2",
+          "category": "triage",
+          "layer1_selected_files": [
+            "rea_dumps/electron_ipc_evidence.json",
+            "rea_dumps/native_binary_symbols.json"
+          ],
+          "layer1_chars": 41537,
+          "layer2_chars": 909,
+          "layer2_step_reduction_pct": 97.8,
+          "layer2_char_reduction_pct": 97.8,
+          "actions": [
+            {
+              "compressor": "rea_ipc_bridge_filter",
+              "raw_chars": 21983,
+              "compressed_chars": 399,
+              "reduction_pct": 98.2,
+              "detail": "collapsed 160 UI/vendor IPC channels; preserved 2 preload & main-process handlers",
+              "path": "rea_dumps/electron_ipc_evidence.json"
+            },
+            {
+              "compressor": "rea_symbol_table_sieve",
+              "raw_chars": 19554,
+              "compressed_chars": 390,
+              "reduction_pct": 98.0,
+              "detail": "stripped 160 stdlib/runtime symbols; preserved 2 domain & crypto symbols",
+              "path": "rea_dumps/native_binary_symbols.json"
+            }
+          ],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 354,
+          "completion_tokens": 900,
+          "total_tokens": 1254,
+          "latency_s": 8.326
+        },
+        {
+          "id": "r3",
+          "category": "triage",
+          "layer1_selected_files": [
+            "rea_dumps/electron_ipc_evidence.json",
+            "rea_dumps/native_binary_symbols.json"
+          ],
+          "layer1_chars": 41537,
+          "layer2_chars": 909,
+          "layer2_step_reduction_pct": 97.8,
+          "layer2_char_reduction_pct": 97.8,
+          "actions": [
+            {
+              "compressor": "rea_ipc_bridge_filter",
+              "raw_chars": 21983,
+              "compressed_chars": 399,
+              "reduction_pct": 98.2,
+              "detail": "collapsed 160 UI/vendor IPC channels; preserved 2 preload & main-process handlers",
+              "path": "rea_dumps/electron_ipc_evidence.json"
+            },
+            {
+              "compressor": "rea_symbol_table_sieve",
+              "raw_chars": 19554,
+              "compressed_chars": 390,
+              "reduction_pct": 98.0,
+              "detail": "stripped 160 stdlib/runtime symbols; preserved 2 domain & crypto symbols",
+              "path": "rea_dumps/native_binary_symbols.json"
+            }
+          ],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 342,
+          "completion_tokens": 900,
+          "total_tokens": 1242,
+          "latency_s": 8.311
+        },
+        {
+          "id": "r4",
+          "category": "triage",
+          "layer1_selected_files": [
+            "rea_dumps/electron_ipc_evidence.json",
+            "rea_dumps/native_binary_symbols.json"
+          ],
+          "layer1_chars": 41537,
+          "layer2_chars": 909,
+          "layer2_step_reduction_pct": 97.8,
+          "layer2_char_reduction_pct": 97.8,
+          "actions": [
+            {
+              "compressor": "rea_ipc_bridge_filter",
+              "raw_chars": 21983,
+              "compressed_chars": 399,
+              "reduction_pct": 98.2,
+              "detail": "collapsed 160 UI/vendor IPC channels; preserved 2 preload & main-process handlers",
+              "path": "rea_dumps/electron_ipc_evidence.json"
+            },
+            {
+              "compressor": "rea_symbol_table_sieve",
+              "raw_chars": 19554,
+              "compressed_chars": 390,
+              "reduction_pct": 98.0,
+              "detail": "stripped 160 stdlib/runtime symbols; preserved 2 domain & crypto symbols",
+              "path": "rea_dumps/native_binary_symbols.json"
+            }
+          ],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 340,
+          "completion_tokens": 900,
+          "total_tokens": 1240,
+          "latency_s": 8.325
+        },
+        {
+          "id": "r5",
+          "category": "reconstruct",
+          "layer1_selected_files": [
+            "rea_dumps/electron_ipc_evidence.json",
+            "rea_dumps/native_binary_symbols.json"
+          ],
+          "layer1_chars": 41537,
+          "layer2_chars": 909,
+          "layer2_step_reduction_pct": 97.8,
+          "layer2_char_reduction_pct": 97.8,
+          "actions": [
+            {
+              "compressor": "rea_ipc_bridge_filter",
+              "raw_chars": 21983,
+              "compressed_chars": 399,
+              "reduction_pct": 98.2,
+              "detail": "collapsed 160 UI/vendor IPC channels; preserved 2 preload & main-process handlers",
+              "path": "rea_dumps/electron_ipc_evidence.json"
+            },
+            {
+              "compressor": "rea_symbol_table_sieve",
+              "raw_chars": 19554,
+              "compressed_chars": 390,
+              "reduction_pct": 98.0,
+              "detail": "stripped 160 stdlib/runtime symbols; preserved 2 domain & crypto symbols",
+              "path": "rea_dumps/native_binary_symbols.json"
+            }
+          ],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 363,
+          "completion_tokens": 900,
+          "total_tokens": 1263,
+          "latency_s": 8.329
+        },
+        {
+          "id": "r6",
+          "category": "reconstruct",
+          "layer1_selected_files": [
+            "rea_dumps/electron_ipc_evidence.json",
+            "rea_dumps/native_binary_symbols.json"
+          ],
+          "layer1_chars": 41537,
+          "layer2_chars": 909,
+          "layer2_step_reduction_pct": 97.8,
+          "layer2_char_reduction_pct": 97.8,
+          "actions": [
+            {
+              "compressor": "rea_ipc_bridge_filter",
+              "raw_chars": 21983,
+              "compressed_chars": 399,
+              "reduction_pct": 98.2,
+              "detail": "collapsed 160 UI/vendor IPC channels; preserved 2 preload & main-process handlers",
+              "path": "rea_dumps/electron_ipc_evidence.json"
+            },
+            {
+              "compressor": "rea_symbol_table_sieve",
+              "raw_chars": 19554,
+              "compressed_chars": 390,
+              "reduction_pct": 98.0,
+              "detail": "stripped 160 stdlib/runtime symbols; preserved 2 domain & crypto symbols",
+              "path": "rea_dumps/native_binary_symbols.json"
+            }
+          ],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 358,
+          "completion_tokens": 900,
+          "total_tokens": 1258,
+          "latency_s": 8.329
+        }
+      ]
+    },
+    {
+      "name": "C. Regolo Brick Complexity Pro Routing Only",
+      "accuracy_pct": 100.0,
+      "prompt_tokens": 91816,
+      "completion_tokens": 2159,
+      "total_tokens": 93975,
+      "latency_p50_s": 1.98,
+      "wall_time_s": 6.73,
+      "cost_per_1000_sessions": {
+        "private_workhorse_usd": 205.22,
+        "zai_glm53_direct_usd": 138.04,
+        "regolo_payg_eur": 44.45,
+        "regolo_core_standard_eur": 6.11,
+        "regolo_core_promo_3mo_eur": 1.83
+      },
+      "items": [
+        {
+          "id": "r1",
+          "category": "triage",
+          "layer1_selected_files": [
+            "rea_dumps/electron_ipc_evidence.json",
+            "rea_dumps/native_binary_symbols.json"
+          ],
+          "layer1_chars": 41537,
+          "layer2_chars": 41537,
+          "layer2_step_reduction_pct": 0.0,
+          "layer2_char_reduction_pct": 0.0,
+          "actions": [],
+          "model": "brick-complexity-pro",
+          "reasoning_effort": "none",
+          "passed": true,
+          "prompt_tokens": 15298,
+          "completion_tokens": 43,
+          "total_tokens": 15341,
+          "latency_s": 1.336
+        },
+        {
+          "id": "r2",
+          "category": "triage",
+          "layer1_selected_files": [
+            "rea_dumps/electron_ipc_evidence.json",
+            "rea_dumps/native_binary_symbols.json"
+          ],
+          "layer1_chars": 41537,
+          "layer2_chars": 41537,
+          "layer2_step_reduction_pct": 0.0,
+          "layer2_char_reduction_pct": 0.0,
+          "actions": [],
+          "model": "brick-complexity-pro",
+          "reasoning_effort": "none",
+          "passed": true,
+          "prompt_tokens": 15307,
+          "completion_tokens": 178,
+          "total_tokens": 15485,
+          "latency_s": 2.407
+        },
+        {
+          "id": "r3",
+          "category": "triage",
+          "layer1_selected_files": [
+            "rea_dumps/electron_ipc_evidence.json",
+            "rea_dumps/native_binary_symbols.json"
+          ],
+          "layer1_chars": 41537,
+          "layer2_chars": 41537,
+          "layer2_step_reduction_pct": 0.0,
+          "layer2_char_reduction_pct": 0.0,
+          "actions": [],
+          "model": "brick-complexity-pro",
+          "reasoning_effort": "none",
+          "passed": true,
+          "prompt_tokens": 15295,
+          "completion_tokens": 69,
+          "total_tokens": 15364,
+          "latency_s": 1.561
+        },
+        {
+          "id": "r4",
+          "category": "triage",
+          "layer1_selected_files": [
+            "rea_dumps/electron_ipc_evidence.json",
+            "rea_dumps/native_binary_symbols.json"
+          ],
+          "layer1_chars": 41537,
+          "layer2_chars": 41537,
+          "layer2_step_reduction_pct": 0.0,
+          "layer2_char_reduction_pct": 0.0,
+          "actions": [],
+          "model": "brick-complexity-pro",
+          "reasoning_effort": "none",
+          "passed": true,
+          "prompt_tokens": 15293,
+          "completion_tokens": 69,
+          "total_tokens": 15362,
+          "latency_s": 1.561
+        },
+        {
+          "id": "r5",
+          "category": "reconstruct",
+          "layer1_selected_files": [
+            "rea_dumps/electron_ipc_evidence.json",
+            "rea_dumps/native_binary_symbols.json"
+          ],
+          "layer1_chars": 41537,
+          "layer2_chars": 41537,
+          "layer2_step_reduction_pct": 0.0,
+          "layer2_char_reduction_pct": 0.0,
+          "actions": [],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 15314,
+          "completion_tokens": 900,
+          "total_tokens": 16214,
+          "latency_s": 6.716
+        },
+        {
+          "id": "r6",
+          "category": "reconstruct",
+          "layer1_selected_files": [
+            "rea_dumps/electron_ipc_evidence.json",
+            "rea_dumps/native_binary_symbols.json"
+          ],
+          "layer1_chars": 41537,
+          "layer2_chars": 41537,
+          "layer2_step_reduction_pct": 0.0,
+          "layer2_char_reduction_pct": 0.0,
+          "actions": [],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 15309,
+          "completion_tokens": 900,
+          "total_tokens": 16209,
+          "latency_s": 6.724
+        }
+      ]
+    },
+    {
+      "name": "D. Full Stack (REA IPC/Symbol Sieve + Regolo Brick Pro)",
+      "accuracy_pct": 100.0,
+      "prompt_tokens": 2110,
+      "completion_tokens": 2238,
+      "total_tokens": 4348,
+      "latency_p50_s": 1.28,
+      "wall_time_s": 6.39,
+      "cost_per_1000_sessions": {
+        "private_workhorse_usd": 26.6,
+        "zai_glm53_direct_usd": 12.8,
+        "regolo_payg_eur": 8.6,
+        "regolo_core_standard_eur": 0.28,
+        "regolo_core_promo_3mo_eur": 0.08
+      },
+      "items": [
+        {
+          "id": "r1",
+          "category": "triage",
+          "layer1_selected_files": [
+            "rea_dumps/electron_ipc_evidence.json",
+            "rea_dumps/native_binary_symbols.json"
+          ],
+          "layer1_chars": 41537,
+          "layer2_chars": 909,
+          "layer2_step_reduction_pct": 97.8,
+          "layer2_char_reduction_pct": 97.8,
+          "actions": [
+            {
+              "compressor": "rea_ipc_bridge_filter",
+              "raw_chars": 21983,
+              "compressed_chars": 399,
+              "reduction_pct": 98.2,
+              "detail": "collapsed 160 UI/vendor IPC channels; preserved 2 preload & main-process handlers",
+              "path": "rea_dumps/electron_ipc_evidence.json"
+            },
+            {
+              "compressor": "rea_symbol_table_sieve",
+              "raw_chars": 19554,
+              "compressed_chars": 390,
+              "reduction_pct": 98.0,
+              "detail": "stripped 160 stdlib/runtime symbols; preserved 2 domain & crypto symbols",
+              "path": "rea_dumps/native_binary_symbols.json"
+            }
+          ],
+          "model": "brick-complexity-pro",
+          "reasoning_effort": "none",
+          "passed": true,
+          "prompt_tokens": 347,
+          "completion_tokens": 45,
+          "total_tokens": 392,
+          "latency_s": 0.558
+        },
+        {
+          "id": "r2",
+          "category": "triage",
+          "layer1_selected_files": [
+            "rea_dumps/electron_ipc_evidence.json",
+            "rea_dumps/native_binary_symbols.json"
+          ],
+          "layer1_chars": 41537,
+          "layer2_chars": 909,
+          "layer2_step_reduction_pct": 97.8,
+          "layer2_char_reduction_pct": 97.8,
+          "actions": [
+            {
+              "compressor": "rea_ipc_bridge_filter",
+              "raw_chars": 21983,
+              "compressed_chars": 399,
+              "reduction_pct": 98.2,
+              "detail": "collapsed 160 UI/vendor IPC channels; preserved 2 preload & main-process handlers",
+              "path": "rea_dumps/electron_ipc_evidence.json"
+            },
+            {
+              "compressor": "rea_symbol_table_sieve",
+              "raw_chars": 19554,
+              "compressed_chars": 390,
+              "reduction_pct": 98.0,
+              "detail": "stripped 160 stdlib/runtime symbols; preserved 2 domain & crypto symbols",
+              "path": "rea_dumps/native_binary_symbols.json"
+            }
+          ],
+          "model": "brick-complexity-pro",
+          "reasoning_effort": "none",
+          "passed": true,
+          "prompt_tokens": 356,
+          "completion_tokens": 165,
+          "total_tokens": 521,
+          "latency_s": 1.432
+        },
+        {
+          "id": "r3",
+          "category": "triage",
+          "layer1_selected_files": [
+            "rea_dumps/electron_ipc_evidence.json",
+            "rea_dumps/native_binary_symbols.json"
+          ],
+          "layer1_chars": 41537,
+          "layer2_chars": 909,
+          "layer2_step_reduction_pct": 97.8,
+          "layer2_char_reduction_pct": 97.8,
+          "actions": [
+            {
+              "compressor": "rea_ipc_bridge_filter",
+              "raw_chars": 21983,
+              "compressed_chars": 399,
+              "reduction_pct": 98.2,
+              "detail": "collapsed 160 UI/vendor IPC channels; preserved 2 preload & main-process handlers",
+              "path": "rea_dumps/electron_ipc_evidence.json"
+            },
+            {
+              "compressor": "rea_symbol_table_sieve",
+              "raw_chars": 19554,
+              "compressed_chars": 390,
+              "reduction_pct": 98.0,
+              "detail": "stripped 160 stdlib/runtime symbols; preserved 2 domain & crypto symbols",
+              "path": "rea_dumps/native_binary_symbols.json"
+            }
+          ],
+          "model": "brick-complexity-pro",
+          "reasoning_effort": "none",
+          "passed": true,
+          "prompt_tokens": 344,
+          "completion_tokens": 123,
+          "total_tokens": 467,
+          "latency_s": 1.136
+        },
+        {
+          "id": "r4",
+          "category": "triage",
+          "layer1_selected_files": [
+            "rea_dumps/electron_ipc_evidence.json",
+            "rea_dumps/native_binary_symbols.json"
+          ],
+          "layer1_chars": 41537,
+          "layer2_chars": 909,
+          "layer2_step_reduction_pct": 97.8,
+          "layer2_char_reduction_pct": 97.8,
+          "actions": [
+            {
+              "compressor": "rea_ipc_bridge_filter",
+              "raw_chars": 21983,
+              "compressed_chars": 399,
+              "reduction_pct": 98.2,
+              "detail": "collapsed 160 UI/vendor IPC channels; preserved 2 preload & main-process handlers",
+              "path": "rea_dumps/electron_ipc_evidence.json"
+            },
+            {
+              "compressor": "rea_symbol_table_sieve",
+              "raw_chars": 19554,
+              "compressed_chars": 390,
+              "reduction_pct": 98.0,
+              "detail": "stripped 160 stdlib/runtime symbols; preserved 2 domain & crypto symbols",
+              "path": "rea_dumps/native_binary_symbols.json"
+            }
+          ],
+          "model": "brick-complexity-pro",
+          "reasoning_effort": "none",
+          "passed": true,
+          "prompt_tokens": 342,
+          "completion_tokens": 105,
+          "total_tokens": 447,
+          "latency_s": 0.995
+        },
+        {
+          "id": "r5",
+          "category": "reconstruct",
+          "layer1_selected_files": [
+            "rea_dumps/electron_ipc_evidence.json",
+            "rea_dumps/native_binary_symbols.json"
+          ],
+          "layer1_chars": 41537,
+          "layer2_chars": 909,
+          "layer2_step_reduction_pct": 97.8,
+          "layer2_char_reduction_pct": 97.8,
+          "actions": [
+            {
+              "compressor": "rea_ipc_bridge_filter",
+              "raw_chars": 21983,
+              "compressed_chars": 399,
+              "reduction_pct": 98.2,
+              "detail": "collapsed 160 UI/vendor IPC channels; preserved 2 preload & main-process handlers",
+              "path": "rea_dumps/electron_ipc_evidence.json"
+            },
+            {
+              "compressor": "rea_symbol_table_sieve",
+              "raw_chars": 19554,
+              "compressed_chars": 390,
+              "reduction_pct": 98.0,
+              "detail": "stripped 160 stdlib/runtime symbols; preserved 2 domain & crypto symbols",
+              "path": "rea_dumps/native_binary_symbols.json"
+            }
+          ],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 363,
+          "completion_tokens": 900,
+          "total_tokens": 1263,
+          "latency_s": 6.383
+        },
+        {
+          "id": "r6",
+          "category": "reconstruct",
+          "layer1_selected_files": [
+            "rea_dumps/electron_ipc_evidence.json",
+            "rea_dumps/native_binary_symbols.json"
+          ],
+          "layer1_chars": 41537,
+          "layer2_chars": 909,
+          "layer2_step_reduction_pct": 97.8,
+          "layer2_char_reduction_pct": 97.8,
+          "actions": [
+            {
+              "compressor": "rea_ipc_bridge_filter",
+              "raw_chars": 21983,
+              "compressed_chars": 399,
+              "reduction_pct": 98.2,
+              "detail": "collapsed 160 UI/vendor IPC channels; preserved 2 preload & main-process handlers",
+              "path": "rea_dumps/electron_ipc_evidence.json"
+            },
+            {
+              "compressor": "rea_symbol_table_sieve",
+              "raw_chars": 19554,
+              "compressed_chars": 390,
+              "reduction_pct": 98.0,
+              "detail": "stripped 160 stdlib/runtime symbols; preserved 2 domain & crypto symbols",
+              "path": "rea_dumps/native_binary_symbols.json"
+            }
+          ],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 358,
+          "completion_tokens": 900,
+          "total_tokens": 1258,
+          "latency_s": 6.383
+        }
+      ]
+    }
+  ]
+}

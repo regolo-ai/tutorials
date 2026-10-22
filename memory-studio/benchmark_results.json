@@ -1,0 +1,917 @@
+{
+  "date": "2026-10-20",
+  "configurations": [
+    {
+      "name": "A. Cold Session Baseline (Full Transcript + Raw Repo Rescan)",
+      "accuracy_pct": 100.0,
+      "prompt_tokens": 52262,
+      "completion_tokens": 5400,
+      "total_tokens": 57662,
+      "latency_p50_s": 10.92,
+      "wall_time_s": 11.02,
+      "cost_per_1000_sessions": {
+        "private_workhorse_usd": 158.52,
+        "zai_glm53_direct_usd": 96.93,
+        "regolo_payg_eur": 74.94,
+        "regolo_core_standard_eur": 3.75,
+        "regolo_core_promo_3mo_eur": 1.12
+      },
+      "items": [
+        {
+          "id": "m1",
+          "category": "recall",
+          "layer1_selected_files": [
+            "src/session_auth.py",
+            "src/wal_writer.py",
+            "src/quota_enforcer.py",
+            "src/vector_index.py",
+            "src/webhook_dispatcher.py"
+          ],
+          "layer1_chars": 36877,
+          "layer2_chars": 36877,
+          "layer2_step_reduction_pct": 0.0,
+          "layer2_char_reduction_pct": 0.0,
+          "actions": [],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 8709,
+          "completion_tokens": 900,
+          "total_tokens": 9609,
+          "latency_s": 10.923
+        },
+        {
+          "id": "m2",
+          "category": "recall",
+          "layer1_selected_files": [
+            "src/session_auth.py",
+            "src/wal_writer.py",
+            "src/quota_enforcer.py",
+            "src/vector_index.py",
+            "src/webhook_dispatcher.py"
+          ],
+          "layer1_chars": 36877,
+          "layer2_chars": 36877,
+          "layer2_step_reduction_pct": 0.0,
+          "layer2_char_reduction_pct": 0.0,
+          "actions": [],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 8701,
+          "completion_tokens": 900,
+          "total_tokens": 9601,
+          "latency_s": 10.945
+        },
+        {
+          "id": "m3",
+          "category": "recall",
+          "layer1_selected_files": [
+            "src/session_auth.py",
+            "src/wal_writer.py",
+            "src/quota_enforcer.py",
+            "src/vector_index.py",
+            "src/webhook_dispatcher.py"
+          ],
+          "layer1_chars": 36877,
+          "layer2_chars": 36877,
+          "layer2_step_reduction_pct": 0.0,
+          "layer2_char_reduction_pct": 0.0,
+          "actions": [],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 8705,
+          "completion_tokens": 900,
+          "total_tokens": 9605,
+          "latency_s": 11.015
+        },
+        {
+          "id": "m4",
+          "category": "recall",
+          "layer1_selected_files": [
+            "src/session_auth.py",
+            "src/wal_writer.py",
+            "src/quota_enforcer.py",
+            "src/vector_index.py",
+            "src/webhook_dispatcher.py"
+          ],
+          "layer1_chars": 36877,
+          "layer2_chars": 36877,
+          "layer2_step_reduction_pct": 0.0,
+          "layer2_char_reduction_pct": 0.0,
+          "actions": [],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 8703,
+          "completion_tokens": 900,
+          "total_tokens": 9603,
+          "latency_s": 10.921
+        },
+        {
+          "id": "m5",
+          "category": "refactor",
+          "layer1_selected_files": [
+            "src/session_auth.py",
+            "src/wal_writer.py",
+            "src/quota_enforcer.py",
+            "src/vector_index.py",
+            "src/webhook_dispatcher.py"
+          ],
+          "layer1_chars": 36877,
+          "layer2_chars": 36877,
+          "layer2_step_reduction_pct": 0.0,
+          "layer2_char_reduction_pct": 0.0,
+          "actions": [],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 8723,
+          "completion_tokens": 900,
+          "total_tokens": 9623,
+          "latency_s": 10.921
+        },
+        {
+          "id": "m6",
+          "category": "refactor",
+          "layer1_selected_files": [
+            "src/session_auth.py",
+            "src/wal_writer.py",
+            "src/quota_enforcer.py",
+            "src/vector_index.py",
+            "src/webhook_dispatcher.py"
+          ],
+          "layer1_chars": 36877,
+          "layer2_chars": 36877,
+          "layer2_step_reduction_pct": 0.0,
+          "layer2_char_reduction_pct": 0.0,
+          "actions": [],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 8721,
+          "completion_tokens": 900,
+          "total_tokens": 9621,
+          "latency_s": 10.907
+        }
+      ]
+    },
+    {
+      "name": "B. ai-memory Wiki + Claim-Once Handoff Only",
+      "accuracy_pct": 100.0,
+      "prompt_tokens": 2477,
+      "completion_tokens": 5256,
+      "total_tokens": 7733,
+      "latency_p50_s": 10.3,
+      "wall_time_s": 10.36,
+      "cost_per_1000_sessions": {
+        "private_workhorse_usd": 57.51,
+        "zai_glm53_direct_usd": 26.59,
+        "regolo_payg_eur": 24.55,
+        "regolo_core_standard_eur": 0.5,
+        "regolo_core_promo_3mo_eur": 0.15
+      },
+      "items": [
+        {
+          "id": "m1",
+          "category": "recall",
+          "layer1_selected_files": [
+            "wiki/src_session_auth_py.md",
+            "wiki/src_webhook_dispatcher_py.md"
+          ],
+          "layer1_chars": 23557,
+          "layer2_chars": 914,
+          "layer2_step_reduction_pct": 96.1,
+          "layer2_char_reduction_pct": 97.5,
+          "actions": [
+            {
+              "path": "session_transcript.log -> handoff_brief.md",
+              "compressor": "claim_once_handoff",
+              "raw_chars": 14840,
+              "compressed_chars": 437,
+              "reduction_pct": 97.1,
+              "detail": "condensed 90-turn Claude Code transcript into typed cross-agent handoff brief"
+            },
+            {
+              "path": "src/session_auth.py",
+              "wiki_page": "wiki/src_session_auth_py.md",
+              "compressor": "wiki_consolidator_fts5",
+              "raw_chars": 4428,
+              "compressed_chars": 206,
+              "reduction_pct": 95.3,
+              "detail": "consolidated into wiki/src_session_auth_py.md; stripped 55 banner/docstring lines & sanitized secrets"
+            },
+            {
+              "path": "src/webhook_dispatcher.py",
+              "wiki_page": "wiki/src_webhook_dispatcher_py.md",
+              "compressor": "wiki_consolidator_fts5",
+              "raw_chars": 4289,
+              "compressed_chars": 68,
+              "reduction_pct": 98.4,
+              "detail": "consolidated into wiki/src_webhook_dispatcher_py.md; stripped 54 banner/docstring lines & sanitized secrets"
+            }
+          ],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 386,
+          "completion_tokens": 756,
+          "total_tokens": 1142,
+          "latency_s": 8.916
+        },
+        {
+          "id": "m2",
+          "category": "recall",
+          "layer1_selected_files": [
+            "wiki/src_wal_writer_py.md",
+            "wiki/src_webhook_dispatcher_py.md"
+          ],
+          "layer1_chars": 23655,
+          "layer2_chars": 1008,
+          "layer2_step_reduction_pct": 95.7,
+          "layer2_char_reduction_pct": 97.3,
+          "actions": [
+            {
+              "path": "session_transcript.log -> handoff_brief.md",
+              "compressor": "claim_once_handoff",
+              "raw_chars": 14840,
+              "compressed_chars": 437,
+              "reduction_pct": 97.1,
+              "detail": "condensed 90-turn Claude Code transcript into typed cross-agent handoff brief"
+            },
+            {
+              "path": "src/wal_writer.py",
+              "wiki_page": "wiki/src_wal_writer_py.md",
+              "compressor": "wiki_consolidator_fts5",
+              "raw_chars": 4526,
+              "compressed_chars": 304,
+              "reduction_pct": 93.3,
+              "detail": "consolidated into wiki/src_wal_writer_py.md; stripped 55 banner/docstring lines & sanitized secrets"
+            },
+            {
+              "path": "src/webhook_dispatcher.py",
+              "wiki_page": "wiki/src_webhook_dispatcher_py.md",
+              "compressor": "wiki_consolidator_fts5",
+              "raw_chars": 4289,
+              "compressed_chars": 68,
+              "reduction_pct": 98.4,
+              "detail": "consolidated into wiki/src_webhook_dispatcher_py.md; stripped 54 banner/docstring lines & sanitized secrets"
+            }
+          ],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 408,
+          "completion_tokens": 900,
+          "total_tokens": 1308,
+          "latency_s": 10.34
+        },
+        {
+          "id": "m3",
+          "category": "recall",
+          "layer1_selected_files": [
+            "wiki/src_quota_enforcer_py.md",
+            "wiki/src_webhook_dispatcher_py.md"
+          ],
+          "layer1_chars": 23618,
+          "layer2_chars": 979,
+          "layer2_step_reduction_pct": 95.9,
+          "layer2_char_reduction_pct": 97.3,
+          "actions": [
+            {
+              "path": "session_transcript.log -> handoff_brief.md",
+              "compressor": "claim_once_handoff",
+              "raw_chars": 14840,
+              "compressed_chars": 437,
+              "reduction_pct": 97.1,
+              "detail": "condensed 90-turn Claude Code transcript into typed cross-agent handoff brief"
+            },
+            {
+              "path": "src/quota_enforcer.py",
+              "wiki_page": "wiki/src_quota_enforcer_py.md",
+              "compressor": "wiki_consolidator_fts5",
+              "raw_chars": 4489,
+              "compressed_chars": 267,
+              "reduction_pct": 94.1,
+              "detail": "consolidated into wiki/src_quota_enforcer_py.md; stripped 55 banner/docstring lines & sanitized secrets"
+            },
+            {
+              "path": "src/webhook_dispatcher.py",
+              "wiki_page": "wiki/src_webhook_dispatcher_py.md",
+              "compressor": "wiki_consolidator_fts5",
+              "raw_chars": 4289,
+              "compressed_chars": 68,
+              "reduction_pct": 98.4,
+              "detail": "consolidated into wiki/src_webhook_dispatcher_py.md; stripped 54 banner/docstring lines & sanitized secrets"
+            }
+          ],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 398,
+          "completion_tokens": 900,
+          "total_tokens": 1298,
+          "latency_s": 10.265
+        },
+        {
+          "id": "m4",
+          "category": "recall",
+          "layer1_selected_files": [
+            "wiki/src_vector_index_py.md",
+            "wiki/src_webhook_dispatcher_py.md"
+          ],
+          "layer1_chars": 23434,
+          "layer2_chars": 792,
+          "layer2_step_reduction_pct": 96.6,
+          "layer2_char_reduction_pct": 97.9,
+          "actions": [
+            {
+              "path": "session_transcript.log -> handoff_brief.md",
+              "compressor": "claim_once_handoff",
+              "raw_chars": 14840,
+              "compressed_chars": 437,
+              "reduction_pct": 97.1,
+              "detail": "condensed 90-turn Claude Code transcript into typed cross-agent handoff brief"
+            },
+            {
+              "path": "src/vector_index.py",
+              "wiki_page": "wiki/src_vector_index_py.md",
+              "compressor": "wiki_consolidator_fts5",
+              "raw_chars": 4305,
+              "compressed_chars": 84,
+              "reduction_pct": 98.0,
+              "detail": "consolidated into wiki/src_vector_index_py.md; stripped 54 banner/docstring lines & sanitized secrets"
+            },
+            {
+              "path": "src/webhook_dispatcher.py",
+              "wiki_page": "wiki/src_webhook_dispatcher_py.md",
+              "compressor": "wiki_consolidator_fts5",
+              "raw_chars": 4289,
+              "compressed_chars": 68,
+              "reduction_pct": 98.4,
+              "detail": "consolidated into wiki/src_webhook_dispatcher_py.md; stripped 54 banner/docstring lines & sanitized secrets"
+            }
+          ],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 349,
+          "completion_tokens": 900,
+          "total_tokens": 1249,
+          "latency_s": 10.265
+        },
+        {
+          "id": "m5",
+          "category": "refactor",
+          "layer1_selected_files": [
+            "wiki/src_session_auth_py.md",
+            "wiki/src_wal_writer_py.md"
+          ],
+          "layer1_chars": 23794,
+          "layer2_chars": 1134,
+          "layer2_step_reduction_pct": 95.2,
+          "layer2_char_reduction_pct": 96.9,
+          "actions": [
+            {
+              "path": "session_transcript.log -> handoff_brief.md",
+              "compressor": "claim_once_handoff",
+              "raw_chars": 14840,
+              "compressed_chars": 437,
+              "reduction_pct": 97.1,
+              "detail": "condensed 90-turn Claude Code transcript into typed cross-agent handoff brief"
+            },
+            {
+              "path": "src/session_auth.py",
+              "wiki_page": "wiki/src_session_auth_py.md",
+              "compressor": "wiki_consolidator_fts5",
+              "raw_chars": 4428,
+              "compressed_chars": 206,
+              "reduction_pct": 95.3,
+              "detail": "consolidated into wiki/src_session_auth_py.md; stripped 55 banner/docstring lines & sanitized secrets"
+            },
+            {
+              "path": "src/wal_writer.py",
+              "wiki_page": "wiki/src_wal_writer_py.md",
+              "compressor": "wiki_consolidator_fts5",
+              "raw_chars": 4526,
+              "compressed_chars": 304,
+              "reduction_pct": 93.3,
+              "detail": "consolidated into wiki/src_wal_writer_py.md; stripped 55 banner/docstring lines & sanitized secrets"
+            }
+          ],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 476,
+          "completion_tokens": 900,
+          "total_tokens": 1376,
+          "latency_s": 10.354
+        },
+        {
+          "id": "m6",
+          "category": "refactor",
+          "layer1_selected_files": [
+            "wiki/src_session_auth_py.md",
+            "wiki/src_quota_enforcer_py.md"
+          ],
+          "layer1_chars": 23757,
+          "layer2_chars": 1105,
+          "layer2_step_reduction_pct": 95.3,
+          "layer2_char_reduction_pct": 97.0,
+          "actions": [
+            {
+              "path": "session_transcript.log -> handoff_brief.md",
+              "compressor": "claim_once_handoff",
+              "raw_chars": 14840,
+              "compressed_chars": 437,
+              "reduction_pct": 97.1,
+              "detail": "condensed 90-turn Claude Code transcript into typed cross-agent handoff brief"
+            },
+            {
+              "path": "src/session_auth.py",
+              "wiki_page": "wiki/src_session_auth_py.md",
+              "compressor": "wiki_consolidator_fts5",
+              "raw_chars": 4428,
+              "compressed_chars": 206,
+              "reduction_pct": 95.3,
+              "detail": "consolidated into wiki/src_session_auth_py.md; stripped 55 banner/docstring lines & sanitized secrets"
+            },
+            {
+              "path": "src/quota_enforcer.py",
+              "wiki_page": "wiki/src_quota_enforcer_py.md",
+              "compressor": "wiki_consolidator_fts5",
+              "raw_chars": 4489,
+              "compressed_chars": 267,
+              "reduction_pct": 94.1,
+              "detail": "consolidated into wiki/src_quota_enforcer_py.md; stripped 55 banner/docstring lines & sanitized secrets"
+            }
+          ],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 460,
+          "completion_tokens": 900,
+          "total_tokens": 1360,
+          "latency_s": 10.354
+        }
+      ]
+    },
+    {
+      "name": "C. Regolo Brick Complexity Pro Routing Only (Cold Context)",
+      "accuracy_pct": 100.0,
+      "prompt_tokens": 52270,
+      "completion_tokens": 1946,
+      "total_tokens": 54216,
+      "latency_p50_s": 1.44,
+      "wall_time_s": 7.09,
+      "cost_per_1000_sessions": {
+        "private_workhorse_usd": 124.0,
+        "zai_glm53_direct_usd": 81.74,
+        "regolo_payg_eur": 28.55,
+        "regolo_core_standard_eur": 3.52,
+        "regolo_core_promo_3mo_eur": 1.06
+      },
+      "items": [
+        {
+          "id": "m1",
+          "category": "recall",
+          "layer1_selected_files": [
+            "src/session_auth.py",
+            "src/wal_writer.py",
+            "src/quota_enforcer.py",
+            "src/vector_index.py",
+            "src/webhook_dispatcher.py"
+          ],
+          "layer1_chars": 36877,
+          "layer2_chars": 36877,
+          "layer2_step_reduction_pct": 0.0,
+          "layer2_char_reduction_pct": 0.0,
+          "actions": [],
+          "model": "brick-complexity-pro",
+          "reasoning_effort": "none",
+          "passed": true,
+          "prompt_tokens": 8711,
+          "completion_tokens": 37,
+          "total_tokens": 8748,
+          "latency_s": 1.373
+        },
+        {
+          "id": "m2",
+          "category": "recall",
+          "layer1_selected_files": [
+            "src/session_auth.py",
+            "src/wal_writer.py",
+            "src/quota_enforcer.py",
+            "src/vector_index.py",
+            "src/webhook_dispatcher.py"
+          ],
+          "layer1_chars": 36877,
+          "layer2_chars": 36877,
+          "layer2_step_reduction_pct": 0.0,
+          "layer2_char_reduction_pct": 0.0,
+          "actions": [],
+          "model": "brick-complexity-pro",
+          "reasoning_effort": "none",
+          "passed": true,
+          "prompt_tokens": 8703,
+          "completion_tokens": 25,
+          "total_tokens": 8728,
+          "latency_s": 1.268
+        },
+        {
+          "id": "m3",
+          "category": "recall",
+          "layer1_selected_files": [
+            "src/session_auth.py",
+            "src/wal_writer.py",
+            "src/quota_enforcer.py",
+            "src/vector_index.py",
+            "src/webhook_dispatcher.py"
+          ],
+          "layer1_chars": 36877,
+          "layer2_chars": 36877,
+          "layer2_step_reduction_pct": 0.0,
+          "layer2_char_reduction_pct": 0.0,
+          "actions": [],
+          "model": "brick-complexity-pro",
+          "reasoning_effort": "none",
+          "passed": true,
+          "prompt_tokens": 8707,
+          "completion_tokens": 31,
+          "total_tokens": 8738,
+          "latency_s": 1.277
+        },
+        {
+          "id": "m4",
+          "category": "recall",
+          "layer1_selected_files": [
+            "src/session_auth.py",
+            "src/wal_writer.py",
+            "src/quota_enforcer.py",
+            "src/vector_index.py",
+            "src/webhook_dispatcher.py"
+          ],
+          "layer1_chars": 36877,
+          "layer2_chars": 36877,
+          "layer2_step_reduction_pct": 0.0,
+          "layer2_char_reduction_pct": 0.0,
+          "actions": [],
+          "model": "brick-complexity-pro",
+          "reasoning_effort": "none",
+          "passed": true,
+          "prompt_tokens": 8705,
+          "completion_tokens": 53,
+          "total_tokens": 8758,
+          "latency_s": 1.501
+        },
+        {
+          "id": "m5",
+          "category": "refactor",
+          "layer1_selected_files": [
+            "src/session_auth.py",
+            "src/wal_writer.py",
+            "src/quota_enforcer.py",
+            "src/vector_index.py",
+            "src/webhook_dispatcher.py"
+          ],
+          "layer1_chars": 36877,
+          "layer2_chars": 36877,
+          "layer2_step_reduction_pct": 0.0,
+          "layer2_char_reduction_pct": 0.0,
+          "actions": [],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 8723,
+          "completion_tokens": 900,
+          "total_tokens": 9623,
+          "latency_s": 7.09
+        },
+        {
+          "id": "m6",
+          "category": "refactor",
+          "layer1_selected_files": [
+            "src/session_auth.py",
+            "src/wal_writer.py",
+            "src/quota_enforcer.py",
+            "src/vector_index.py",
+            "src/webhook_dispatcher.py"
+          ],
+          "layer1_chars": 36877,
+          "layer2_chars": 36877,
+          "layer2_step_reduction_pct": 0.0,
+          "layer2_char_reduction_pct": 0.0,
+          "actions": [],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 8721,
+          "completion_tokens": 900,
+          "total_tokens": 9621,
+          "latency_s": 6.867
+        }
+      ]
+    },
+    {
+      "name": "D. Full Stack (ai-memory Handoff + Wiki + Regolo Brick Pro)",
+      "accuracy_pct": 100.0,
+      "prompt_tokens": 2485,
+      "completion_tokens": 2005,
+      "total_tokens": 4490,
+      "latency_p50_s": 0.78,
+      "wall_time_s": 5.4,
+      "cost_per_1000_sessions": {
+        "private_workhorse_usd": 25.02,
+        "zai_glm53_direct_usd": 12.3,
+        "regolo_payg_eur": 8.73,
+        "regolo_core_standard_eur": 0.29,
+        "regolo_core_promo_3mo_eur": 0.09
+      },
+      "items": [
+        {
+          "id": "m1",
+          "category": "recall",
+          "layer1_selected_files": [
+            "wiki/src_session_auth_py.md",
+            "wiki/src_webhook_dispatcher_py.md"
+          ],
+          "layer1_chars": 23557,
+          "layer2_chars": 914,
+          "layer2_step_reduction_pct": 96.1,
+          "layer2_char_reduction_pct": 97.5,
+          "actions": [
+            {
+              "path": "session_transcript.log -> handoff_brief.md",
+              "compressor": "claim_once_handoff",
+              "raw_chars": 14840,
+              "compressed_chars": 437,
+              "reduction_pct": 97.1,
+              "detail": "condensed 90-turn Claude Code transcript into typed cross-agent handoff brief"
+            },
+            {
+              "path": "src/session_auth.py",
+              "wiki_page": "wiki/src_session_auth_py.md",
+              "compressor": "wiki_consolidator_fts5",
+              "raw_chars": 4428,
+              "compressed_chars": 206,
+              "reduction_pct": 95.3,
+              "detail": "consolidated into wiki/src_session_auth_py.md; stripped 55 banner/docstring lines & sanitized secrets"
+            },
+            {
+              "path": "src/webhook_dispatcher.py",
+              "wiki_page": "wiki/src_webhook_dispatcher_py.md",
+              "compressor": "wiki_consolidator_fts5",
+              "raw_chars": 4289,
+              "compressed_chars": 68,
+              "reduction_pct": 98.4,
+              "detail": "consolidated into wiki/src_webhook_dispatcher_py.md; stripped 54 banner/docstring lines & sanitized secrets"
+            }
+          ],
+          "model": "brick-complexity-pro",
+          "reasoning_effort": "none",
+          "passed": true,
+          "prompt_tokens": 388,
+          "completion_tokens": 34,
+          "total_tokens": 422,
+          "latency_s": 0.509
+        },
+        {
+          "id": "m2",
+          "category": "recall",
+          "layer1_selected_files": [
+            "wiki/src_wal_writer_py.md",
+            "wiki/src_webhook_dispatcher_py.md"
+          ],
+          "layer1_chars": 23655,
+          "layer2_chars": 1008,
+          "layer2_step_reduction_pct": 95.7,
+          "layer2_char_reduction_pct": 97.3,
+          "actions": [
+            {
+              "path": "session_transcript.log -> handoff_brief.md",
+              "compressor": "claim_once_handoff",
+              "raw_chars": 14840,
+              "compressed_chars": 437,
+              "reduction_pct": 97.1,
+              "detail": "condensed 90-turn Claude Code transcript into typed cross-agent handoff brief"
+            },
+            {
+              "path": "src/wal_writer.py",
+              "wiki_page": "wiki/src_wal_writer_py.md",
+              "compressor": "wiki_consolidator_fts5",
+              "raw_chars": 4526,
+              "compressed_chars": 304,
+              "reduction_pct": 93.3,
+              "detail": "consolidated into wiki/src_wal_writer_py.md; stripped 55 banner/docstring lines & sanitized secrets"
+            },
+            {
+              "path": "src/webhook_dispatcher.py",
+              "wiki_page": "wiki/src_webhook_dispatcher_py.md",
+              "compressor": "wiki_consolidator_fts5",
+              "raw_chars": 4289,
+              "compressed_chars": 68,
+              "reduction_pct": 98.4,
+              "detail": "consolidated into wiki/src_webhook_dispatcher_py.md; stripped 54 banner/docstring lines & sanitized secrets"
+            }
+          ],
+          "model": "brick-complexity-pro",
+          "reasoning_effort": "none",
+          "passed": true,
+          "prompt_tokens": 410,
+          "completion_tokens": 77,
+          "total_tokens": 487,
+          "latency_s": 0.838
+        },
+        {
+          "id": "m3",
+          "category": "recall",
+          "layer1_selected_files": [
+            "wiki/src_quota_enforcer_py.md",
+            "wiki/src_webhook_dispatcher_py.md"
+          ],
+          "layer1_chars": 23618,
+          "layer2_chars": 979,
+          "layer2_step_reduction_pct": 95.9,
+          "layer2_char_reduction_pct": 97.3,
+          "actions": [
+            {
+              "path": "session_transcript.log -> handoff_brief.md",
+              "compressor": "claim_once_handoff",
+              "raw_chars": 14840,
+              "compressed_chars": 437,
+              "reduction_pct": 97.1,
+              "detail": "condensed 90-turn Claude Code transcript into typed cross-agent handoff brief"
+            },
+            {
+              "path": "src/quota_enforcer.py",
+              "wiki_page": "wiki/src_quota_enforcer_py.md",
+              "compressor": "wiki_consolidator_fts5",
+              "raw_chars": 4489,
+              "compressed_chars": 267,
+              "reduction_pct": 94.1,
+              "detail": "consolidated into wiki/src_quota_enforcer_py.md; stripped 55 banner/docstring lines & sanitized secrets"
+            },
+            {
+              "path": "src/webhook_dispatcher.py",
+              "wiki_page": "wiki/src_webhook_dispatcher_py.md",
+              "compressor": "wiki_consolidator_fts5",
+              "raw_chars": 4289,
+              "compressed_chars": 68,
+              "reduction_pct": 98.4,
+              "detail": "consolidated into wiki/src_webhook_dispatcher_py.md; stripped 54 banner/docstring lines & sanitized secrets"
+            }
+          ],
+          "model": "brick-complexity-pro",
+          "reasoning_effort": "none",
+          "passed": true,
+          "prompt_tokens": 400,
+          "completion_tokens": 31,
+          "total_tokens": 431,
+          "latency_s": 0.47
+        },
+        {
+          "id": "m4",
+          "category": "recall",
+          "layer1_selected_files": [
+            "wiki/src_vector_index_py.md",
+            "wiki/src_webhook_dispatcher_py.md"
+          ],
+          "layer1_chars": 23434,
+          "layer2_chars": 792,
+          "layer2_step_reduction_pct": 96.6,
+          "layer2_char_reduction_pct": 97.9,
+          "actions": [
+            {
+              "path": "session_transcript.log -> handoff_brief.md",
+              "compressor": "claim_once_handoff",
+              "raw_chars": 14840,
+              "compressed_chars": 437,
+              "reduction_pct": 97.1,
+              "detail": "condensed 90-turn Claude Code transcript into typed cross-agent handoff brief"
+            },
+            {
+              "path": "src/vector_index.py",
+              "wiki_page": "wiki/src_vector_index_py.md",
+              "compressor": "wiki_consolidator_fts5",
+              "raw_chars": 4305,
+              "compressed_chars": 84,
+              "reduction_pct": 98.0,
+              "detail": "consolidated into wiki/src_vector_index_py.md; stripped 54 banner/docstring lines & sanitized secrets"
+            },
+            {
+              "path": "src/webhook_dispatcher.py",
+              "wiki_page": "wiki/src_webhook_dispatcher_py.md",
+              "compressor": "wiki_consolidator_fts5",
+              "raw_chars": 4289,
+              "compressed_chars": 68,
+              "reduction_pct": 98.4,
+              "detail": "consolidated into wiki/src_webhook_dispatcher_py.md; stripped 54 banner/docstring lines & sanitized secrets"
+            }
+          ],
+          "model": "brick-complexity-pro",
+          "reasoning_effort": "none",
+          "passed": true,
+          "prompt_tokens": 351,
+          "completion_tokens": 63,
+          "total_tokens": 414,
+          "latency_s": 0.717
+        },
+        {
+          "id": "m5",
+          "category": "refactor",
+          "layer1_selected_files": [
+            "wiki/src_session_auth_py.md",
+            "wiki/src_wal_writer_py.md"
+          ],
+          "layer1_chars": 23794,
+          "layer2_chars": 1134,
+          "layer2_step_reduction_pct": 95.2,
+          "layer2_char_reduction_pct": 96.9,
+          "actions": [
+            {
+              "path": "session_transcript.log -> handoff_brief.md",
+              "compressor": "claim_once_handoff",
+              "raw_chars": 14840,
+              "compressed_chars": 437,
+              "reduction_pct": 97.1,
+              "detail": "condensed 90-turn Claude Code transcript into typed cross-agent handoff brief"
+            },
+            {
+              "path": "src/session_auth.py",
+              "wiki_page": "wiki/src_session_auth_py.md",
+              "compressor": "wiki_consolidator_fts5",
+              "raw_chars": 4428,
+              "compressed_chars": 206,
+              "reduction_pct": 95.3,
+              "detail": "consolidated into wiki/src_session_auth_py.md; stripped 55 banner/docstring lines & sanitized secrets"
+            },
+            {
+              "path": "src/wal_writer.py",
+              "wiki_page": "wiki/src_wal_writer_py.md",
+              "compressor": "wiki_consolidator_fts5",
+              "raw_chars": 4526,
+              "compressed_chars": 304,
+              "reduction_pct": 93.3,
+              "detail": "consolidated into wiki/src_wal_writer_py.md; stripped 55 banner/docstring lines & sanitized secrets"
+            }
+          ],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 476,
+          "completion_tokens": 900,
+          "total_tokens": 1376,
+          "latency_s": 5.396
+        },
+        {
+          "id": "m6",
+          "category": "refactor",
+          "layer1_selected_files": [
+            "wiki/src_session_auth_py.md",
+            "wiki/src_quota_enforcer_py.md"
+          ],
+          "layer1_chars": 23757,
+          "layer2_chars": 1105,
+          "layer2_step_reduction_pct": 95.3,
+          "layer2_char_reduction_pct": 97.0,
+          "actions": [
+            {
+              "path": "session_transcript.log -> handoff_brief.md",
+              "compressor": "claim_once_handoff",
+              "raw_chars": 14840,
+              "compressed_chars": 437,
+              "reduction_pct": 97.1,
+              "detail": "condensed 90-turn Claude Code transcript into typed cross-agent handoff brief"
+            },
+            {
+              "path": "src/session_auth.py",
+              "wiki_page": "wiki/src_session_auth_py.md",
+              "compressor": "wiki_consolidator_fts5",
+              "raw_chars": 4428,
+              "compressed_chars": 206,
+              "reduction_pct": 95.3,
+              "detail": "consolidated into wiki/src_session_auth_py.md; stripped 55 banner/docstring lines & sanitized secrets"
+            },
+            {
+              "path": "src/quota_enforcer.py",
+              "wiki_page": "wiki/src_quota_enforcer_py.md",
+              "compressor": "wiki_consolidator_fts5",
+              "raw_chars": 4489,
+              "compressed_chars": 267,
+              "reduction_pct": 94.1,
+              "detail": "consolidated into wiki/src_quota_enforcer_py.md; stripped 55 banner/docstring lines & sanitized secrets"
+            }
+          ],
+          "model": "qwen3.5-122b",
+          "reasoning_effort": "high",
+          "passed": true,
+          "prompt_tokens": 460,
+          "completion_tokens": 900,
+          "total_tokens": 1360,
+          "latency_s": 5.387
+        }
+      ]
+    }
+  ]
+}

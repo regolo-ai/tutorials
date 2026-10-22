@@ -1,0 +1,20 @@
+# Secrets: never commit keys. The TUI and benchmark read an optional .env next to the scripts.
+.env
+.env.*
+!.env.example
+
+# Generated output (the TUI writes diagrams to output/<project>/)
+output/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# Local logs, editors, OS
+*.log
+.idea/
+.vscode/
+.DS_Store
