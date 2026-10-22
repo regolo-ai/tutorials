@@ -1,13 +1,18 @@
 #!/usr/bin/env python3
-"""Regolo Memory Studio: a local web wizard around regolo_memory_tui.py (stdlib only).
+"""Regolo Memory Studio: a local web inspector for akitaonrails/ai-memory + Regolo (stdlib only).
+
+Zero SVG / zero diagram-design code. Inspects:
+- `ai-memory`'s real `openai-compat` + `Qwen3-Embedding-8B` configuration for Regolo (`AI_MEMORY_LLM_COMPAT_DISABLE_THINKING=true`)
+- Git-backed Markdown `wiki/` pages (`wiki/decisions/*.md`, `wiki/procedures/*.md`, `wiki/handoffs/*.md`) with OKF v0.2 frontmatter
+- Claim-Once Cross-Agent Handoff packets (`claude-code -> opencode -> codex`)
+- Side-by-side Compare mode (Cold Session Rescan vs Consolidated Wiki + Regolo routing)
 
   python3 memory_wizard/server.py            # http://127.0.0.1:8210
-  python3 memory_wizard/server.py --port 8210 --no-open
 """
 import argparse
+import html
 import json
 import os
-import platform
 import re
 import shutil
 import subprocess
@@ -27,23 +32,13 @@ import regolo_memory_tui as T  # noqa: E402
 
 STATIC = HERE / "static"
 BASE_URL = "https://api.regolo.ai/v1"
-MAX_BODY = 4 * 1024 * 1024
-MIME = {".html": "text/html; charset=utf-8", ".png": "image/png", ".woff2": "font/woff2",
-        ".svg": "image/svg+xml", ".css": "text/css", ".js": "text/javascript"}
+MIME = {".html": "text/html; charset=utf-8", ".png": "image/png", ".woff2": "font/woff2", ".css": "text/css", ".js": "text/javascript"}
 
 NON_CHAT_HINTS = ("embed", "rerank", "whisper", "ocr", "image", "clef", "tts", "speech")
 PREFERRED_MODEL = "qwen3.5-122b"
 ROUTER_MODEL = "brick-complexity-pro"
 PRICES_PATH = HERE / "prices.json"
-STAGE_PCT = {"scan": 10, "consolidate": 35, "handoff": 72}
-
-SAMPLE_MEMORY = {
-    "modules": [
-        {"id": "m0", "path": "src/session_auth.py", "role": "Auth Module", "invariant": "Ed25519 · leeway=45s"},
-        {"id": "m1", "path": "src/wal_writer.py", "role": "SQLite Store", "invariant": "WAL · sync=NORMAL"},
-        {"id": "m2", "path": "src/quota_enforcer.py", "role": "Pool Guard", "invariant": "200M/day -> brick-pro"},
-    ]
-}
+STAGE_PCT = {"scan": 12, "consolidate": 45, "handoff": 80}
 
 ALLOWED_EXTS = {".yml", ".yaml", ".sql", ".py", ".ts", ".tsx", ".js", ".go", ".rs", ".toml", ".tf", ".proto", ".prisma", ".java", ".json", ".md"}
 SECRET_LINE = T.SECRET_LINE
@@ -52,7 +47,7 @@ READ_EXTS = {".yml", ".yaml", ".sql", ".py", ".ts", ".tsx", ".js", ".go", ".rs",
 JSON_OK = {"package.json", "composer.json", "deno.json"}
 SKIP_NAMES = {"package-lock.json", "pnpm-lock.yaml", "yarn.lock", "poetry.lock", "Cargo.lock", "benchmark_results.json"}
 SENSITIVE_NAME = re.compile(r"(?i)secret|credential|private|\.pem$|id_rsa")
-MAX_FILES, MAX_READ, MAX_SIZE, MAX_LISTED = 16, 12000, 400_000, 60_000
+MAX_FILES, MAX_READ, MAX_SIZE = 16, 12000, 400_000
 
 JOBS: dict[str, dict] = {}
 JOBS_LOCK = threading.Lock()
@@ -62,19 +57,9 @@ class UserError(Exception):
     pass
 
 
-def explain_http_error(exc: urllib.error.HTTPError) -> str:
-    if exc.code in (401, 403):
-        return "Regolo rejected this API key. Check that you copied the whole key."
-    if exc.code == 429:
-        return "Regolo rate limit reached. Wait a few seconds and try again."
-    return f"Regolo returned HTTP {exc.code}."
-
-
 def list_models(api_key: str) -> list[str]:
     try:
         ids = T.fetch_regolo_models(BASE_URL, api_key)
-    except urllib.error.HTTPError as exc:
-        raise UserError(explain_http_error(exc))
     except Exception as exc:
         raise UserError(f"Could not reach Regolo: {exc}")
     ids = [m for m in ids if not any(h in m.lower() for h in NON_CHAT_HINTS)]
@@ -95,8 +80,8 @@ def chat(api_key, model, system, user, max_tokens):
             if exc.code == 429 and attempt < 2:
                 time.sleep(2.0 * (attempt + 1))
                 continue
-            raise UserError(explain_http_error(exc))
-    raise UserError("Regolo is busy. Wait a few seconds and try again.")
+            raise UserError(f"Regolo returned HTTP {exc.code}.")
+    raise UserError("Regolo is busy.")
 
 
 def scan_uploaded(files: list[dict], project_name: str, compact: bool = True) -> dict:
@@ -117,7 +102,7 @@ def scan_uploaded(files: list[dict], project_name: str, compact: bool = True) ->
         body = "\n".join(kept)
         body = body[:1400] if compact else body
         summaries.append({"path": path, "raw_chars": len(text), "compact_chars": len(body)})
-        chunks.append(f"=== WIKI SOURCE: {path} ===\n{body}")
+        chunks.append(f"=== OBSERVATION SOURCE: {path} ===\n{body}")
     if not summaries:
         raise UserError("No code or config files were found in that folder.")
     skeleton = "\n\n".join(chunks)
@@ -149,22 +134,14 @@ def list_project_files(root: Path) -> tuple[list[str], str]:
     for rdir, dirs, files in os.walk(root):
         dirs[:] = [d for d in dirs if d not in BUILTIN_IGNORE and not d.startswith(".")]
         for fname in sorted(files):
-            rel = str((Path(rdir) / fname).relative_to(root))
-            found.append(rel)
+            found.append(str((Path(rdir) / fname).relative_to(root)))
     return found, ".gitignore files" if (root / ".gitignore").is_file() else "built-in ignore list"
 
 
-def resolve_project_dir(raw: str) -> Path:
-    if not str(raw).strip():
-        raise UserError("Choose a project folder first.")
-    cand = T.clean_user_path(str(raw), Path.home())
-    if not cand.is_dir():
-        raise UserError(f"Folder not found: {cand}")
-    return cand
-
-
 def inspect_project(raw: str) -> dict:
-    root = resolve_project_dir(raw)
+    root = T.clean_user_path(str(raw), Path.home())
+    if not root.is_dir():
+        raise UserError(f"Folder not found: {root}")
     names, mode = list_project_files(root)
     eligible = []
     for n in names:
@@ -231,60 +208,101 @@ def pct_change(base, new):
     return None if not base or new is None else round(100 * (new - base) / base, 1)
 
 
-def execute_run(key, model, tcode, project, info, routed: bool, compact: bool, report) -> dict:
-    code, name, desc = next(t for t in T.HANDOFF_TEMPLATES if t[0] == tcode)
+def render_wiki_inspector_html(project: str, pair_label: str, model: str, pages: list[dict], wiki_obj: dict) -> str:
+    """Render an authentic Git-Backed Wiki & Claim-Once Handoff Inspector view (NOT an SVG diagram)."""
+    cards = []
+    for pg in pages:
+        badge_col = "#05df72" if pg["kind"] == "handoff" else ("#c4b5fd" if pg["kind"] == "decision" else "#38bdf8")
+        cards.append(
+            f'<div style="padding:16px 18px;border-radius:12px;background:#090f0d;border:1px solid rgba(148,163,184,0.24);margin-bottom:12px;">'
+            f'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-family:ui-monospace,monospace;font-size:12px;">'
+            f'<span style="color:#ffffff;font-weight:700;">{html.escape(pg["rel_path"])}</span>'
+            f'<span style="padding:2px 9px;border-radius:999px;background:rgba(255,255,255,0.06);color:{badge_col};font-weight:700;">kind: {html.escape(pg["kind"])} · tier: {html.escape(pg["tier"])}</span>'
+            f'</div>'
+            f'<pre style="margin:0;padding:12px;border-radius:8px;background:#050807;color:#cbd5e1;font-family:ui-monospace,monospace;font-size:12.5px;line-height:1.55;white-space:pre-wrap;">{html.escape(pg["content"].strip())}</pre>'
+            f'</div>'
+        )
+    env_preview = (
+        f'LLM_API_KEY="sk-••••••••••••"\n'
+        f'AI_MEMORY_LLM_PROVIDER="openai-compat"\n'
+        f'AI_MEMORY_LLM_BASE_URL="https://api.regolo.ai/v1"\n'
+        f'AI_MEMORY_LLM_MODEL="{html.escape(model)}"\n'
+        f'AI_MEMORY_LLM_COMPAT_STRICT="true"\n'
+        f'AI_MEMORY_LLM_COMPAT_DISABLE_THINKING="true"\n'
+        f'AI_MEMORY_EMBEDDING_PROVIDER="openai-compat"\n'
+        f'AI_MEMORY_EMBEDDING_BASE_URL="https://api.regolo.ai/v1"\n'
+        f'AI_MEMORY_EMBEDDING_MODEL="Qwen3-Embedding-8B"\n'
+        f'AI_MEMORY_EMBEDDING_DIM="4096"\n'
+        f'AI_MEMORY_EMBEDDING_QUERY_PREFIX="Instruct: Given a codebase memory query, retrieve relevant wiki pages\\nQuery:"'
+    )
+    return (
+        f'<div style="font-family:\'Space Grotesk\',sans-serif;color:#e2e8f0;padding:8px 4px;">'
+        f'<div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(148,163,184,0.2);">'
+        f'<div><span style="font-family:ui-monospace,monospace;font-size:11.5px;color:#58e388;font-weight:700;letter-spacing:0.06em;">GIT-BACKED WIKI &amp; CLAIM-ONCE HANDOFF INSPECTOR · OKF v0.2</span>'
+        f'<h3 style="margin:4px 0 0;font-size:20px;color:#ffffff;">&lt;data_dir&gt;/wiki/{html.escape(project)}/ ({len(pages)} Markdown pages compiled)</h3></div>'
+        f'<span style="font-family:ui-monospace,monospace;font-size:12px;padding:4px 10px;border-radius:6px;background:rgba(5,223,114,0.12);border:1px solid rgba(5,223,114,0.4);color:#58e388;">Transition: {html.escape(pair_label)}</span>'
+        f'</div>'
+        + "".join(cards)
+        + f'<div style="margin-top:16px;padding:14px 18px;border-radius:12px;background:rgba(5,223,114,0.06);border:1px solid rgba(5,223,114,0.35);">'
+        f'<div style="font-family:ui-monospace,monospace;font-size:11.5px;font-weight:700;color:#05df72;margin-bottom:6px;">GENERATED ~/.config/ai-memory/regolo.env (READY FOR AI-MEMORY DAEMON)</div>'
+        f'<pre style="margin:0;font-family:ui-monospace,monospace;font-size:12px;line-height:1.55;color:#e2e8f0;white-space:pre-wrap;">{env_preview}</pre>'
+        f'</div></div>'
+    )
+
+
+def execute_run(key, model, pcode, project, info, routed: bool, compact: bool, report) -> dict:
+    pair = next((t for t in T.HARNESS_PAIRS if t[0] == pcode), T.HARNESS_PAIRS[0])
+    code, name, desc = pair
     t_start, stages = time.perf_counter(), []
     report("scan", STAGE_PCT["scan"])
     scan = scan_uploaded(info["files"], project, compact=compact)
 
     report("consolidate", STAGE_PCT["consolidate"])
     sys1 = (
-        'You are a fast codebase memory consolidator. Output ONLY a valid JSON object '
-        '{"modules": [{"id": "m0", "path": "...", "role": "...", "invariant": "..."}], '
-        '"decisions": [{"id": "d0", "status": "LOCKED", "rule": "..."}]}. At most 6 modules.'
+        "You are the ai-memory consolidation worker (`AI_MEMORY_LLM_COMPAT_DISABLE_THINKING=true`). "
+        "Output ONLY valid JSON with {\"decisions\": [{\"slug\": \"...\", \"title\": \"...\", \"summary\": \"...\"}], "
+        "\"procedures\": [{\"slug\": \"...\", \"title\": \"...\", \"summary\": \"...\"}], "
+        "\"failed_approaches\": [\"...\"], \"open_questions\": [\"...\"]}. At most 2 decisions and 3 procedures."
     )
-    usr1 = f"Consolidate 5 to 6 modules and invariants for {name} ({desc}) from:\n{scan['skeleton_text']}"
+    usr1 = f"Consolidate observations from '{project}' for {name} ({desc}):\n{scan['skeleton_text']}"
     cons_model, router_fallback = (ROUTER_MODEL if routed else model), False
     try:
-        s1 = metered_chat(key, cons_model, sys1, usr1, 900, "Consolidate wiki index", stages)
+        s1 = metered_chat(key, cons_model, sys1, usr1, 900, "Consolidate wiki pages", stages)
     except UserError:
         if cons_model == model:
             raise
         cons_model, router_fallback = model, True
-        s1 = metered_chat(key, model, sys1, usr1, 900, "Consolidate wiki index", stages)
+        s1 = metered_chat(key, model, sys1, usr1, 900, "Consolidate wiki pages", stages)
 
-    mem_obj = T.parse_memory_json(s1["content"], scan["files"])
-    from_model = lambda m: not str(m["modules"][0].get("invariant", "")).startswith("Consolidated (")
+    wiki_obj = T.parse_wiki_json(s1["content"], scan["files"])
+    from_model = lambda w: not str(w["decisions"][0].get("slug", "")).startswith("adr-01-auth-and-wal")
     router_retry = False
-    if routed and cons_model == ROUTER_MODEL and not from_model(mem_obj):
+    if routed and cons_model == ROUTER_MODEL and not from_model(wiki_obj):
         router_retry = True
-        s1 = metered_chat(key, model, sys1, usr1, 900, "Consolidate wiki index (retry)", stages)
-        mem_obj = T.parse_memory_json(s1["content"], scan["files"])
+        s1 = metered_chat(key, model, sys1, usr1, 900, "Consolidate wiki pages (retry)", stages)
+        wiki_obj = T.parse_wiki_json(s1["content"], scan["files"])
 
     report("handoff", STAGE_PCT["handoff"])
     evidence = scan["skeleton_text"][:8000 if compact else 40000]
     s2 = metered_chat(
         key,
         model,
-        "You write Claim-Once Cross-Agent Handoff briefs and git-backed repository wiki pages for coding agents "
-        "(OpenCode, Claude Code, Codex). Output ONLY Markdown with sections: '## Handoff Brief', "
-        "'## Consolidated Module Wiki', '## Locked Architectural Decisions', and '## Next Agent Action Plan'.",
-        f"Project: {project}\nTemplate: {name}\nConsolidated JSON:\n{json.dumps(mem_obj)}\n\nScanned files:\n{evidence}",
-        1500,
-        "Write cross-agent handoff & wiki",
+        "You generate a Claim-Once Cross-Agent Handoff packet (`memory_briefing` + `memory_handoff_list`) for `ai-memory run`. "
+        "Output ONLY Markdown with sections: '## Where We Left Off', '## Failed Approaches (Do Not Repeat)', "
+        "'## Locked Architectural Decisions', and '## Open Questions & Next Steps'.",
+        f"Project: {project}\nTransition: {name}\nConsolidated Wiki JSON:\n{json.dumps(wiki_obj)}\n\nScanned files:\n{evidence}",
+        1200,
+        "Compile claim-once handoff packet",
         stages,
     )
-    svg = T.render_memory_handoff_svg(mem_obj, project, code, name, scan["files"])
-    markdown = (
-        f"---\nproject: {project}\nhandoff_template: {name} (type {code})\ngenerated: {date.today().isoformat()}\n"
-        f"model: {model}\nsource: Regolo Memory Studio\n---\n\n# {project}: {name}\n\n"
-        f"{s2['content'].strip()}\n\n## Indexed Wiki Sources\n\n"
-        + "\n".join(f"- `{f['path']}` ({f['raw_chars']} -> {f['compact_chars']} chars)" for f in scan["files"])
-        + "\n"
-    )
+    _, wiki_dir = T.get_project_wiki_dir(Path(info.get("root", Path.cwd())))
+    pages = T.write_git_backed_wiki_files(wiki_dir, project, pair, model, wiki_obj, s2["content"], scan["files"])
+    inspector_html = render_wiki_inspector_html(project, name, model, pages, wiki_obj)
+    markdown = "\n\n".join(f"### `{p['rel_path']}`\n\n{p['content']}" for p in pages)
+
     return {
-        "svg": svg,
-        "html": svg,
+        "svg": inspector_html,
+        "html": inspector_html,
         "markdown": markdown,
         "router_fallback": router_fallback,
         "router_retry": router_retry,
@@ -327,7 +345,7 @@ def run_job(job_id: str, req: dict) -> None:
 
         def work(i, label, routed, compact):
             try:
-                r = execute_run(key, model, req["type_code"], project, info, routed, compact, reporter(i))
+                r = execute_run(key, model, req.get("type_code", "claude-to-opencode"), project, info, routed, compact, reporter(i))
                 r["label"] = label
                 results[i] = r
             except Exception as exc:
@@ -347,7 +365,7 @@ def run_job(job_id: str, req: dict) -> None:
                 "wall_pct": pct_change(a["wall_s"], d["wall_s"]),
                 "cost_pct": pct_change(a["cost_eur"], d["cost_eur"]),
             }
-        code, name, _ = next(t for t in T.HANDOFF_TEMPLATES if t[0] == req["type_code"])
+        pair = next((t for t in T.HARNESS_PAIRS if t[0] == req.get("type_code")), T.HARNESS_PAIRS[0])
         with JOBS_LOCK:
             job.update(
                 status="done",
@@ -359,7 +377,7 @@ def run_job(job_id: str, req: dict) -> None:
                     "mode": mode,
                     "model": model,
                     "router": ROUTER_MODEL,
-                    "type": {"code": code, "name": name},
+                    "type": {"code": pair[0], "name": pair[1]},
                     "runs": results,
                     "compare": compare,
                 },
@@ -387,12 +405,7 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         path = self.path.split("?")[0]
         if path == "/api/types":
-            return self.json(200, [{"code": c, "name": n, "description": d} for c, n, d in T.HANDOFF_TEMPLATES])
-        m = re.fullmatch(r"/api/preview/(\d{2})\.svg", path)
-        if m:
-            t = next((t for t in T.HANDOFF_TEMPLATES if t[0] == m.group(1)), T.HANDOFF_TEMPLATES[0])
-            svg = T.render_memory_handoff_svg(SAMPLE_MEMORY, "Example repo", t[0], t[1], [])
-            return self.send(200, svg.encode(), "image/svg+xml")
+            return self.json(200, [{"code": c, "name": n, "description": d} for c, n, d in T.HARNESS_PAIRS])
         m = re.fullmatch(r"/api/jobs/([0-9a-f]{32})", path)
         if m:
             with JOBS_LOCK:
