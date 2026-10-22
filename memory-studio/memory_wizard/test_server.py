@@ -7,12 +7,13 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import server as S
 
-PRICES = {"brick-complexity-pro": {"in": 0.10, "out": 0.40}, "qwen3.5-122b": {"in": 1.00, "out": 4.20}}
-MEM_JSON = json.dumps({
-    "modules": [{"id": f"m{i}", "path": f"src/mod_{i}.py", "role": "Core", "invariant": "Ed25519 verified"} for i in range(4)],
-    "decisions": [{"id": "d0", "status": "LOCKED", "rule": "Keep WAL synchronous=NORMAL"}],
+WIKI_JSON = json.dumps({
+    "decisions": [{"slug": "adr-01-ed25519", "title": "Ed25519 Assertion", "summary": "Keep leeway=45s"}],
+    "procedures": [{"slug": "proc-wal", "title": "SQLite WAL", "summary": "Keep synchronous=NORMAL"}],
+    "failed_approaches": ["Do not set synchronous=OFF"],
+    "open_questions": ["Verify daily pool threshold"],
 })
-HANDOFF_MD = "## Handoff Brief\n" + "word " * 60
+HANDOFF_MD = "## Where We Left Off\n" + "word " * 50
 
 
 class FakeChat:
@@ -23,9 +24,9 @@ class FakeChat:
     def __call__(self, key, model, system, user, max_tokens):
         self.calls.append((model, len(user)))
         if self.bad_router and model == S.ROUTER_MODEL:
-            return {"content": "{truncated", "prompt_tokens": 20, "completion_tokens": 900, "total_tokens": 920, "latency_s": 0.8}
-        content = MEM_JSON if "memory consolidator" in system else HANDOFF_MD
-        return {"content": content, "prompt_tokens": len(user) // 4, "completion_tokens": 120, "total_tokens": len(user) // 4 + 120, "latency_s": 0.9}
+            return {"content": "{broken", "prompt_tokens": 20, "completion_tokens": 900, "total_tokens": 920, "latency_s": 0.8}
+        content = WIKI_JSON if "consolidation worker" in system else HANDOFF_MD
+        return {"content": content, "prompt_tokens": len(user) // 4, "completion_tokens": 110, "total_tokens": len(user) // 4 + 110, "latency_s": 0.9}
 
 
 def sample_files():
@@ -46,14 +47,16 @@ class MemoryStudioTests(unittest.TestCase):
 
     def test_routed_consolidation_and_retry(self):
         S.chat = FakeChat(bad_router=False)
-        r = S.execute_run("k", "qwen3.5-122b", "01", "proj", {"files": sample_files()}, True, True, lambda *_: None)
+        r = S.execute_run("k", "qwen3.5-122b", "claude-to-opencode", "proj", {"files": sample_files()}, True, True, lambda *_: None)
         self.assertEqual([s["model"] for s in r["stages"]], ["brick-complexity-pro", "qwen3.5-122b"])
         self.assertFalse(r["router_retry"])
+        self.assertIn("wiki/decisions/adr-01-ed25519.md", r["html"])
+        self.assertIn("AI_MEMORY_LLM_COMPAT_DISABLE_THINKING", r["html"])
 
         S.chat = FakeChat(bad_router=True)
-        r2 = S.execute_run("k", "qwen3.5-122b", "01", "proj", {"files": sample_files()}, True, True, lambda *_: None)
+        r2 = S.execute_run("k", "qwen3.5-122b", "claude-to-opencode", "proj", {"files": sample_files()}, True, True, lambda *_: None)
         self.assertTrue(r2["router_retry"])
-        self.assertEqual([s["stage"] for s in r2["stages"]][:2], ["Consolidate wiki index", "Consolidate wiki index (retry)"])
+        self.assertEqual([s["stage"] for s in r2["stages"]][:2], ["Consolidate wiki pages", "Consolidate wiki pages (retry)"])
 
 
 if __name__ == "__main__":

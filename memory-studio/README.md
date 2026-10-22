@@ -33,10 +33,10 @@ This repository provides a **zero-dependency Python web app** (`memory_wizard/se
 
 | Metric | Baseline (Whole files + `qwen3.5-122b`) | Optimized (Sanitized wiki skeleton + `brick-complexity-pro` routing) | Change |
 |:---|---:|---:|---:|
-| **Prompt tokens** | 25,858 | 5,619 | **−78.3%** |
-| **Total tokens** | 27,973 | 7,641 | **−72.7%** |
-| **Wall time** | 18.4 s | 16.7 s | **−9.2%** |
-| **Regolo PAYG cost** | €0.0350 | €0.0094 | **−73.1%** |
+| **Prompt tokens** | 26,185 | 5,453 | **−79.2%** |
+| **Total tokens** | 27,760 | 6,587 | **−76.3%** |
+| **Wall time** | 12.8 s | 9.7 s | **−24.2%** |
+| **Regolo PAYG cost** | €0.0330 | €0.0065 | **−80.3%** |
 
 ![Compare mode results in Regolo Memory Studio](docs/img/app-compare.png)
 
