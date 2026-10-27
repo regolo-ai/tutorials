@@ -29,14 +29,14 @@ This repository provides a **zero-dependency Python web app** (`rea_wizard/serve
 
 ## Visual Benchmarks
 
-### 1. Live Compare Mode on REA Evidence Dumps (`rea-studio`, October 22, 2026)
+### 1. Live Compare Mode on REA Evidence Dumps (`rea-studio`, October 27, 2026)
 
 | Metric | Baseline (Unfiltered dumps + `qwen3.5-122b`) | Optimized (Local IPC/symbol sieve + `brick-complexity-pro` routing) | Change |
 |:---|---:|---:|---:|
-| **Prompt tokens** | 30,402 | 983 | **−96.8%** |
-| **Total tokens** | 32,400 | 2,803 | **−91.3%** |
-| **Wall time** | 14.2 s | 12.4 s | **−12.7%** |
-| **Regolo PAYG cost** | €0.0390 | €0.0071 | **−81.8%** |
+| **Prompt tokens** | 30,298 | 993 | **−96.7%** |
+| **Total tokens** | 31,846 | 2,481 | **−92.2%** |
+| **Wall time** | 14.6 s | 13.2 s | **−9.6%** |
+| **Regolo PAYG cost** | €0.0370 | €0.0058 | **−84.3%** |
 
 ![Compare mode results in Regolo REA Studio](docs/img/app-compare.png)
 

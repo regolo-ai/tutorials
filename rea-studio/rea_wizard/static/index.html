@@ -201,7 +201,7 @@ pre.md{margin:0;padding:20px;border-radius:14px;background:#0b0f0d;color:#e2e8f0
     <section class="panel" id="p1" role="tabpanel" aria-labelledby="tab1">
       <span class="eyebrow"><i class="dot"></i>Step 1 of 4</span>
       <h1>Connect your Regolo account</h1>
-      <p class="lead">Paste your API key. We use it to list the models you can run and to draw your diagram on Regolo's EU infrastructure.</p>
+      <p class="lead">Paste your API key. We use it to list the models you can run and to build your client PoC specification on Regolo's EU infrastructure.</p>
       <form id="keyform" autocomplete="off">
         <label class="f" for="key">Regolo API key</label>
         <div class="field">
@@ -221,7 +221,7 @@ pre.md{margin:0;padding:20px;border-radius:14px;background:#0b0f0d;color:#e2e8f0
     <section class="panel" id="p2" role="tabpanel" aria-labelledby="tab2" hidden>
       <span class="eyebrow"><i class="dot"></i>Step 2 of 4</span>
       <h1>Choose a model and a run mode</h1>
-      <p class="lead">These are the chat models available for your key right now. A larger model usually draws a more faithful diagram; a smaller one is faster and cheaper. Then decide how Regolo should run it.</p>
+      <p class="lead">These are the chat models available for your key right now. A larger model writes a richer client PoC specification; a smaller model is faster and cheaper. Then decide how Regolo should run it.</p>
       <div class="modelbar"><span class="count" id="mcount"></span></div>
       <div class="models" id="models" role="radiogroup" aria-label="Models"></div>
       <h2>Run mode</h2>
@@ -233,7 +233,7 @@ pre.md{margin:0;padding:20px;border-radius:14px;background:#0b0f0d;color:#e2e8f0
     <section class="panel" id="p3" role="tabpanel" aria-labelledby="tab3" hidden>
       <span class="eyebrow"><i class="dot"></i>Step 3 of 4</span>
       <h1>Pick an application folder and an audit template</h1>
-      <p class="lead">Choose the folder to analyse, then the kind of diagram you want. The app reads the project on your computer, skips everything in .gitignore, and sends the model only a compact skeleton of the main code and config files.</p>
+      <p class="lead">Choose the target application or HAR folder to inspect, then pick the client PoC workflow you want to build. The app reads the project on your computer, skips everything in .gitignore, and sends the model only a compact skeleton of the main code and config files.</p>
       <label class="f" for="path">Project folder</label>
       <div class="field wide">
         <input id="path" type="text" placeholder="/Users/you/projects/my-app" spellcheck="false" autocapitalize="off" autocomplete="off">
@@ -241,10 +241,10 @@ pre.md{margin:0;padding:20px;border-radius:14px;background:#0b0f0d;color:#e2e8f0
       </div>
       <p class="hint" id="folderMeta">Pick a folder with the dialog or paste its path. Files excluded by the project's .gitignore are skipped.</p>
       <details id="fileDetails" hidden><summary id="fileSummary">Files that will be analysed</summary><ul id="fileList"></ul></details>
-      <h2>Reverse-engineering audit template</h2>
-      <div class="types" id="types" role="radiogroup" aria-label="Reverse-engineering audit templates"></div>
+      <h2>Client PoC & modernization workflow</h2>
+      <div class="types" id="types" role="radiogroup" aria-label="Client PoC & modernization workflows"></div>
       <div class="err" id="err3" role="alert"></div>
-      <div class="actions"><button class="btn primary" id="generate" type="button" disabled>Sieve evidence & reconstruct spec</button><button class="btn ghost" id="back2" type="button">Back</button></div>
+      <div class="actions"><button class="btn primary" id="generate" type="button" disabled>Sieve evidence & build client PoC</button><button class="btn ghost" id="back2" type="button">Back</button></div>
     </section>
 
     <!-- 4 result -->
@@ -271,11 +271,11 @@ pre.md{margin:0;padding:20px;border-radius:14px;background:#0b0f0d;color:#e2e8f0
         <p class="note" id="fallbackNote" hidden></p>
         <div class="seg" id="runseg" role="tablist" aria-label="Which run" hidden></div>
         <div class="seg" role="tablist" aria-label="Result view">
-          <button role="tab" id="rt1" aria-selected="true">Evidence Map (SVG)</button>
-          <button role="tab" id="rt2" aria-selected="false">Clean-Room Spec (Markdown)</button>
+          <button role="tab" id="rt1" aria-selected="true">PoC & Evidence Inspector</button>
+          <button role="tab" id="rt2" aria-selected="false">Raw PoC Deliverables (.md / .json)</button>
         </div>
         <div id="rv1"><div class="canvas" id="canvas"></div>
-          <div class="actions"><button class="btn primary sm" id="dlHtml" type="button">Download HTML</button><button class="btn ghost sm" id="dlSvg" type="button">Download SVG</button></div></div>
+          <div class="actions"><button class="btn primary sm" id="dlHtml" type="button">Download HTML</button><button class="btn ghost sm" id="dlSvg" type="button" hidden>Download SVG</button></div></div>
         <div id="rv2" hidden><pre class="md" id="md" tabindex="0"></pre>
           <div class="actions"><button class="btn primary sm" id="cpMd" type="button">Copy Markdown</button><button class="btn ghost sm" id="dlMd" type="button">Download .md</button></div>
           <p class="hint">Drop this file in your repository (for example <code>docs/architecture.md</code>) or paste it into an agent's context as project knowledge.</p></div>
@@ -345,7 +345,7 @@ $("#to3").addEventListener("click", () => { unlock(3); go(3); });
 $("#back1").addEventListener("click", () => go(1));
 
 const MODES = [
-  ["routed", "Regolo routing", "Recommended", "Extraction runs on the router model {router}, fast and cheap. Drawing and the knowledge base run on the model you chose."],
+  ["routed", "Regolo routing", "Recommended", "Extraction runs on the router model {router}, fast and cheap. PoC specification and API contracts run on the model you chose."],
   ["single", "Single model", "", "Every step runs on the model you chose."],
   ["compare", "Compare on my repo", "Uses more tokens", "Runs your project twice in parallel: whole files on one model, then the compressed skeleton with routing. Tokens, time and cost side by side."]];
 function renderModes() {
@@ -389,7 +389,7 @@ async function loadTypes() {
   const types = await (await fetch("/api/types")).json();
   S.type = S.type || types[0].code;
   $("#types").innerHTML = types.map((t) => `<label class="opt type"><input type="radio" name="dtype" value="${t.code}" ${t.code === S.type ? "checked" : ""}>
-    <span class="card"><span class="prev"><img src="/api/preview/${t.code}.svg" alt="Preview of the ${esc(t.name)} layout" loading="lazy"></span>
+    <span class="card">
     <span class="n"><span class="code">${t.code}</span>${esc(t.name)}</span><span class="d">${esc(t.description)}</span></span></label>`).join("");
   $$("#types input").forEach((i) => i.addEventListener("change", () => { S.type = i.value; syncGenerate(); }));
 }
@@ -447,7 +447,7 @@ function renderPerf(r) {
       ${row("Prompt tokens", a.prompt_tokens, d.prompt_tokens, fmtN, c.prompt_tokens_pct)}${row("Total tokens", a.total_tokens, d.total_tokens, fmtN, c.total_tokens_pct)}
       ${row("Time", a.wall_s, d.wall_s, fmtS, c.wall_pct)}${row("Cost", a.cost_eur, d.cost_eur, fmtEur, c.cost_pct)}</tbody></table>
       <details><summary>Per step</summary><h2 style="font-size:13px;margin:12px 0 4px">Baseline</h2>${stageTable(r.runs[0])}<h2 style="font-size:13px;margin:12px 0 4px">Optimized</h2>${stageTable(r.runs[1])}</details>
-      <p class="foot">One run each, started in parallel, on your files. Baseline: the same files uncompressed (first 12 KB of each) with ${esc(r.model)} for every step. Optimized: compressed skeleton, extraction on ${esc(r.router)}, drawing and write-up on ${esc(r.model)}. Token counts and times are measured; they vary between runs.${priceNote}</p>`;
+      <p class="foot">One run each, started in parallel, on your files. Baseline: the same files uncompressed (first 12 KB of each) with ${esc(r.model)} for every step. Optimized: compressed skeleton, extraction on ${esc(r.router)}, PoC spec write-up on ${esc(r.model)}. Token counts and times are measured; they vary between runs.${priceNote}</p>`;
   } else {
     const run = r.runs[0], t = run.totals, comp = run.compact ? `The model received ${fmtN(run.scan.sent_chars)} of ${fmtN(run.scan.raw_chars)} characters (${pctTxt(-run.scan.reduction_pct)}).` : "";
     $("#perf").innerHTML = `<h2>Cost and speed</h2>
