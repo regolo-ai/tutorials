@@ -34,13 +34,13 @@ STATIC = HERE / "static"
 BASE_URL = "https://api.regolo.ai/v1"
 MIME = {".html": "text/html; charset=utf-8", ".png": "image/png", ".woff2": "font/woff2", ".css": "text/css", ".js": "text/javascript"}
 
-NON_CHAT_HINTS = ("embed", "rerank", "whisper", "ocr", "image", "clef", "tts", "speech")
+NON_CHAT_HINTS = ("embed", "rerank", "whisper", "ocr", "image", "clef", "tts", "speech", "brick-complexity")
 PREFERRED_MODEL = "qwen3.5-122b"
-ROUTER_MODEL = "brick-complexity-pro"
+ROUTER_MODEL = "brick-v1-beta"
 PRICES_PATH = HERE / "prices.json"
 STAGE_PCT = {"scan": 12, "triage": 45, "reconstruct": 80}
 
-ALLOWED_EXTS = {".json", ".har", ".yml", ".yaml", ".sql", ".py", ".ts", ".js", ".go", ".rs", ".toml"}
+ALLOWED_EXTS = {".json", ".har", ".yml", ".yaml", ".sql", ".py", ".ts", ".tsx", ".js", ".jsx", ".mjs", ".go", ".rs", ".toml"}
 BUILTIN_IGNORE = {".git", "node_modules", ".venv", "venv", "__pycache__", "dist", "build", ".next", "output"}
 SKIP_NAMES = {"benchmark_results.json", "package-lock.json", "pnpm-lock.yaml", "yarn.lock"}
 SENSITIVE_NAME = re.compile(r"(?i)secret|credential|private|\.pem$|id_rsa")
@@ -233,20 +233,21 @@ def execute_run(key, model, tcode, project, info, routed: bool, compact: bool, r
     )
     usr1 = f"Isolate critical IPC channels, API payloads, crypto routines, and SQLite tables for '{name}' ({desc}) from:\n{scan['skeleton_text']}"
     tri_model, router_fallback = (ROUTER_MODEL if routed else model), False
+    fallback_model = PREFERRED_MODEL if model == ROUTER_MODEL else model
     try:
         s1 = metered_chat(key, tri_model, sys1, usr1, 900, "Triage REA evidence dump", stages)
     except UserError:
-        if tri_model == model:
+        if tri_model == fallback_model:
             raise
-        tri_model, router_fallback = model, True
-        s1 = metered_chat(key, model, sys1, usr1, 900, "Triage REA evidence dump", stages)
+        tri_model, router_fallback = fallback_model, True
+        s1 = metered_chat(key, fallback_model, sys1, usr1, 900, "Triage REA evidence dump", stages)
 
     rea_obj = T.parse_rea_json(s1["content"], scan["files"])
     from_model = lambda r: not str(r["evidence"][0].get("symbol", "")).startswith("ipc:sync:flush_offline_queue ->")
     router_retry = False
     if routed and tri_model == ROUTER_MODEL and not from_model(rea_obj):
         router_retry = True
-        s1 = metered_chat(key, model, sys1, usr1, 900, "Triage REA evidence dump (retry)", stages)
+        s1 = metered_chat(key, fallback_model, sys1, usr1, 900, "Triage REA evidence dump (retry)", stages)
         rea_obj = T.parse_rea_json(s1["content"], scan["files"])
 
     report("reconstruct", STAGE_PCT["reconstruct"])
@@ -394,7 +395,8 @@ class Handler(BaseHTTPRequestHandler):
             key = str(data.get("api_key", "")).strip()
             if self.path == "/api/models":
                 models = list_models(key)
-                default = PREFERRED_MODEL if PREFERRED_MODEL in models else models[0]
+                non_brick = [m for m in models if not m.startswith("brick-")]
+                default = PREFERRED_MODEL if PREFERRED_MODEL in non_brick else (non_brick[0] if non_brick else models[0])
                 return self.json(200, {"models": models, "default": default, "router": ROUTER_MODEL, "router_available": ROUTER_MODEL in models})
             if self.path == "/api/generate":
                 job_id = uuid.uuid4().hex

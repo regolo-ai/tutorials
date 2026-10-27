@@ -31,7 +31,7 @@ This repository provides a **zero-dependency Python web app** (`rea_wizard/serve
 
 ### 1. Live Compare Mode on REA Evidence Dumps (`rea-studio`, October 27, 2026)
 
-| Metric | Baseline (Unfiltered dumps + `qwen3.5-122b`) | Optimized (Local IPC/symbol sieve + `brick-complexity-pro` routing) | Change |
+| Metric | Baseline (Unfiltered dumps + `qwen3.5-122b`) | Optimized (Local IPC/symbol sieve + `brick-v1-beta` routing) | Change |
 |:---|---:|---:|---:|
 | **Prompt tokens** | 30,298 | 993 | **−96.7%** |
 | **Total tokens** | 31,846 | 2,481 | **−92.2%** |
