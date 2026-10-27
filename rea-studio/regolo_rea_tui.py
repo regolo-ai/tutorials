@@ -40,12 +40,13 @@ BG_BADGE = f"{ESC}48;2;6;25;16m"
 
 POC_TEMPLATES = [
     ("web-har-to-poc", "Web / HAR Capture -> Interactive Client PoC", "Turn recorded web flows (`rea environment-build`) into a runnable service PoC for agency pitches"),
-    ("electron-ipc-to-web", "Electron / JS Bundle -> Cloud SaaS PoC", "Extract preload bridges & IPC handlers (`analyze-javascript-application`) to prototype a web migration"),
-    ("legacy-binary-to-api", "Go / Rust / .NET Binary -> Modern API Spec", "Recover domain symbols, crypto parameters & state machines to scope fixed-price modernization"),
+    ("electron-ipc-to-web", "TypeScript / JS / Electron -> Cloud SaaS PoC", "Trace TS/JS module graphs, preload bridges & IPC (`analyze-javascript-application`) to prototype a SaaS migration"),
+    ("legacy-binary-to-api", "PyInstaller / Go / Rust / .NET -> Modern API Spec", "Extract PyInstaller CArchive/PYZ, Go/Rust symbols & state machines to scope fixed-price modernization"),
     ("sqlite-wal-to-service", "SQLite Snapshot -> Microservice Data Layer", "Inspect tables, triggers & sync policies to generate a clean-room backend prototype"),
 ]
 
 NON_CHAT_MODELS = {
+    "brick-complexity-pro",
     "clef-flash",
     "deepseek-ocr-2",
     "faster-whisper-large-v3",
@@ -194,7 +195,7 @@ def sieve_evidence_content(path: str, text: str, compact: bool = True) -> str:
 
 
 def scan_project_directory(project_dir: Path, max_files: int = 12) -> dict:
-    allowed_exts = {".json", ".har", ".yml", ".yaml", ".sql", ".py", ".ts", ".js", ".go", ".rs", ".toml"}
+    allowed_exts = {".json", ".har", ".yml", ".yaml", ".sql", ".py", ".ts", ".tsx", ".js", ".jsx", ".mjs", ".go", ".rs", ".toml"}
     ignore_dirs = {".git", "node_modules", ".venv", "venv", "__pycache__", "dist", "build", ".next", "output"}
     skip_names = {"benchmark_results.json", "package-lock.json", "pnpm-lock.yaml", "yarn.lock"}
 

@@ -220,12 +220,13 @@ pre.md{margin:0;padding:20px;border-radius:14px;background:#0b0f0d;color:#e2e8f0
     <!-- 2 model -->
     <section class="panel" id="p2" role="tabpanel" aria-labelledby="tab2" hidden>
       <span class="eyebrow"><i class="dot"></i>Step 2 of 4</span>
-      <h1>Choose a model and a run mode</h1>
-      <p class="lead">These are the chat models available for your key right now. A larger model writes a richer client PoC specification; a smaller model is faster and cheaper. Then decide how Regolo should run it.</p>
+      <h1>Choose a run mode and a model</h1>
+      <p class="lead">First choose how Regolo should run your workflow (automatic routing with <code>brick-v1-beta</code>, a single model, or a side-by-side comparison between <code>brick-v1-beta</code> and your chosen model). The model list below updates based on your selection.</p>
+      <h2>1. Run mode</h2>
+      <div class="modes" id="modes" role="radiogroup" aria-label="Run mode"></div>
+      <h2 id="modelHeading">2. Model selection</h2>
       <div class="modelbar"><span class="count" id="mcount"></span></div>
       <div class="models" id="models" role="radiogroup" aria-label="Models"></div>
-      <h2>Run mode</h2>
-      <div class="modes" id="modes" role="radiogroup" aria-label="Run mode"></div>
       <div class="actions"><button class="btn primary" id="to3" type="button">Continue</button><button class="btn ghost" id="back1" type="button">Back</button></div>
     </section>
 
@@ -334,28 +335,49 @@ $("#keyform").addEventListener("submit", async (e) => {
 });
 
 /* ---- step 2 ---- */
+const isBrick = (m) => m.startsWith("brick-");
+function visibleModels() {
+  if (S.mode === "routed") {
+    const bm = S.models.filter(isBrick);
+    return bm.length ? bm : [S.router || "brick-v1-beta"];
+  }
+  return S.models.filter((m) => !isBrick(m));
+}
 function renderModels() {
-  $("#mcount").textContent = `${S.models.length} models available`;
-  $("#models").innerHTML = S.models.map((m) => `<label class="opt"><input type="radio" name="model" value="${esc(m)}" ${m === S.model ? "checked" : ""}>
-    <span class="card"><span class="radio"></span><span class="mname">${esc(m)}</span>${m === "qwen3.5-122b" ? '<span class="tag">Recommended</span>' : ""}</span></label>`).join("");
-  $$("#models input").forEach((i) => i.addEventListener("change", () => { S.model = i.value; $("#s2").textContent = S.model; }));
-  $("#s2").textContent = S.model;
+  const list = visibleModels();
+  if (!list.includes(S.model)) {
+    S.model = list.includes("qwen3.5-122b") ? "qwen3.5-122b" : list[0];
+  }
+  if (S.mode === "routed") {
+    $("#modelHeading").textContent = "2. Active Brick router model";
+    $("#mcount").textContent = `${list.length} Brick router model (${S.router || "brick-v1-beta"})`;
+  } else if (S.mode === "compare") {
+    $("#modelHeading").textContent = `2. Choose the single model to compare against ${S.router || "brick-v1-beta"}`;
+    $("#mcount").textContent = `${list.length} direct models available · compared vs ${S.router || "brick-v1-beta"}`;
+  } else {
+    $("#modelHeading").textContent = "2. Choose the single model to run every step";
+    $("#mcount").textContent = `${list.length} direct models available`;
+  }
+  $("#models").innerHTML = list.map((m) => `<label class="opt"><input type="radio" name="model" value="${esc(m)}" ${m === S.model ? "checked" : ""}>
+    <span class="card"><span class="radio"></span><span class="mname">${esc(m)}</span>${m === "qwen3.5-122b" || m === "brick-v1-beta" ? '<span class="tag">Recommended</span>' : ""}</span></label>`).join("");
+  $$("#models input").forEach((i) => i.addEventListener("change", () => { S.model = i.value; $("#s2").textContent = S.mode === "routed" ? (S.router || "brick-v1-beta") : S.model; }));
+  $("#s2").textContent = S.mode === "routed" ? (S.router || "brick-v1-beta") : S.model;
 }
 $("#to3").addEventListener("click", () => { unlock(3); go(3); });
 $("#back1").addEventListener("click", () => go(1));
 
 const MODES = [
-  ["routed", "Regolo routing", "Recommended", "Extraction runs on the router model {router}, fast and cheap. PoC specification and API contracts run on the model you chose."],
-  ["single", "Single model", "", "Every step runs on the model you chose."],
-  ["compare", "Compare on my repo", "Uses more tokens", "Runs your project twice in parallel: whole files on one model, then the compressed skeleton with routing. Tokens, time and cost side by side."]];
+  ["routed", "Regolo routing (brick-v1-beta)", "Recommended", "Uses Regolo's {router} router model to classify and route steps automatically."],
+  ["single", "Single model", "", "Runs every step directly on the single model you choose from the list below."],
+  ["compare", "Compare brick-v1-beta vs Single model", "Side-by-side benchmark", "Runs your project twice in parallel: your chosen single model on raw files vs compressed skeleton with {router}. Compares tokens, time and cost side by side."]];
 function renderModes() {
   $("#modes").innerHTML = MODES.map(([id, name, tag, d]) => {
     const off = id !== "single" && !S.routerOk;
     return `<label class="opt mode"><input type="radio" name="mode" value="${id}" ${S.mode === id ? "checked" : ""} ${off ? "disabled" : ""}>
       <span class="card"><span class="h"><span class="radio"></span>${name}${tag ? `<span class="tag">${tag}</span>` : ""}</span>
-      <span class="d">${esc(d.replace("{router}", S.router || "brick-complexity-pro"))}${off ? " Not available for this key." : ""}</span></span></label>`;
+      <span class="d">${esc(d.replace("{router}", S.router || "brick-v1-beta"))}${off ? " Not available for this key." : ""}</span></span></label>`;
   }).join("");
-  $$("#modes input").forEach((i) => i.addEventListener("change", () => { S.mode = i.value; }));
+  $$("#modes input").forEach((i) => i.addEventListener("change", () => { S.mode = i.value; renderModels(); }));
 }
 
 /* ---- step 3 ---- */

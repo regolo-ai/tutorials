@@ -46,7 +46,7 @@ class ReaStudioTests(unittest.TestCase):
     def test_routed_triage_and_retry(self):
         S.chat = FakeChat(bad_router=False)
         r = S.execute_run("k", "qwen3.5-122b", "web-har-to-poc", "pos", {"files": sample_dumps()}, True, True, lambda *_: None)
-        self.assertEqual([s["model"] for s in r["stages"]], ["brick-complexity-pro", "qwen3.5-122b"])
+        self.assertEqual([s["model"] for s in r["stages"]], ["brick-v1-beta", "qwen3.5-122b"])
         self.assertFalse(r["router_retry"])
         self.assertIn("REA_MCP_INPUT_SCHEMA_PROFILE", r["html"])
 
