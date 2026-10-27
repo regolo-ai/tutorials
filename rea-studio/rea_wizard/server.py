@@ -1,10 +1,16 @@
 #!/usr/bin/env python3
-"""Regolo REA Studio: a local web wizard around regolo_rea_tui.py (stdlib only).
+"""Regolo REA Studio: a local web PoC & Clean-Room Specification Builder for morluto/rea + Regolo (stdlib only).
+
+Zero SVG / zero diagram-design code. Inspects:
+- `morluto/rea` static evidence dumps (web HAR captures, Electron ASAR/IPC bundles, Go/Rust/.NET binaries, SQLite snapshots)
+- `REA_MCP_INPUT_SCHEMA_PROFILE=compact` and `REA_MCP_OUTPUT_SCHEMA_PROFILE=compact`
+- Client-ready Proof-of-Concept (PoC) specifications and API contracts (`poc/evidence-ledger.json` & `poc/poc-spec-*.md`)
+- Side-by-side Compare mode (Unfiltered REA Dumps vs Sieved Evidence + Regolo routing)
 
   python3 rea_wizard/server.py            # http://127.0.0.1:8220
-  python3 rea_wizard/server.py --port 8220 --no-open
 """
 import argparse
+import html
 import json
 import os
 import re
@@ -26,24 +32,15 @@ import regolo_rea_tui as T  # noqa: E402
 
 STATIC = HERE / "static"
 BASE_URL = "https://api.regolo.ai/v1"
-MIME = {".html": "text/html; charset=utf-8", ".png": "image/png", ".woff2": "font/woff2",
-        ".svg": "image/svg+xml", ".css": "text/css", ".js": "text/javascript"}
+MIME = {".html": "text/html; charset=utf-8", ".png": "image/png", ".woff2": "font/woff2", ".css": "text/css", ".js": "text/javascript"}
 
 NON_CHAT_HINTS = ("embed", "rerank", "whisper", "ocr", "image", "clef", "tts", "speech")
 PREFERRED_MODEL = "qwen3.5-122b"
 ROUTER_MODEL = "brick-complexity-pro"
 PRICES_PATH = HERE / "prices.json"
-STAGE_PCT = {"scan": 10, "triage": 35, "reconstruct": 72}
+STAGE_PCT = {"scan": 12, "triage": 45, "reconstruct": 80}
 
-SAMPLE_REA = {
-    "evidence": [
-        {"id": "e0", "symbol": "ipc:sync:flush_offline_queue", "scope": "Main Process IPC", "detail": "batch=250 · ack=4800ms"},
-        {"id": "e1", "symbol": "ipc:keystore:unseal_master_key", "scope": "Preload Bridge", "detail": "AES-256-GCM · HSM seal"},
-        {"id": "e2", "symbol": "DeriveOfflinePinKey", "scope": "Native Binary Symbol", "detail": "Argon2id · 64 MiB · 4 iter"},
-    ]
-}
-
-ALLOWED_EXTS = {".json", ".yml", ".yaml", ".sql", ".py", ".ts", ".js", ".go", ".rs", ".toml"}
+ALLOWED_EXTS = {".json", ".har", ".yml", ".yaml", ".sql", ".py", ".ts", ".js", ".go", ".rs", ".toml"}
 BUILTIN_IGNORE = {".git", "node_modules", ".venv", "venv", "__pycache__", "dist", "build", ".next", "output"}
 SKIP_NAMES = {"benchmark_results.json", "package-lock.json", "pnpm-lock.yaml", "yarn.lock"}
 SENSITIVE_NAME = re.compile(r"(?i)secret|credential|private|\.pem$|id_rsa")
@@ -184,8 +181,46 @@ def pct_change(base, new):
     return None if not base or new is None else round(100 * (new - base) / base, 1)
 
 
+def render_poc_inspector_html(project: str, tmpl_name: str, model: str, artifacts: list[dict]) -> str:
+    """Render an authentic REA PoC & Clean-Room Specification Inspector view (NOT an SVG diagram)."""
+    cards = []
+    for art in artifacts:
+        badge_col = "#05df72" if "Specification" in art["kind"] else "#fbbf24"
+        cards.append(
+            f'<div style="padding:16px 18px;border-radius:12px;background:#090f0d;border:1px solid rgba(148,163,184,0.24);margin-bottom:12px;">'
+            f'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-family:ui-monospace,monospace;font-size:12px;">'
+            f'<span style="color:#ffffff;font-weight:700;">{html.escape(art["rel_path"])}</span>'
+            f'<span style="padding:2px 9px;border-radius:999px;background:rgba(255,255,255,0.06);color:{badge_col};font-weight:700;">{html.escape(art["kind"])} · {html.escape(art["tier"])}</span>'
+            f'</div>'
+            f'<pre style="margin:0;padding:12px;border-radius:8px;background:#050807;color:#cbd5e1;font-family:ui-monospace,monospace;font-size:12.5px;line-height:1.55;white-space:pre-wrap;">{html.escape(art["content"].strip()[:1600])}</pre>'
+            f'</div>'
+        )
+    cli_preview = (
+        f'# 1. Inspect target app or HAR session locally with REA (compact MCP schema profile)\n'
+        f'export REA_MCP_INPUT_SCHEMA_PROFILE="compact"\n'
+        f'export REA_MCP_OUTPUT_SCHEMA_PROFILE="compact"\n'
+        f'npx -y rea-agents@latest analyze-javascript-application ./target-app --json > rea-evidence.json\n'
+        f'# Or build an interactive agent environment from a recorded browser HAR session:\n'
+        f'rea environment-build ./session.har ./client-poc-env --name client-poc --json'
+    )
+    return (
+        f'<div style="font-family:\'Space Grotesk\',sans-serif;color:#e2e8f0;padding:8px 4px;">'
+        f'<div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(148,163,184,0.2);">'
+        f'<div><span style="font-family:ui-monospace,monospace;font-size:11.5px;color:#58e388;font-weight:700;letter-spacing:0.06em;">REA EVIDENCE SIEVE &amp; CLIENT POC BUILDER · EU ZERO RETENTION</span>'
+        f'<h3 style="margin:4px 0 0;font-size:20px;color:#ffffff;">output/{html.escape(project)}/poc/ ({len(artifacts)} PoC deliverables generated)</h3></div>'
+        f'<span style="font-family:ui-monospace,monospace;font-size:12px;padding:4px 10px;border-radius:6px;background:rgba(5,223,114,0.12);border:1px solid rgba(5,223,114,0.4);color:#58e388;">Workflow: {html.escape(tmpl_name)}</span>'
+        f'</div>'
+        + "".join(cards)
+        + f'<div style="margin-top:16px;padding:14px 18px;border-radius:12px;background:rgba(5,223,114,0.06);border:1px solid rgba(5,223,114,0.35);">'
+        f'<div style="font-family:ui-monospace,monospace;font-size:11.5px;font-weight:700;color:#05df72;margin-bottom:6px;">UPSTREAM REA CLI &amp; COMPACT MCP PROFILE COMMANDS</div>'
+        f'<pre style="margin:0;font-family:ui-monospace,monospace;font-size:12px;line-height:1.55;color:#e2e8f0;white-space:pre-wrap;">{cli_preview}</pre>'
+        f'</div></div>'
+    )
+
+
 def execute_run(key, model, tcode, project, info, routed: bool, compact: bool, report) -> dict:
-    code, name, desc = next(t for t in T.REA_TEMPLATES if t[0] == tcode)
+    tmpl = next((t for t in T.POC_TEMPLATES if t[0] == tcode), T.POC_TEMPLATES[0])
+    code, name, desc = tmpl
     t_start, stages = time.perf_counter(), []
     report("scan", STAGE_PCT["scan"])
     scan = scan_uploaded(info["files"], project, compact=compact)
@@ -193,24 +228,25 @@ def execute_run(key, model, tcode, project, info, routed: bool, compact: bool, r
     report("triage", STAGE_PCT["triage"])
     sys1 = (
         'You are a fast reverse-engineering evidence triage engine. Output ONLY a valid JSON object '
-        '{"evidence": [{"id": "e0", "symbol": "...", "scope": "...", "detail": "..."}]}. At most 6 items.'
+        '{"evidence": [{"symbol": "...", "surface": "...", "contract": "..."}], '
+        '"poc_endpoints": [{"route": "...", "purpose": "..."}]}. At most 4 evidence items and 3 PoC routes.'
     )
-    usr1 = f"Isolate the 4 to 6 critical IPC channels, crypto routines, and sync tables for {name} ({desc}) from:\n{scan['skeleton_text']}"
+    usr1 = f"Isolate critical IPC channels, API payloads, crypto routines, and SQLite tables for '{name}' ({desc}) from:\n{scan['skeleton_text']}"
     tri_model, router_fallback = (ROUTER_MODEL if routed else model), False
     try:
-        s1 = metered_chat(key, tri_model, sys1, usr1, 900, "Triage IPC & binary symbols", stages)
+        s1 = metered_chat(key, tri_model, sys1, usr1, 900, "Triage REA evidence dump", stages)
     except UserError:
         if tri_model == model:
             raise
         tri_model, router_fallback = model, True
-        s1 = metered_chat(key, model, sys1, usr1, 900, "Triage IPC & binary symbols", stages)
+        s1 = metered_chat(key, model, sys1, usr1, 900, "Triage REA evidence dump", stages)
 
     rea_obj = T.parse_rea_json(s1["content"], scan["files"])
-    from_model = lambda r: not str(r["evidence"][0].get("detail", "")).startswith("Sieved (")
+    from_model = lambda r: not str(r["evidence"][0].get("symbol", "")).startswith("ipc:sync:flush_offline_queue ->")
     router_retry = False
     if routed and tri_model == ROUTER_MODEL and not from_model(rea_obj):
         router_retry = True
-        s1 = metered_chat(key, model, sys1, usr1, 900, "Triage IPC & binary symbols (retry)", stages)
+        s1 = metered_chat(key, model, sys1, usr1, 900, "Triage REA evidence dump (retry)", stages)
         rea_obj = T.parse_rea_json(s1["content"], scan["files"])
 
     report("reconstruct", STAGE_PCT["reconstruct"])
@@ -218,25 +254,22 @@ def execute_run(key, model, tcode, project, info, routed: bool, compact: bool, r
     s2 = metered_chat(
         key,
         model,
-        "You write clean-room software specifications from static reverse-engineering evidence. "
-        "Output ONLY Markdown with sections: '## Architecture & IPC Overview', '## Critical Symbols & Crypto Parameters', "
-        "'## Reconstructed State Machine', and '## Reference Implementation Skeleton'.",
-        f"Project: {project}\nAudit: {name}\nTriaged Evidence JSON:\n{json.dumps(rea_obj)}\n\nEvidence:\n{evidence}",
-        1500,
-        "Reconstruct clean-room spec",
+        "You write client-ready Proof-of-Concept (PoC) specifications from static REA evidence for software agencies and dev teams. "
+        "Output ONLY Markdown with sections: '## Extracted Feature & Evidence Summary', '## Critical IPC / API / Database Contracts', "
+        "'## Clean-Room PoC Architecture', and '## Fast-Track Implementation Plan'.",
+        f"Project: {project}\nPoC Workflow: {name}\nTriaged Evidence JSON:\n{json.dumps(rea_obj)}\n\nEvidence:\n{evidence}",
+        1200,
+        "Build client PoC specification",
         stages,
     )
-    svg = T.render_rea_evidence_svg(rea_obj, project, code, name, scan["files"])
-    markdown = (
-        f"---\nproject: {project}\naudit_template: {name} (type {code})\ngenerated: {date.today().isoformat()}\n"
-        f"model: {model}\nsource: Regolo REA Studio\n---\n\n# {project}: {name}\n\n"
-        f"{s2['content'].strip()}\n\n## Sieved Evidence Sources\n\n"
-        + "\n".join(f"- `{f['path']}` ({f['raw_chars']} -> {f['compact_chars']} chars)" for f in scan["files"])
-        + "\n"
-    )
+    _, poc_dir = T.get_project_poc_dir(Path(info.get("root", Path.cwd())))
+    artifacts = T.write_poc_artifacts(poc_dir, project, tmpl, model, rea_obj, s2["content"], scan["files"])
+    inspector_html = render_poc_inspector_html(project, name, model, artifacts)
+    markdown = "\n\n".join(f"### `{a['rel_path']}`\n\n{a['content']}" for a in artifacts)
+
     return {
-        "svg": svg,
-        "html": svg,
+        "svg": inspector_html,
+        "html": inspector_html,
         "markdown": markdown,
         "router_fallback": router_fallback,
         "router_retry": router_retry,
@@ -279,7 +312,7 @@ def run_job(job_id: str, req: dict) -> None:
 
         def work(i, label, routed, compact):
             try:
-                r = execute_run(key, model, req["type_code"], project, info, routed, compact, reporter(i))
+                r = execute_run(key, model, req.get("type_code", "web-har-to-poc"), project, info, routed, compact, reporter(i))
                 r["label"] = label
                 results[i] = r
             except Exception as exc:
@@ -299,7 +332,7 @@ def run_job(job_id: str, req: dict) -> None:
                 "wall_pct": pct_change(a["wall_s"], d["wall_s"]),
                 "cost_pct": pct_change(a["cost_eur"], d["cost_eur"]),
             }
-        code, name, _ = next(t for t in T.REA_TEMPLATES if t[0] == req["type_code"])
+        tmpl = next((t for t in T.POC_TEMPLATES if t[0] == req.get("type_code")), T.POC_TEMPLATES[0])
         with JOBS_LOCK:
             job.update(
                 status="done",
@@ -311,7 +344,7 @@ def run_job(job_id: str, req: dict) -> None:
                     "mode": mode,
                     "model": model,
                     "router": ROUTER_MODEL,
-                    "type": {"code": code, "name": name},
+                    "type": {"code": tmpl[0], "name": tmpl[1]},
                     "runs": results,
                     "compare": compare,
                 },
@@ -339,12 +372,7 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         path = self.path.split("?")[0]
         if path == "/api/types":
-            return self.json(200, [{"code": c, "name": n, "description": d} for c, n, d in T.REA_TEMPLATES])
-        m = re.fullmatch(r"/api/preview/(\d{2})\.svg", path)
-        if m:
-            t = next((t for t in T.REA_TEMPLATES if t[0] == m.group(1)), T.REA_TEMPLATES[0])
-            svg = T.render_rea_evidence_svg(SAMPLE_REA, "legacy-pos-desktop", t[0], t[1], [])
-            return self.send(200, svg.encode(), "image/svg+xml")
+            return self.json(200, [{"code": c, "name": n, "description": d} for c, n, d in T.POC_TEMPLATES])
         m = re.fullmatch(r"/api/jobs/([0-9a-f]{32})", path)
         if m:
             with JOBS_LOCK:
