@@ -55,6 +55,9 @@ class ReaStudioTests(unittest.TestCase):
         self.assertTrue(r2["router_retry"])
         self.assertEqual([s["stage"] for s in r2["stages"]][:2], ["Triage REA evidence dump", "Triage REA evidence dump (retry)"])
 
+    def test_pick_folder_endpoint_registered(self):
+        self.assertTrue(callable(getattr(S, "pick_folder", None)))
+
 
 if __name__ == "__main__":
     unittest.main()

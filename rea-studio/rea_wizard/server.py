@@ -13,6 +13,7 @@ import argparse
 import html
 import json
 import os
+import platform
 import re
 import shutil
 import subprocess
@@ -135,6 +136,25 @@ def inspect_project(raw: str) -> dict:
     picked = sorted(eligible)[:MAX_FILES]
     files = [{"path": n, "content": (root / n).read_text(encoding="utf-8", errors="ignore")[:MAX_READ]} for n in picked]
     return {"root": str(root), "name": root.name, "mode": "git", "total": len(eligible), "readable": len(eligible), "selected": picked, "files": files}
+
+
+def pick_folder() -> dict:
+    """Native folder dialog on the machine running this app (the browser cannot reveal real paths)."""
+    system = platform.system()
+    if system == "Darwin":
+        cmd = ["osascript", "-e", 'POSIX path of (choose folder with prompt "Choose the project folder for Regolo REA Studio")']
+    elif shutil.which("zenity"):
+        cmd = ["zenity", "--file-selection", "--directory", "--title=Choose the project folder"]
+    else:
+        raise UserError("No folder dialog is available on this system. Paste the folder path instead.")
+    try:
+        r = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
+    except subprocess.TimeoutExpired:
+        raise UserError("The folder dialog timed out. Paste the folder path instead.")
+    path = r.stdout.strip()
+    if r.returncode != 0 or not path:
+        return {"path": ""}
+    return {"path": path.rstrip("/") or "/"}
 
 
 def load_prices() -> dict:
@@ -389,6 +409,8 @@ class Handler(BaseHTTPRequestHandler):
         try:
             n = int(self.headers.get("Content-Length") or 0)
             data = json.loads(self.rfile.read(n) or b"{}")
+            if self.path == "/api/pick-folder":
+                return self.json(200, pick_folder())
             if self.path == "/api/scan":
                 info = inspect_project(data.get("path", ""))
                 return self.json(200, {k: info[k] for k in ("root", "name", "mode", "total", "readable", "selected")})
