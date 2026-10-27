@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-"""Regolo Memory Studio: a local web inspector for akitaonrails/ai-memory + Regolo (stdlib only).
+"""Regolo Memory Studio: a local web app that turns a project folder into Markdown wiki pages and a handoff brief
+for the next coding agent, on Regolo models (stdlib only).
 
-Zero SVG / zero diagram-design code. Inspects:
-- `ai-memory`'s real `openai-compat` + `Qwen3-Embedding-8B` configuration for Regolo (`AI_MEMORY_LLM_COMPAT_DISABLE_THINKING=true`)
-- Git-backed Markdown `wiki/` pages (`wiki/decisions/*.md`, `wiki/procedures/*.md`, `wiki/handoffs/*.md`) with OKF v0.2 frontmatter
-- Claim-Once Cross-Agent Handoff packets (`claude-code -> opencode -> codex`)
-- Side-by-side Compare mode (Cold Session Rescan vs Consolidated Wiki + Regolo routing)
+Inspired by the cross-agent memory ideas of akitaonrails/ai-memory (MIT). It is an independent implementation, not
+affiliated with that project, and ai-memory does not read its output automatically. It produces:
+- Markdown pages under `wiki/decisions/`, `wiki/procedures/` and `wiki/handoffs/`, with this app's own frontmatter
+- A handoff brief for a switch between agents (`claude-code -> opencode`, `opencode -> codex`, ...)
+- An example `regolo.env` for ai-memory's `openai-compat` provider, for people who also run ai-memory
+- Side-by-side Compare mode (whole files on one model vs compressed skeleton + Regolo routing)
 
   python3 memory_wizard/server.py            # http://127.0.0.1:8210
 """
@@ -13,6 +15,7 @@ import argparse
 import html
 import json
 import os
+import platform
 import re
 import shutil
 import subprocess
@@ -36,9 +39,10 @@ MIME = {".html": "text/html; charset=utf-8", ".png": "image/png", ".woff2": "fon
 
 NON_CHAT_HINTS = ("embed", "rerank", "whisper", "ocr", "image", "clef", "tts", "speech")
 PREFERRED_MODEL = "qwen3.5-122b"
-ROUTER_MODEL = "brick-complexity-pro"
+ROUTER_MODEL = "brick-v1-beta"  # Regolo router: picks the model that serves each request (see served_model)
 PRICES_PATH = HERE / "prices.json"
-STAGE_PCT = {"scan": 12, "consolidate": 45, "handoff": 80}
+STAGE_PCT = {"scan": 12, "consolidate": 45, "handoff": 80, "wiki": 95}
+CONSOLIDATE_MAX_TOKENS = 900
 
 ALLOWED_EXTS = {".yml", ".yaml", ".sql", ".py", ".ts", ".tsx", ".js", ".go", ".rs", ".toml", ".tf", ".proto", ".prisma", ".java", ".json", ".md"}
 SECRET_LINE = T.SECRET_LINE
@@ -181,6 +185,7 @@ def metered_chat(key, model, system, user, max_tokens, label, stages):
     stages.append({
         "stage": label,
         "model": model,
+        "served_model": r.get("model") or model,
         "prompt_tokens": r["prompt_tokens"],
         "completion_tokens": r["completion_tokens"],
         "latency_s": r["latency_s"],
@@ -209,7 +214,7 @@ def pct_change(base, new):
 
 
 def render_wiki_inspector_html(project: str, pair_label: str, model: str, pages: list[dict], wiki_obj: dict) -> str:
-    """Render an authentic Git-Backed Wiki & Claim-Once Handoff Inspector view (NOT an SVG diagram)."""
+    """Render the wiki pages, the handoff brief and an example ai-memory env file as one HTML view."""
     cards = []
     for pg in pages:
         badge_col = "#05df72" if pg["kind"] == "handoff" else ("#c4b5fd" if pg["kind"] == "decision" else "#38bdf8")
@@ -238,19 +243,19 @@ def render_wiki_inspector_html(project: str, pair_label: str, model: str, pages:
     return (
         f'<div style="font-family:\'Space Grotesk\',sans-serif;color:#e2e8f0;padding:8px 4px;">'
         f'<div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(148,163,184,0.2);">'
-        f'<div><span style="font-family:ui-monospace,monospace;font-size:11.5px;color:#58e388;font-weight:700;letter-spacing:0.06em;">GIT-BACKED WIKI &amp; CLAIM-ONCE HANDOFF INSPECTOR · OKF v0.2</span>'
-        f'<h3 style="margin:4px 0 0;font-size:20px;color:#ffffff;">&lt;data_dir&gt;/wiki/{html.escape(project)}/ ({len(pages)} Markdown pages compiled)</h3></div>'
+        f'<div><span style="font-family:ui-monospace,monospace;font-size:11.5px;color:#58e388;font-weight:700;letter-spacing:0.06em;">WIKI &amp; HANDOFF INSPECTOR · MEMORY STUDIO FORMAT</span>'
+        f'<h3 style="margin:4px 0 0;font-size:20px;color:#ffffff;">wiki/ for {html.escape(project)} ({len(pages)} Markdown pages)</h3></div>'
         f'<span style="font-family:ui-monospace,monospace;font-size:12px;padding:4px 10px;border-radius:6px;background:rgba(5,223,114,0.12);border:1px solid rgba(5,223,114,0.4);color:#58e388;">Transition: {html.escape(pair_label)}</span>'
         f'</div>'
         + "".join(cards)
         + f'<div style="margin-top:16px;padding:14px 18px;border-radius:12px;background:rgba(5,223,114,0.06);border:1px solid rgba(5,223,114,0.35);">'
-        f'<div style="font-family:ui-monospace,monospace;font-size:11.5px;font-weight:700;color:#05df72;margin-bottom:6px;">GENERATED ~/.config/ai-memory/regolo.env (READY FOR AI-MEMORY DAEMON)</div>'
+        f'<div style="font-family:ui-monospace,monospace;font-size:11.5px;font-weight:700;color:#05df72;margin-bottom:6px;">OPTIONAL · EXAMPLE regolo.env FOR AI-MEMORY&#39;S OPENAI-COMPAT PROVIDER (AI-MEMORY DOES NOT IMPORT THE PAGES ABOVE)</div>'
         f'<pre style="margin:0;font-family:ui-monospace,monospace;font-size:12px;line-height:1.55;color:#e2e8f0;white-space:pre-wrap;">{env_preview}</pre>'
         f'</div></div>'
     )
 
 
-def execute_run(key, model, pcode, project, info, routed: bool, compact: bool, report) -> dict:
+def execute_run(key, model, pcode, project, info, routed: bool, compact: bool, report, wiki_dir: Path | None = None) -> dict:
     pair = next((t for t in T.HARNESS_PAIRS if t[0] == pcode), T.HARNESS_PAIRS[0])
     code, name, desc = pair
     t_start, stages = time.perf_counter(), []
@@ -259,7 +264,7 @@ def execute_run(key, model, pcode, project, info, routed: bool, compact: bool, r
 
     report("consolidate", STAGE_PCT["consolidate"])
     sys1 = (
-        "You are the ai-memory consolidation worker (`AI_MEMORY_LLM_COMPAT_DISABLE_THINKING=true`). "
+        "You are a wiki consolidation worker for a code repository. "
         "Output ONLY valid JSON with {\"decisions\": [{\"slug\": \"...\", \"title\": \"...\", \"summary\": \"...\"}], "
         "\"procedures\": [{\"slug\": \"...\", \"title\": \"...\", \"summary\": \"...\"}], "
         "\"failed_approaches\": [\"...\"], \"open_questions\": [\"...\"]}. At most 2 decisions and 3 procedures."
@@ -267,19 +272,19 @@ def execute_run(key, model, pcode, project, info, routed: bool, compact: bool, r
     usr1 = f"Consolidate observations from '{project}' for {name} ({desc}):\n{scan['skeleton_text']}"
     cons_model, router_fallback = (ROUTER_MODEL if routed else model), False
     try:
-        s1 = metered_chat(key, cons_model, sys1, usr1, 900, "Consolidate wiki pages", stages)
+        s1 = metered_chat(key, cons_model, sys1, usr1, CONSOLIDATE_MAX_TOKENS, "Consolidate wiki pages", stages)
     except UserError:
         if cons_model == model:
             raise
         cons_model, router_fallback = model, True
-        s1 = metered_chat(key, model, sys1, usr1, 900, "Consolidate wiki pages", stages)
+        s1 = metered_chat(key, model, sys1, usr1, CONSOLIDATE_MAX_TOKENS, "Consolidate wiki pages", stages)
 
     wiki_obj = T.parse_wiki_json(s1["content"], scan["files"])
     from_model = lambda w: not str(w["decisions"][0].get("slug", "")).startswith("adr-01-auth-and-wal")
     router_retry = False
     if routed and cons_model == ROUTER_MODEL and not from_model(wiki_obj):
         router_retry = True
-        s1 = metered_chat(key, model, sys1, usr1, 900, "Consolidate wiki pages (retry)", stages)
+        s1 = metered_chat(key, model, sys1, usr1, CONSOLIDATE_MAX_TOKENS, "Consolidate wiki pages (retry)", stages)
         wiki_obj = T.parse_wiki_json(s1["content"], scan["files"])
 
     report("handoff", STAGE_PCT["handoff"])
@@ -287,16 +292,23 @@ def execute_run(key, model, pcode, project, info, routed: bool, compact: bool, r
     s2 = metered_chat(
         key,
         model,
-        "You generate a Claim-Once Cross-Agent Handoff packet (`memory_briefing` + `memory_handoff_list`) for `ai-memory run`. "
+        "You write a handoff brief for the next coding agent that picks up this repository. "
         "Output ONLY Markdown with sections: '## Where We Left Off', '## Failed Approaches (Do Not Repeat)', "
         "'## Locked Architectural Decisions', and '## Open Questions & Next Steps'.",
         f"Project: {project}\nTransition: {name}\nConsolidated Wiki JSON:\n{json.dumps(wiki_obj)}\n\nScanned files:\n{evidence}",
         1200,
-        "Compile claim-once handoff packet",
+        "Write handoff brief",
         stages,
     )
-    _, wiki_dir = T.get_project_wiki_dir(Path(info.get("root", Path.cwd())))
-    pages = T.write_git_backed_wiki_files(wiki_dir, project, pair, model, wiki_obj, s2["content"], scan["files"])
+    report("wiki", STAGE_PCT["wiki"])
+    if wiki_dir is None:
+        _, wiki_dir = T.get_project_wiki_dir(Path(info.get("root", Path.cwd())))
+    else:
+        for sub in ("decisions", "procedures", "handoffs"):
+            (wiki_dir / sub).mkdir(parents=True, exist_ok=True)
+    cons = stages[-2]  # the consolidation call that produced wiki_obj (after any retry)
+    by = cons["model"] if cons["served_model"] == cons["model"] else f'{cons["model"]} ({cons["served_model"]})'
+    pages = T.write_git_backed_wiki_files(wiki_dir, project, pair, model, wiki_obj, s2["content"], scan["files"], consolidated_by=by)
     inspector_html = render_wiki_inspector_html(project, name, model, pages, wiki_obj)
     markdown = "\n\n".join(f"### `{p['rel_path']}`\n\n{p['content']}" for p in pages)
 
@@ -421,6 +433,17 @@ class Handler(BaseHTTPRequestHandler):
         try:
             n = int(self.headers.get("Content-Length") or 0)
             data = json.loads(self.rfile.read(n) or b"{}")
+            if self.path == "/api/pick-folder":
+                system = platform.system()
+                if system == "Darwin":
+                    cmd = ["osascript", "-e", 'POSIX path of (choose folder with prompt "Choose the project folder for Regolo Memory Studio")']
+                elif shutil.which("zenity"):
+                    cmd = ["zenity", "--file-selection", "--directory", "--title=Choose the project folder"]
+                else:
+                    raise UserError("No folder dialog is available on this system. Paste the folder path instead.")
+                r = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
+                p = r.stdout.strip()
+                return self.json(200, {"path": (p.rstrip("/") or "/") if r.returncode == 0 and p else ""})
             if self.path == "/api/scan":
                 info = inspect_project(data.get("path", ""))
                 return self.json(200, {k: info[k] for k in ("root", "name", "mode", "total", "readable", "selected")})
