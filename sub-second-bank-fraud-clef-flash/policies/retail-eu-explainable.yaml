@@ -1,0 +1,41 @@
+# Extended compliance & explainable AI (XAI) profile: adds three diagnostic flags for AML and fraud
+# case review alongside the graded pattern and risk score (~2.5x input tokens per model call).
+extends: retail-eu.yaml
+policy_id: retail-eu-explainable
+description: >-
+  Extended compliance diagnostics: adds three yes/no explanation flags (amount, geography/device,
+  account takeover) for analyst case review, at roughly 2.5x the input tokens per model call.
+governance:
+  change_ticket: CHG-2026-XAI-04
+
+model:
+  timeout_ms:
+    card_present: 4500
+    atm: 4500
+    card_not_present: 4500
+    sepa_instant: 4500
+    default: 4500
+
+questions:
+  amount_anomalous:
+    type: noul
+    weight: 0.10
+    instructions: >-
+      Is the candidate amount anomalous compared with the spending habits shown in the
+      history and in the precomputed features?
+  geo_device_inconsistent:
+    type: noul
+    weight: 0.10
+    instructions: >-
+      Are the candidate's country, IP country or device inconsistent with the customer's
+      recent transactions?
+  account_takeover:
+    type: noul
+    weight: 0.10
+    instructions: >-
+      Are there signs that a third party has taken control of the account, such as a recent
+      contact change, a new device and a new beneficiary together?
+  scam_pattern:
+    weight: 0.30
+  fraud_risk:
+    weight: 0.40

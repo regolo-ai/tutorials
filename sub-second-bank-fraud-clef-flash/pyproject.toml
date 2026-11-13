@@ -1,0 +1,34 @@
+[project]
+name = "fraudclef"
+version = "0.1.0"
+description = "Sub-second European payment fraud scoring engine: YAML security policies + Clef-Flash decision model on Regolo"
+readme = "GUIDE.md"
+requires-python = ">=3.12"
+dependencies = [
+    "httpx>=0.27",
+    "pydantic>=2.7",
+    "pyyaml>=6.0",
+    "simpleeval>=1.0",
+    "python-dotenv>=1.0",
+    "fastapi>=0.115",
+    "uvicorn>=0.30",
+]
+
+[project.scripts]
+fraudclef = "fraudclef.cli:main"
+
+[dependency-groups]
+dev = ["pytest>=8.0"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/fraudclef"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["live: calls the real Regolo API (needs REGOLO_API_KEY)"]
+addopts = "-m 'not live'"
+filterwarnings = ["ignore:Using `httpx` with `starlette.testclient`"]

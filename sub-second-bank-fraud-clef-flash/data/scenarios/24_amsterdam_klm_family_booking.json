@@ -1,0 +1,438 @@
+{
+  "name": "24_amsterdam_klm_family_booking",
+  "description": "Amsterdam customer books EUR 460 KLM flight on known iPhone and home NL IP with SCA",
+  "expected": [
+    "approve",
+    "step_up"
+  ],
+  "label": "legit",
+  "type": "unusual_legit",
+  "request": {
+    "customer": {
+      "id": "cust-nl-0401",
+      "segment": "retail",
+      "vulnerable": false,
+      "account_age_days": 2050,
+      "home_country": "NL",
+      "recent_profile_changes": []
+    },
+    "history": [
+      {
+        "transaction_id": "o19",
+        "timestamp": "2026-08-17T20:07:00+02:00",
+        "amount": 30.75,
+        "channel": "card_present",
+        "merchant": {
+          "name": "CAFE LOETJE OOST",
+          "mcc": "5812",
+          "country": "NL"
+        },
+        "location": {
+          "lat": 52.3676,
+          "lon": 4.9041,
+          "country": "NL"
+        }
+      },
+      {
+        "transaction_id": "o18",
+        "timestamp": "2026-08-20T15:07:00+02:00",
+        "amount": 54.8,
+        "channel": "card_present",
+        "merchant": {
+          "name": "ALBERT HEIJN MUSEUMPLEIN",
+          "mcc": "5411",
+          "country": "NL"
+        },
+        "location": {
+          "lat": 52.3676,
+          "lon": 4.9041,
+          "country": "NL"
+        }
+      },
+      {
+        "transaction_id": "o17",
+        "timestamp": "2026-08-23T10:07:00+02:00",
+        "amount": 73.0,
+        "channel": "sepa_direct_debit",
+        "mandate": {
+          "creditor_id": "DE98ZZZ0999990012345",
+          "mandate_id": "MND-MAINOVA-2022-1108",
+          "signed_at": "2022-11-08T09:00:00+01:00"
+        },
+        "recurring": true
+      },
+      {
+        "transaction_id": "o16",
+        "timestamp": "2026-08-27T17:07:00+02:00",
+        "amount": 62.6,
+        "channel": "card_present",
+        "merchant": {
+          "name": "ALBERT HEIJN MUSEUMPLEIN",
+          "mcc": "5411",
+          "country": "NL"
+        },
+        "location": {
+          "lat": 52.3676,
+          "lon": 4.9041,
+          "country": "NL"
+        }
+      },
+      {
+        "transaction_id": "o15",
+        "timestamp": "2026-08-30T12:07:00+02:00",
+        "amount": 43.75,
+        "channel": "card_present",
+        "merchant": {
+          "name": "CAFE LOETJE OOST",
+          "mcc": "5812",
+          "country": "NL"
+        },
+        "location": {
+          "lat": 52.3676,
+          "lon": 4.9041,
+          "country": "NL"
+        }
+      },
+      {
+        "transaction_id": "o14",
+        "timestamp": "2026-09-03T19:07:00+02:00",
+        "amount": 40.4,
+        "channel": "card_present",
+        "merchant": {
+          "name": "ALBERT HEIJN MUSEUMPLEIN",
+          "mcc": "5411",
+          "country": "NL"
+        },
+        "location": {
+          "lat": 52.3676,
+          "lon": 4.9041,
+          "country": "NL"
+        }
+      },
+      {
+        "transaction_id": "o13",
+        "timestamp": "2026-09-06T14:07:00+02:00",
+        "amount": 650.0,
+        "channel": "sepa_credit_transfer",
+        "beneficiary": {
+          "iban": "NL91ABNA0417164300",
+          "name": "Jan de Vries",
+          "vop_result": "match"
+        },
+        "device_id": "dev-nl-iphone",
+        "ip_country": "NL",
+        "authentication": "sca"
+      },
+      {
+        "transaction_id": "o12",
+        "timestamp": "2026-09-09T09:07:00+02:00",
+        "amount": 48.2,
+        "channel": "card_present",
+        "merchant": {
+          "name": "ALBERT HEIJN MUSEUMPLEIN",
+          "mcc": "5411",
+          "country": "NL"
+        },
+        "location": {
+          "lat": 52.3676,
+          "lon": 4.9041,
+          "country": "NL"
+        }
+      },
+      {
+        "transaction_id": "o11",
+        "timestamp": "2026-09-13T16:07:00+02:00",
+        "amount": 31.75,
+        "channel": "card_present",
+        "merchant": {
+          "name": "CAFE LOETJE OOST",
+          "mcc": "5812",
+          "country": "NL"
+        },
+        "location": {
+          "lat": 52.3676,
+          "lon": 4.9041,
+          "country": "NL"
+        }
+      },
+      {
+        "transaction_id": "o10",
+        "timestamp": "2026-09-16T11:07:00+02:00",
+        "amount": 56.0,
+        "channel": "card_present",
+        "merchant": {
+          "name": "ALBERT HEIJN MUSEUMPLEIN",
+          "mcc": "5411",
+          "country": "NL"
+        },
+        "location": {
+          "lat": 52.3676,
+          "lon": 4.9041,
+          "country": "NL"
+        }
+      },
+      {
+        "transaction_id": "o09",
+        "timestamp": "2026-09-20T18:07:00+02:00",
+        "amount": 38.25,
+        "channel": "card_present",
+        "merchant": {
+          "name": "CAFE LOETJE OOST",
+          "mcc": "5812",
+          "country": "NL"
+        },
+        "location": {
+          "lat": 52.3676,
+          "lon": 4.9041,
+          "country": "NL"
+        }
+      },
+      {
+        "transaction_id": "o08",
+        "timestamp": "2026-09-23T13:07:00+02:00",
+        "amount": 63.8,
+        "channel": "card_present",
+        "merchant": {
+          "name": "ALBERT HEIJN MUSEUMPLEIN",
+          "mcc": "5411",
+          "country": "NL"
+        },
+        "location": {
+          "lat": 52.3676,
+          "lon": 4.9041,
+          "country": "NL"
+        }
+      },
+      {
+        "transaction_id": "o07",
+        "timestamp": "2026-09-26T20:07:00+02:00",
+        "amount": 72.0,
+        "channel": "sepa_direct_debit",
+        "mandate": {
+          "creditor_id": "DE98ZZZ0999990012345",
+          "mandate_id": "MND-MAINOVA-2022-1108",
+          "signed_at": "2022-11-08T09:00:00+01:00"
+        },
+        "recurring": true
+      },
+      {
+        "transaction_id": "o06",
+        "timestamp": "2026-09-30T15:07:00+02:00",
+        "amount": 41.6,
+        "channel": "card_present",
+        "merchant": {
+          "name": "ALBERT HEIJN MUSEUMPLEIN",
+          "mcc": "5411",
+          "country": "NL"
+        },
+        "location": {
+          "lat": 52.3676,
+          "lon": 4.9041,
+          "country": "NL"
+        }
+      },
+      {
+        "transaction_id": "o05",
+        "timestamp": "2026-10-03T10:07:00+02:00",
+        "amount": 51.25,
+        "channel": "card_present",
+        "merchant": {
+          "name": "CAFE LOETJE OOST",
+          "mcc": "5812",
+          "country": "NL"
+        },
+        "location": {
+          "lat": 52.3676,
+          "lon": 4.9041,
+          "country": "NL"
+        }
+      },
+      {
+        "transaction_id": "o04",
+        "timestamp": "2026-10-07T17:07:00+02:00",
+        "amount": 49.4,
+        "channel": "card_present",
+        "merchant": {
+          "name": "ALBERT HEIJN MUSEUMPLEIN",
+          "mcc": "5411",
+          "country": "NL"
+        },
+        "location": {
+          "lat": 52.3676,
+          "lon": 4.9041,
+          "country": "NL"
+        }
+      },
+      {
+        "transaction_id": "o03",
+        "timestamp": "2026-10-10T12:07:00+02:00",
+        "amount": 650.0,
+        "channel": "sepa_credit_transfer",
+        "beneficiary": {
+          "iban": "NL91ABNA0417164300",
+          "name": "Jan de Vries",
+          "vop_result": "match"
+        },
+        "device_id": "dev-nl-iphone",
+        "ip_country": "NL",
+        "authentication": "sca"
+      },
+      {
+        "transaction_id": "o02",
+        "timestamp": "2026-10-13T19:07:00+02:00",
+        "amount": 57.2,
+        "channel": "card_present",
+        "merchant": {
+          "name": "ALBERT HEIJN MUSEUMPLEIN",
+          "mcc": "5411",
+          "country": "NL"
+        },
+        "location": {
+          "lat": 52.3676,
+          "lon": 4.9041,
+          "country": "NL"
+        }
+      },
+      {
+        "transaction_id": "o01",
+        "timestamp": "2026-10-17T14:07:00+02:00",
+        "amount": 39.25,
+        "channel": "card_present",
+        "merchant": {
+          "name": "CAFE LOETJE OOST",
+          "mcc": "5812",
+          "country": "NL"
+        },
+        "location": {
+          "lat": 52.3676,
+          "lon": 4.9041,
+          "country": "NL"
+        }
+      },
+      {
+        "transaction_id": "o00",
+        "timestamp": "2026-10-20T09:07:00+02:00",
+        "amount": 35.0,
+        "channel": "card_present",
+        "merchant": {
+          "name": "ALBERT HEIJN MUSEUMPLEIN",
+          "mcc": "5411",
+          "country": "NL"
+        },
+        "location": {
+          "lat": 52.3676,
+          "lon": 4.9041,
+          "country": "NL"
+        }
+      },
+      {
+        "transaction_id": "nh01",
+        "timestamp": "2026-10-22T15:00:00+02:00",
+        "amount": 51.2,
+        "channel": "card_present",
+        "merchant": {
+          "name": "ALBERT HEIJN MUSEUMPLEIN",
+          "mcc": "5411",
+          "country": "NL"
+        },
+        "location": {
+          "lat": 52.3676,
+          "lon": 4.9041,
+          "country": "NL"
+        }
+      },
+      {
+        "transaction_id": "nh02",
+        "timestamp": "2026-10-27T15:00:00+02:00",
+        "amount": 28.4,
+        "channel": "card_present",
+        "merchant": {
+          "name": "NS REIZIGERS AMSTERDAM",
+          "mcc": "4112",
+          "country": "NL"
+        },
+        "location": {
+          "lat": 52.3676,
+          "lon": 4.9041,
+          "country": "NL"
+        }
+      },
+      {
+        "transaction_id": "nh03",
+        "timestamp": "2026-11-01T15:00:00+02:00",
+        "amount": 64.1,
+        "channel": "card_present",
+        "merchant": {
+          "name": "HEMA KALVERSTRAAT",
+          "mcc": "5311",
+          "country": "NL"
+        },
+        "location": {
+          "lat": 52.3676,
+          "lon": 4.9041,
+          "country": "NL"
+        }
+      },
+      {
+        "transaction_id": "nh04",
+        "timestamp": "2026-11-04T15:00:00+02:00",
+        "amount": 44.8,
+        "channel": "card_present",
+        "merchant": {
+          "name": "ALBERT HEIJN MUSEUMPLEIN",
+          "mcc": "5411",
+          "country": "NL"
+        },
+        "location": {
+          "lat": 52.3676,
+          "lon": 4.9041,
+          "country": "NL"
+        }
+      },
+      {
+        "transaction_id": "nh05",
+        "timestamp": "2026-11-07T15:00:00+02:00",
+        "amount": 39.0,
+        "channel": "card_not_present",
+        "merchant": {
+          "name": "BOL.COM UTRECHT",
+          "mcc": "5942",
+          "country": "NL"
+        },
+        "device_id": "dev-nl-iphone",
+        "ip_country": "NL",
+        "authentication": "sca"
+      },
+      {
+        "transaction_id": "nh06",
+        "timestamp": "2026-11-09T15:00:00+02:00",
+        "amount": 47.5,
+        "channel": "card_present",
+        "merchant": {
+          "name": "CAFE LOETJE OOST",
+          "mcc": "5812",
+          "country": "NL"
+        },
+        "location": {
+          "lat": 52.3676,
+          "lon": 4.9041,
+          "country": "NL"
+        }
+      }
+    ],
+    "candidate": {
+      "transaction_id": "c24",
+      "timestamp": "2026-11-10T13:10:00+02:00",
+      "amount": 460.0,
+      "channel": "card_not_present",
+      "merchant": {
+        "name": "KLM ROYAL DUTCH AIRLINES",
+        "mcc": "4511",
+        "country": "NL"
+      },
+      "device_id": "dev-nl-iphone",
+      "ip_country": "NL",
+      "authentication": "sca"
+    }
+  }
+}

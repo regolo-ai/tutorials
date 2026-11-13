@@ -1,0 +1,181 @@
+# Eurozone retail banking & SEPA Instant policy.
+# Every change requires a new version, a change ticket, and a separate approver (four-eyes).
+# Expressions in `when` run in a restricted evaluator with read-only access to:
+#   candidate, customer, features, lists, limits  (+ answers in decision.overrides)
+
+policy_id: retail-eu
+description: >-
+  Eurozone retail banking and SEPA Instant standard (PSD2 TRA exemptions, Reg. EU 2024/886 VoP
+  checks, APP impersonation controls, account-takeover holds, and DORA channel fail modes).
+version: 1
+effective_from: 2026-11-01
+governance:
+  author: fraud-strategy-team
+  approved_by: chief-risk-office
+  change_ticket: CHG-2026-EU-0412
+  mode: enforce                     # enforce | shadow (compute and log, do not act)
+
+privacy:
+  pseudonymize: [beneficiary.iban, beneficiary.name, customer.id, device_id, mandate.creditor_id, mandate.mandate_id]
+  drop_fields_before_model: [description, merchant.name, location.lat, location.lon, transaction_id]
+  allow_external_backend: true      # false -> no data is sent to Regolo; requires routing.mode: never
+
+# How many of the customer's most recent payments to read (1-50). Ten payments plus long-term
+# profile flags balance monthly subscription detection against input token latency.
+history:
+  payments: 10
+
+lists:
+  sanctioned_countries: [KP, IR, SY, CU, RU, BY]    # align with official EU/UN sanctions lists
+  high_risk_countries: [NG, GH, KH, MM]            # align with FATF / EU high-risk third countries
+  high_risk_mcc: ["4829", "6051", "6540", "7995", "5967"]  # money transfer, crypto, stored value, gambling, direct marketing
+  mule_beneficiaries_file: ../lists/mule_ibans.txt
+
+limits:                              # keyed by customer.limit_segment (retail | business | vulnerable)
+  daily_amount: { retail: 5000, business: 50000, vulnerable: 1500 }
+  atm_daily: { retail: 1000, business: 3000, vulnerable: 500 }
+
+# ── Level 2: hard rules (evaluated in order; the first match decides) ─────────
+hard_rules:
+  - id: sanctions_country
+    when: "features.sanctioned_country"
+    decision: block
+    reason: "Country subject to EU/UN sanctions"
+  - id: known_mule_beneficiary
+    when: "features.beneficiary_in_mule_list"
+    decision: block
+    reason: "Beneficiary IBAN matched on interbank mule intelligence list"
+  - id: impossible_travel
+    when: "candidate.channel in ['card_present', 'atm'] and features.implied_speed_kmh > 900"
+    decision: block
+    reason: "Physically impossible travel between card-present transactions (likely cloned card)"
+  - id: card_testing_burst
+    when: "features.small_tx_burst >= 4 and features.tx_count_10m >= 5"
+    decision: block
+    reason: "Card-testing pattern: burst of micro-charges"
+  - id: atm_daily_limit
+    when: "candidate.channel == 'atm' and features.atm_amount_24h > limits.atm_daily[customer.limit_segment]"
+    decision: block
+    reason: "ATM daily cash limit exceeded"
+  - id: vop_no_match_large
+    when: "features.vop_mismatch and candidate.amount >= 1000"
+    decision: hold
+    reason: "Verification of Payee: beneficiary name does not match the IBAN"
+  - id: account_takeover_pattern
+    # hold, not step_up: an SMS/app code could reach the attacker's newly registered phone.
+    when: "features.profile_change_hours < 48 and features.new_device and features.new_beneficiary"
+    decision: hold
+    reason: "Recent contact change + new device + new beneficiary; verify out of band"
+  - id: new_mandate_large_debit
+    when: "candidate.channel == 'sepa_direct_debit' and features.new_creditor and features.mandate_age_days < 2 and candidate.amount >= 500"
+    decision: hold
+    reason: "Large first debit on a mandate signed in the last 48 hours"
+  - id: daily_limit
+    when: "features.amount_24h_total > limits.daily_amount[customer.limit_segment]"
+    decision: step_up
+    reason: "Daily amount limit for the segment exceeded"
+  - id: known_recurring
+    when: "features.recurring_matches_known and not features.new_device"
+    decision: approve
+    reason: "Matches an established recurring payment"
+
+# ── PSD2 SCA exemptions (RTS SCA, Del. Reg. (EU) 2018/389) ───────────────────
+sca:
+  current_fraud_rate_bps: { card_not_present: 5, credit_transfer: 0.8 }
+  tra_thresholds_eur:
+    card_not_present: [{max_rate_bps: 1, eur: 500}, {max_rate_bps: 6, eur: 250}, {max_rate_bps: 13, eur: 100}]
+    credit_transfer:  [{max_rate_bps: 0.5, eur: 500}, {max_rate_bps: 1, eur: 250}, {max_rate_bps: 1.5, eur: 100}]
+  exempt_only_if_risk_below: 0.20
+
+# ── Level 3: pre-score and routing ───────────────────────────────────────────
+prescore:
+  weights:
+    amount_zscore: 0.20
+    new_device: 0.15
+    new_beneficiary: 0.10
+    ip_geo_mismatch: 0.10
+    new_country: 0.10
+    high_risk_mcc: 0.10
+    new_merchant: 0.10
+    new_creditor: 0.05
+    first_instant_payment: 0.05
+    hour_deviation: 0.05
+
+routing:
+  mode: cascade                     # cascade | always | never
+  approve_if_prescore_below: 0.15
+  block_if_prescore_above: 0.95
+  always_call_model_if:
+    amount_at_least: 500
+    channels: [sepa_instant]
+
+# ── Level 4: Clef-Flash ──────────────────────────────────────────────────────
+# Timeouts below fit HTTPS calls over the shared Regolo Cloud API (~200-900 ms under concurrency).
+# On dedicated co-located H200 GPUs in the same region (38.8 ms median), tighten to:
+#   { card_present: 150, atm: 300, card_not_present: 300, sepa_instant: 800, default: 500 }
+model:
+  backend: regolo                   # regolo | fake (offline tests)
+  name: clef-flash
+  timeout_ms:
+    card_present: 3000
+    atm: 3000
+    card_not_present: 3000
+    sepa_instant: 3500
+    default: 3000
+  circuit_breaker: { failure_ratio: 0.35, window_s: 30, open_s: 30, min_calls: 8 }
+
+# Each question re-encodes the whole state, so retail-eu asks the two most informative graded
+# questions. Additional yes/no analyst explanation flags live in retail-eu-explainable.yaml.
+questions:
+  scam_pattern:
+    type: choice
+    weight: 0.40
+    instructions: Which fraud pattern best fits the candidate payment?
+    criteria:
+      none: No fraud pattern, behaviour consistent with the customer's habits
+      card_fraud: Unauthorised use of a cloned or stolen card
+      card_testing: Card being tested with micro-charges
+      app_scam: Customer appears manipulated into paying a fraudster (fake bank operator, investment, invoice swap, romance)
+      account_takeover: Payment initiated by a third party controlling the account
+      money_mule: Account appears to be used to move funds through
+      unauthorised_debit: Direct debit from a creditor the customer never authorised
+    risk_by_option: { none: 0.0, card_fraud: 1.0, card_testing: 1.0, app_scam: 0.9, account_takeover: 1.0, money_mule: 0.8, unauthorised_debit: 0.9 }
+  fraud_risk:
+    type: score
+    weight: 0.60
+    instructions: Rate the overall risk that the candidate payment is fraud against the account holder.
+    criteria:
+      - Consistent with the customer's habits
+      - Unusual but plausible
+      - Suspicious, needs verification
+      - Very likely fraudulent
+
+# ── Level 5: decision ────────────────────────────────────────────────────────
+decision:
+  combine: { prescore: 0.4, model: 0.6 }
+  thresholds:
+    default:    { step_up: 0.40, hold: 0.65, block: 0.80 }
+    vulnerable: { step_up: 0.25, hold: 0.50, block: 0.70 }
+  overrides:
+    - when: "answers.scam_pattern == 'account_takeover' and answers.scam_pattern_confidence >= 0.70 and features.new_device"
+      decision: block
+      reason: "Model is confident of account takeover on a new device"
+    - when: "answers.scam_pattern == 'app_scam' and answers.scam_pattern_confidence >= 0.70 and candidate.channel == 'sepa_instant'"
+      decision: hold
+      reason: "Likely authorised push payment scam: call the customer before releasing"
+  on_backend_failure:
+    card_present: use_prescore      # stand-in processing on the pre-score
+    atm: step_up
+    card_not_present: step_up
+    sepa_instant: step_up
+    sepa_credit_transfer: hold
+    sepa_direct_debit: hold
+    default: step_up
+  unavailable_actions:
+    sepa_direct_debit: { step_up: hold }   # the payer is not online during a direct debit
+
+audit:
+  sink: logs/decisions.jsonl
+  hash_chain: true
+  retention_days: 3650
+  log_model_payload: pseudonymized

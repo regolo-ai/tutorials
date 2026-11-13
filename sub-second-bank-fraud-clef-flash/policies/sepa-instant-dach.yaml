@@ -1,0 +1,64 @@
+# DACH & corporate SEPA Instant protection profile (Germany / Austria / cross-border Eurozone).
+# Designed for strict Empfaengerueberpruefung (VoP), spoofed bank-hotline APP scams, and SME
+# invoice-redirect protection.
+extends: retail-eu.yaml
+policy_id: sepa-instant-dach
+description: >-
+  DACH retail and Mittelstand SEPA Instant profile: inspects all credit transfers from EUR 250 with
+  Clef-Flash, holds VoP mismatches from EUR 500, and applies tighter step-up and hold thresholds.
+governance:
+  change_ticket: CHG-2026-DACH-09
+
+routing:
+  approve_if_prescore_below: 0.12
+  always_call_model_if:
+    amount_at_least: 250
+    channels: [sepa_instant, sepa_credit_transfer]
+
+hard_rules:
+  - id: sanctions_country
+    when: "features.sanctioned_country"
+    decision: block
+    reason: "Country subject to EU/UN sanctions"
+  - id: known_mule_beneficiary
+    when: "features.beneficiary_in_mule_list"
+    decision: block
+    reason: "Beneficiary IBAN matched on interbank mule intelligence list"
+  - id: impossible_travel
+    when: "candidate.channel in ['card_present', 'atm'] and features.implied_speed_kmh > 900"
+    decision: block
+    reason: "Physically impossible travel between card-present transactions (likely cloned card)"
+  - id: card_testing_burst
+    when: "features.small_tx_burst >= 4 and features.tx_count_10m >= 5"
+    decision: block
+    reason: "Card-testing pattern: burst of micro-charges"
+  - id: atm_daily_limit
+    when: "candidate.channel == 'atm' and features.atm_amount_24h > limits.atm_daily[customer.limit_segment]"
+    decision: block
+    reason: "ATM daily cash limit exceeded"
+  - id: vop_no_match_medium
+    when: "features.vop_mismatch and candidate.amount >= 500"
+    decision: hold
+    reason: "Empfaengerueberpruefung (VoP): beneficiary name does not match IBAN on transfer >= EUR 500"
+  - id: account_takeover_pattern
+    when: "features.profile_change_hours < 48 and features.new_device and features.new_beneficiary"
+    decision: hold
+    reason: "Recent contact change + new device + new beneficiary; verify out of band"
+  - id: new_mandate_large_debit
+    when: "candidate.channel == 'sepa_direct_debit' and features.new_creditor and features.mandate_age_days < 2 and candidate.amount >= 500"
+    decision: hold
+    reason: "Large first debit on a mandate signed in the last 48 hours"
+  - id: daily_limit
+    when: "features.amount_24h_total > limits.daily_amount[customer.limit_segment]"
+    decision: step_up
+    reason: "Daily amount limit for the segment exceeded"
+  - id: known_recurring
+    when: "features.recurring_matches_known and not features.new_device"
+    decision: approve
+    reason: "Matches an established recurring payment"
+
+decision:
+  thresholds:
+    default:    { step_up: 0.32, hold: 0.58, block: 0.78 }
+    vulnerable: { step_up: 0.22, hold: 0.45, block: 0.68 }
+    business:   { step_up: 0.35, hold: 0.60, block: 0.82 }

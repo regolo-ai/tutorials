@@ -1,0 +1,5 @@
+# IBANs reported on cross-bank money-mule intelligence lists (synthetic test identifiers).
+LT601010012345678901
+IT02L1234512345123456789012
+DE75512108001245126199
+FR7630006000011234567890189

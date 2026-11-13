@@ -1,0 +1,437 @@
+{
+  "name": "22_madrid_vulnerable_foreign_instant",
+  "description": "Vulnerable Madrid pensioner: first SEPA Instant EUR 1,150 to unfamiliar Cyprus IBAN",
+  "expected": [
+    "step_up",
+    "hold",
+    "block"
+  ],
+  "label": "fraud",
+  "type": "impersonation_scam",
+  "request": {
+    "customer": {
+      "id": "cust-es-0304",
+      "segment": "retail",
+      "vulnerable": true,
+      "account_age_days": 7800,
+      "home_country": "ES",
+      "recent_profile_changes": []
+    },
+    "history": [
+      {
+        "transaction_id": "o19",
+        "timestamp": "2026-08-17T20:07:00+02:00",
+        "amount": 10.54,
+        "channel": "card_present",
+        "merchant": {
+          "name": "FARMACIA MAYOR MADRID",
+          "mcc": "5912",
+          "country": "ES"
+        },
+        "location": {
+          "lat": 40.4168,
+          "lon": -3.7038,
+          "country": "ES"
+        }
+      },
+      {
+        "transaction_id": "o18",
+        "timestamp": "2026-08-20T15:07:00+02:00",
+        "amount": 46.5,
+        "channel": "card_present",
+        "merchant": {
+          "name": "MERCADONA CASTELLANA MADRID",
+          "mcc": "5411",
+          "country": "ES"
+        },
+        "location": {
+          "lat": 40.4168,
+          "lon": -3.7038,
+          "country": "ES"
+        }
+      },
+      {
+        "transaction_id": "o17",
+        "timestamp": "2026-08-23T10:07:00+02:00",
+        "amount": 73.0,
+        "channel": "sepa_direct_debit",
+        "mandate": {
+          "creditor_id": "ES29000A48010615",
+          "mandate_id": "MND-IBER-2023-3390",
+          "signed_at": "2023-02-19T10:30:00+01:00"
+        },
+        "recurring": true
+      },
+      {
+        "transaction_id": "o16",
+        "timestamp": "2026-08-27T17:07:00+02:00",
+        "amount": 53.0,
+        "channel": "card_present",
+        "merchant": {
+          "name": "MERCADONA CASTELLANA MADRID",
+          "mcc": "5411",
+          "country": "ES"
+        },
+        "location": {
+          "lat": 40.4168,
+          "lon": -3.7038,
+          "country": "ES"
+        }
+      },
+      {
+        "transaction_id": "o15",
+        "timestamp": "2026-08-30T12:07:00+02:00",
+        "amount": 19.9,
+        "channel": "card_present",
+        "merchant": {
+          "name": "FARMACIA MAYOR MADRID",
+          "mcc": "5912",
+          "country": "ES"
+        },
+        "location": {
+          "lat": 40.4168,
+          "lon": -3.7038,
+          "country": "ES"
+        }
+      },
+      {
+        "transaction_id": "o14",
+        "timestamp": "2026-09-03T19:07:00+02:00",
+        "amount": 34.5,
+        "channel": "card_present",
+        "merchant": {
+          "name": "MERCADONA CASTELLANA MADRID",
+          "mcc": "5411",
+          "country": "ES"
+        },
+        "location": {
+          "lat": 40.4168,
+          "lon": -3.7038,
+          "country": "ES"
+        }
+      },
+      {
+        "transaction_id": "o13",
+        "timestamp": "2026-09-06T14:07:00+02:00",
+        "amount": 650.0,
+        "channel": "sepa_credit_transfer",
+        "beneficiary": {
+          "iban": "ES9121000418450200051332",
+          "name": "Carlos Navarro",
+          "vop_result": "match"
+        },
+        "device_id": "dev-es-ipad",
+        "ip_country": "ES",
+        "authentication": "sca"
+      },
+      {
+        "transaction_id": "o12",
+        "timestamp": "2026-09-09T09:07:00+02:00",
+        "amount": 41.0,
+        "channel": "card_present",
+        "merchant": {
+          "name": "MERCADONA CASTELLANA MADRID",
+          "mcc": "5411",
+          "country": "ES"
+        },
+        "location": {
+          "lat": 40.4168,
+          "lon": -3.7038,
+          "country": "ES"
+        }
+      },
+      {
+        "transaction_id": "o11",
+        "timestamp": "2026-09-13T16:07:00+02:00",
+        "amount": 11.26,
+        "channel": "card_present",
+        "merchant": {
+          "name": "FARMACIA MAYOR MADRID",
+          "mcc": "5912",
+          "country": "ES"
+        },
+        "location": {
+          "lat": 40.4168,
+          "lon": -3.7038,
+          "country": "ES"
+        }
+      },
+      {
+        "transaction_id": "o10",
+        "timestamp": "2026-09-16T11:07:00+02:00",
+        "amount": 47.5,
+        "channel": "card_present",
+        "merchant": {
+          "name": "MERCADONA CASTELLANA MADRID",
+          "mcc": "5411",
+          "country": "ES"
+        },
+        "location": {
+          "lat": 40.4168,
+          "lon": -3.7038,
+          "country": "ES"
+        }
+      },
+      {
+        "transaction_id": "o09",
+        "timestamp": "2026-09-20T18:07:00+02:00",
+        "amount": 15.94,
+        "channel": "card_present",
+        "merchant": {
+          "name": "FARMACIA MAYOR MADRID",
+          "mcc": "5912",
+          "country": "ES"
+        },
+        "location": {
+          "lat": 40.4168,
+          "lon": -3.7038,
+          "country": "ES"
+        }
+      },
+      {
+        "transaction_id": "o08",
+        "timestamp": "2026-09-23T13:07:00+02:00",
+        "amount": 54.0,
+        "channel": "card_present",
+        "merchant": {
+          "name": "MERCADONA CASTELLANA MADRID",
+          "mcc": "5411",
+          "country": "ES"
+        },
+        "location": {
+          "lat": 40.4168,
+          "lon": -3.7038,
+          "country": "ES"
+        }
+      },
+      {
+        "transaction_id": "o07",
+        "timestamp": "2026-09-26T20:07:00+02:00",
+        "amount": 72.0,
+        "channel": "sepa_direct_debit",
+        "mandate": {
+          "creditor_id": "ES29000A48010615",
+          "mandate_id": "MND-IBER-2023-3390",
+          "signed_at": "2023-02-19T10:30:00+01:00"
+        },
+        "recurring": true
+      },
+      {
+        "transaction_id": "o06",
+        "timestamp": "2026-09-30T15:07:00+02:00",
+        "amount": 35.5,
+        "channel": "card_present",
+        "merchant": {
+          "name": "MERCADONA CASTELLANA MADRID",
+          "mcc": "5411",
+          "country": "ES"
+        },
+        "location": {
+          "lat": 40.4168,
+          "lon": -3.7038,
+          "country": "ES"
+        }
+      },
+      {
+        "transaction_id": "o05",
+        "timestamp": "2026-10-03T10:07:00+02:00",
+        "amount": 25.3,
+        "channel": "card_present",
+        "merchant": {
+          "name": "FARMACIA MAYOR MADRID",
+          "mcc": "5912",
+          "country": "ES"
+        },
+        "location": {
+          "lat": 40.4168,
+          "lon": -3.7038,
+          "country": "ES"
+        }
+      },
+      {
+        "transaction_id": "o04",
+        "timestamp": "2026-10-07T17:07:00+02:00",
+        "amount": 42.0,
+        "channel": "card_present",
+        "merchant": {
+          "name": "MERCADONA CASTELLANA MADRID",
+          "mcc": "5411",
+          "country": "ES"
+        },
+        "location": {
+          "lat": 40.4168,
+          "lon": -3.7038,
+          "country": "ES"
+        }
+      },
+      {
+        "transaction_id": "o03",
+        "timestamp": "2026-10-10T12:07:00+02:00",
+        "amount": 650.0,
+        "channel": "sepa_credit_transfer",
+        "beneficiary": {
+          "iban": "ES9121000418450200051332",
+          "name": "Carlos Navarro",
+          "vop_result": "match"
+        },
+        "device_id": "dev-es-ipad",
+        "ip_country": "ES",
+        "authentication": "sca"
+      },
+      {
+        "transaction_id": "o02",
+        "timestamp": "2026-10-13T19:07:00+02:00",
+        "amount": 48.5,
+        "channel": "card_present",
+        "merchant": {
+          "name": "MERCADONA CASTELLANA MADRID",
+          "mcc": "5411",
+          "country": "ES"
+        },
+        "location": {
+          "lat": 40.4168,
+          "lon": -3.7038,
+          "country": "ES"
+        }
+      },
+      {
+        "transaction_id": "o01",
+        "timestamp": "2026-10-17T14:07:00+02:00",
+        "amount": 16.66,
+        "channel": "card_present",
+        "merchant": {
+          "name": "FARMACIA MAYOR MADRID",
+          "mcc": "5912",
+          "country": "ES"
+        },
+        "location": {
+          "lat": 40.4168,
+          "lon": -3.7038,
+          "country": "ES"
+        }
+      },
+      {
+        "transaction_id": "o00",
+        "timestamp": "2026-10-20T09:07:00+02:00",
+        "amount": 30.0,
+        "channel": "card_present",
+        "merchant": {
+          "name": "MERCADONA CASTELLANA MADRID",
+          "mcc": "5411",
+          "country": "ES"
+        },
+        "location": {
+          "lat": 40.4168,
+          "lon": -3.7038,
+          "country": "ES"
+        }
+      },
+      {
+        "transaction_id": "eh01",
+        "timestamp": "2026-10-23T15:00:00+02:00",
+        "amount": 42.3,
+        "channel": "card_present",
+        "merchant": {
+          "name": "MERCADONA CASTELLANA MADRID",
+          "mcc": "5411",
+          "country": "ES"
+        },
+        "location": {
+          "lat": 40.4168,
+          "lon": -3.7038,
+          "country": "ES"
+        }
+      },
+      {
+        "transaction_id": "eh02",
+        "timestamp": "2026-10-26T15:00:00+02:00",
+        "amount": 63.1,
+        "channel": "sepa_direct_debit",
+        "mandate": {
+          "creditor_id": "ES29000A48010615",
+          "mandate_id": "MND-IBER-2023-3390",
+          "signed_at": "2023-02-19T10:30:00+01:00"
+        },
+        "recurring": true
+      },
+      {
+        "transaction_id": "eh03",
+        "timestamp": "2026-10-30T15:00:00+02:00",
+        "amount": 19.8,
+        "channel": "card_present",
+        "merchant": {
+          "name": "FARMACIA MAYOR MADRID",
+          "mcc": "5912",
+          "country": "ES"
+        },
+        "location": {
+          "lat": 40.4168,
+          "lon": -3.7038,
+          "country": "ES"
+        }
+      },
+      {
+        "transaction_id": "eh04",
+        "timestamp": "2026-11-02T15:00:00+02:00",
+        "amount": 36.5,
+        "channel": "card_present",
+        "merchant": {
+          "name": "CASA DANI MERCADO PAZ",
+          "mcc": "5812",
+          "country": "ES"
+        },
+        "location": {
+          "lat": 40.4168,
+          "lon": -3.7038,
+          "country": "ES"
+        }
+      },
+      {
+        "transaction_id": "eh05",
+        "timestamp": "2026-11-05T15:00:00+02:00",
+        "amount": 48.9,
+        "channel": "card_present",
+        "merchant": {
+          "name": "MERCADONA CASTELLANA MADRID",
+          "mcc": "5411",
+          "country": "ES"
+        },
+        "location": {
+          "lat": 40.4168,
+          "lon": -3.7038,
+          "country": "ES"
+        }
+      },
+      {
+        "transaction_id": "eh06",
+        "timestamp": "2026-11-08T15:00:00+02:00",
+        "amount": 21.4,
+        "channel": "card_present",
+        "merchant": {
+          "name": "RENFE CERCANIAS MADRID",
+          "mcc": "4112",
+          "country": "ES"
+        },
+        "location": {
+          "lat": 40.4168,
+          "lon": -3.7038,
+          "country": "ES"
+        }
+      }
+    ],
+    "candidate": {
+      "transaction_id": "c22",
+      "timestamp": "2026-11-10T19:40:00+02:00",
+      "amount": 1150.0,
+      "channel": "sepa_instant",
+      "beneficiary": {
+        "iban": "CY17002001280000001200527600",
+        "name": "Elena Petrou",
+        "vop_result": "close_match"
+      },
+      "device_id": "dev-es-ipad",
+      "ip_country": "ES",
+      "authentication": "sca"
+    }
+  }
+}

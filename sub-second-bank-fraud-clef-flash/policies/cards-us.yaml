@@ -1,0 +1,48 @@
+# Card portfolio of a US issuer, written for the IBM TabFormer sample: customers make many small
+# everyday purchases, so the questions tell Clef-Flash what card testing is and is not, and ask it
+# to judge where and at what kind of merchant the card is used against the customer's own history.
+extends: retail-eu.yaml
+policy_id: cards-us
+description: >-
+  High-frequency card issuer portfolio (such as IBM TabFormer): frequent small everyday shop
+  purchases are normal; card use abroad and at unusual merchants is judged against 20 past payments.
+governance:
+  change_ticket: CHG-2026-CARD-11
+
+# Cardholders here pay several times a day: 20 payments cover about a week.
+history:
+  payments: 20
+
+prescore:
+  weights:                          # restated in full: they must add up to 1
+    amount_zscore: 0.15
+    new_device: 0.10
+    new_beneficiary: 0.10
+    ip_geo_mismatch: 0.05
+    new_country: 0.10
+    foreign_merchant: 0.15
+    high_risk_mcc: 0.05
+    new_merchant: 0.10
+    new_creditor: 0.05
+    first_instant_payment: 0.05
+    hour_deviation: 0.05
+    recent_credential_error: 0.05
+
+questions:
+  scam_pattern:
+    instructions: >-
+      Which fraud pattern best fits the candidate card payment? Judge it against this customer's own
+      history, not against what a typical customer does.
+    criteria:
+      none: Consistent with this customer's habits, including frequent small everyday purchases in shops
+      card_fraud: >-
+        The card is used by someone else: in a country, city or kind of merchant this customer does not
+        normally use, often in a burst of payments in a short time
+      card_testing: >-
+        Several tiny charges, around one dollar or less, at unknown online merchants within minutes;
+        ordinary small purchases in shops are not card testing
+  fraud_risk:
+    instructions: >-
+      Rate the risk that the candidate card payment was not made by the account holder. Small amounts
+      are normal when the history shows them; focus on where, at what kind of merchant and at what hour
+      the payment happens compared with the history.

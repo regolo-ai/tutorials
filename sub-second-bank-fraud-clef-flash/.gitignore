@@ -1,0 +1,12 @@
+.env
+logs/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+data/random_*.json
+.env-*.part
+**/.tmp-*.part
+policies/.history/
+data/generated/
+data/tabformer/

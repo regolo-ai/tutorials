@@ -1,0 +1,88 @@
+# cards-us with the customer's usual countries from the bank's profile (customer.usual_countries).
+# Fraud on a stolen card comes in bursts: after a few payments abroad, the recent history makes the
+# new country look habitual. The profile looks further back, before the burst, so it does not.
+extends: cards-us.yaml
+policy_id: cards-us-profile
+description: >-
+  cards-us, judging card use abroad against the countries the customer usually pays in, from the
+  bank's profile: outside them, the payment is held.
+governance:
+  change_ticket: CHG-2026-CARD-12
+
+prescore:
+  weights:                          # merged with cards-us: a weight set to 0 is switched off; the total must be 1
+    amount_zscore: 0.15
+    new_device: 0.10
+    new_beneficiary: 0.10
+    ip_geo_mismatch: 0.05
+    new_country: 0.05
+    unusual_country: 0.25           # replaces foreign_merchant: abroad is fine where the customer usually goes
+    foreign_merchant: 0
+    recent_credential_error: 0      # no signal in TabFormer
+    high_risk_mcc: 0.05
+    new_merchant: 0.10
+    new_creditor: 0.05
+    first_instant_payment: 0.05
+    hour_deviation: 0.05
+
+questions:
+  scam_pattern:
+    criteria:
+      card_fraud: >-
+        The card is used by someone else: in a country outside the customer's usual countries, or in a
+        city or kind of merchant this customer does not normally use, often in a burst of payments in a
+        short time. Recent payments in that country do not make it usual: they may be the same fraud
+  fraud_risk:
+    instructions: >-
+      Rate the risk that the candidate card payment was not made by the account holder. Small amounts
+      are normal when the history shows them. customer.usual_countries lists where this customer paid
+      over the months before the last 30 days: a payment in a country outside it is a strong sign of
+      fraud, even when the recent history already has payments there. Also weigh the kind of merchant
+      and the hour against the history.
+
+# Lists replace the parent's: the inherited rules are repeated, with unusual_country before the limits.
+hard_rules:
+  - id: sanctions_country
+    when: "features.sanctioned_country"
+    decision: block
+    reason: "Country subject to sanctions"
+  - id: known_mule_beneficiary
+    when: "features.beneficiary_in_mule_list"
+    decision: block
+    reason: "Beneficiary flagged as a mule account"
+  - id: impossible_travel
+    when: "candidate.channel in ['card_present', 'atm'] and features.implied_speed_kmh > 900"
+    decision: block
+    reason: "Physically impossible travel between card-present transactions (likely cloned card)"
+  - id: card_testing_burst
+    when: "features.small_tx_burst >= 4 and features.tx_count_10m >= 5"
+    decision: block
+    reason: "Card-testing pattern: burst of micro-charges"
+  - id: atm_daily_limit
+    when: "candidate.channel == 'atm' and features.atm_amount_24h > limits.atm_daily[customer.limit_segment]"
+    decision: block
+    reason: "ATM daily cash limit exceeded"
+  - id: vop_no_match_large
+    when: "features.vop_mismatch and candidate.amount >= 1000"
+    decision: hold
+    reason: "Verification of Payee: beneficiary name does not match the IBAN"
+  - id: account_takeover_pattern
+    when: "features.profile_change_hours < 48 and features.new_device and features.new_beneficiary"
+    decision: hold
+    reason: "Recent contact change + new device + new beneficiary; verify out of band"
+  - id: new_mandate_large_debit
+    when: "candidate.channel == 'sepa_direct_debit' and features.new_creditor and features.mandate_age_days < 2 and candidate.amount >= 500"
+    decision: hold
+    reason: "Large first debit on a mandate signed in the last 48 hours"
+  - id: unusual_country
+    when: "features.unusual_country"
+    decision: hold
+    reason: "Card used abroad outside the customer's usual countries"
+  - id: daily_limit
+    when: "features.amount_24h_total > limits.daily_amount[customer.limit_segment]"
+    decision: step_up
+    reason: "Daily amount limit for the segment exceeded"
+  - id: known_recurring
+    when: "features.recurring_matches_known and not features.new_device"
+    decision: approve
+    reason: "Matches an established recurring payment"

@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fraud scoring console</title>
+<link rel="icon" href="/static/brand/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+<header class="appbar">
+  <div class="shell appbar-inner">
+    <a class="logo" href="https://regolo.ai" target="_blank" rel="noopener">
+      <img src="/static/brand/logo-dark-background.png" alt="regolo.ai" width="126" height="24">
+    </a>
+    <span class="product">Fraud scoring console</span>
+    <nav class="tabs" aria-label="Sections">
+      <a href="/" data-view="start">Start</a>
+      <a href="#test" data-view="test">Test</a>
+      <a href="#policies" data-view="policies">Policies</a>
+      <a href="#audit" data-view="audit">Audit log</a>
+    </nav>
+  </div>
+</header>
+
+<div class="shell layout">
+  <div class="content">
+    <main>
+      <!-- Start -->
+      <section class="view" id="view-start" hidden>
+        <div class="page-head start-head">
+          <div>
+            <h2 class="headline">Check a payment against the customer's own history, in under a second</h2>
+            <p class="lede">Hard rules and a quick score settle most payments on this machine, at no cost. Only the uncertain ones, high amounts and instant transfers go to Clef-Flash on Regolo, which answers two questions: which fraud pattern fits, and how risky the payment is. Every rule, weight, threshold and question lives in a YAML policy, including how many past payments to read (<span id="start-history">10</span> in the default policy).</p>
+          </div>
+        </div>
+
+        <h3 class="section-title">Get started</h3>
+        <ol class="path panel" id="path">
+          <li data-step="create">
+            <div><b>Create your Regolo API key</b><span>Sign up at Regolo and create a key. New accounts can start with a free trial.</span></div>
+            <a class="button" id="key-create" href="https://regolo.ai/signup" target="_blank" rel="noopener">Create a key at Regolo</a>
+            <span class="state" hidden>Done</span>
+          </li>
+          <li data-step="key">
+            <div><b>Add your API key</b><span>Paste it in the box on the right. It is checked with Regolo and saved in <code>.env</code> on this computer.</span></div>
+            <button type="button" id="key-focus">Add the key</button>
+            <span class="state"></span>
+          </li>
+          <li data-step="bench">
+            <div><b>Run a quick comparison</b><span>The European reference suite with policy <code>retail-eu</code>, asking Clef-Flash on every payment and only when needed. Less than one cent.</span></div>
+            <button class="primary" id="quick-bench">Run a quick comparison</button>
+          </li>
+        </ol>
+
+        <div class="cascade-wrap">
+          <h3 class="section-title">Latest benchmark: who decides each payment</h3>
+          <p class="lede" id="cascade-caption">No benchmark yet. Run a quick comparison above: it takes a few seconds and costs less than one cent.</p>
+          <div class="cascade" id="cascade" role="img" aria-label="Share of payments decided by each level"></div>
+          <div class="cascade-legend" id="cascade-legend"></div>
+        </div>
+        <div class="figures panel" id="figures"></div>
+
+        <details class="how">
+          <summary>How a payment is scored, and what the measurements changed</summary>
+          <div class="two-col">
+            <div>
+              <h3>Steps on every payment</h3>
+              <ol class="steps">
+                <li><b>Validate and pseudonymise.</b> IBANs, names and device ids are replaced by keyed hashes before anything leaves the process.</li>
+                <li><b>Compute features.</b> Robust z-score of the amount against the customer's last payments (how many is set in the policy), velocity, impossible travel, new device, new beneficiary, Verification of Payee result.</li>
+                <li><b>Apply hard rules.</b> Sanctions, mule accounts, card testing, account takeover, limits. A match decides immediately.</li>
+                <li><b>Pre-score.</b> A weighted score of the features approves the clearly habitual payments.</li>
+                <li><b>Ask Clef-Flash on Regolo.</b> Only the grey zone, high amounts and instant transfers.</li>
+                <li><b>Decide and record.</b> Thresholds, overrides, PSD2 SCA exemptions, a fail mode per channel, then a hash-chained audit record.</li>
+              </ol>
+            </div>
+            <div>
+              <h3>What the measurements changed</h3>
+              <ul class="findings">
+                <li><b>Every question re-reads the whole state.</b> Five questions cost about 6,100 input tokens and 566 ms; two cost about 2,500 tokens and 148 ms. The policy asks two.</li>
+                <li><b>Yes/no answers saturate.</b> They come back as 0 or 1. The pattern choice and the 0–3 risk score return graded values, so decisions rely on those.</li>
+                <li><b>The shared API queues under load.</b> At 4 parallel requests the model's median rose from about 200 ms to about 680 ms. Card-authorisation latency needs dedicated capacity.</li>
+              </ul>
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- Test: set up a run in four steps, then the results -->
+      <section class="view" id="view-test" hidden>
+        <div class="page-head">
+          <div>
+            <h2>Test payments</h2>
+            <p class="lede">Set up a run in four steps: the policies, when to ask the decision model, the dataset. Then see how much fraud each setting stopped, how many genuine customers it interrupted, how long it took and what it cost.</p>
+          </div>
+          <div class="switch" id="test-switch" role="tablist" aria-label="Section">
+            <button type="button" role="tab" data-section="setup" aria-selected="true">Set up a run</button>
+            <button type="button" role="tab" data-section="results" aria-selected="false">Results</button>
+          </div>
+        </div>
+
+        <div id="sec-setup">
+          <ol class="stepper" id="stepper"></ol>
+
+          <div class="wstep" data-step="1">
+            <h3 class="step-head">Which policies?</h3>
+            <p class="lede narrow">A policy is the rulebook the engine follows, in a YAML file you can edit in <a href="#policies">Policies</a>. One of its rules reads:</p>
+            <p class="rule-line" id="t-example"></p>
+            <p class="fine pick-hint">Choose one, or up to three to compare them on the same payments.</p>
+            <div class="choices policy-choices" id="t-policies" aria-label="Policies"></div>
+          </div>
+
+          <div class="wstep" data-step="2" hidden>
+            <h3 class="step-head">When should the decision model be asked?</h3>
+            <p class="lede narrow">The decision model is Clef-Flash on Regolo: it reads the payment with the customer's history and answers the policy's questions with probabilities. Hard rules always decide first: a sanctioned country, a mule account or card testing is stopped before any model is asked. For everything else, the model adds what rules cannot see.</p>
+            <ul class="why panel" id="t-why"></ul>
+            <p class="fine pick-hint">Choose one, or more to compare them: for example only when needed against never.</p>
+            <div class="choices routing-choices" id="t-routing" aria-label="When to ask the decision model"></div>
+          </div>
+
+          <div class="wstep" data-step="3" hidden>
+            <h3 class="step-head">Which dataset?</h3>
+            <p class="lede narrow">A dataset is a list of customers, each with their past payments and one new payment to check. Need another one? <button type="button" class="link" data-open-gen>Add a dataset</button>: written by a Regolo model, or sampled from IBM TabFormer.</p>
+            <div class="choices dataset-choices" id="t-datasets" role="radiogroup" aria-label="Dataset"></div>
+          </div>
+
+          <div class="wstep" data-step="4" hidden>
+            <h3 class="step-head">What it will cost</h3>
+            <form id="plan-form" class="plan panel" onsubmit="return false">
+              <div class="table-scroll flat"><table class="grid" id="plan-table">
+                <thead><tr><th>Policy and Clef-Flash use</th><th class="num">Payments</th><th class="num">Calls to the decision model</th><th class="num">Cost</th></tr></thead>
+                <tbody></tbody><tfoot></tfoot>
+              </table></div>
+              <p class="fine" id="plan-note"></p>
+              <div class="plan-opts">
+                <label id="plan-n">At most <input type="number" name="n" value="200" min="10" max="6000" step="10"> payments from the set</label>
+                <label>Parallel requests <select name="concurrency"></select></label>
+              </div>
+            </form>
+          </div>
+
+          <div class="wizard-nav">
+            <button type="button" id="w-back" hidden>Back</button>
+            <span class="fine" id="w-hint"></span>
+            <button type="button" class="primary" id="w-next">Next</button>
+          </div>
+        </div>
+
+        <div id="sec-results" hidden>
+          <div id="bench-live" class="live panel" hidden aria-live="polite">
+            <div class="live-head"><b id="live-count"></b><span id="live-now"></span></div>
+            <div class="progress"><div class="progress-fill"></div></div>
+            <ol class="live-events" id="live-events"></ol>
+          </div>
+          <p class="error" id="bench-error" hidden></p>
+          <div id="bench-result"></div>
+          <h3 class="section-title">Previous runs</h3>
+          <ul class="runs" id="runs"></ul>
+        </div>
+      </section>
+
+      <!-- Policies -->
+      <section class="view" id="view-policies" hidden>
+        <div class="page-head">
+          <div>
+            <h2>Policies</h2>
+            <p class="lede">A policy decides everything the engine does: hard rules, pre-score weights, when to ask Clef-Flash, the questions it asks and the thresholds for each decision. To adapt the engine to another kind of risk, create a policy and change those. The transaction format and the computed features are fixed in code.</p>
+          </div>
+          <div class="actions">
+            <label>Policy <select id="pol-select" class="policy-options"></select></label>
+            <button id="pol-new-toggle" aria-expanded="false">New policy</button>
+          </div>
+        </div>
+
+        <form id="pol-new" class="new-policy panel" hidden>
+          <label>Name <input name="name" required pattern="[a-z0-9][a-z0-9_\-]{0,39}" placeholder="for example sme-italy" autocomplete="off"></label>
+          <label>Start from <select name="base" class="policy-options"></select></label>
+          <fieldset>
+            <label><input type="radio" name="how" value="extends" checked> Inherit it and change only what differs</label>
+            <label><input type="radio" name="how" value="copy"> Full copy</label>
+          </fieldset>
+          <button class="primary" type="submit">Create policy</button>
+          <p class="error" id="pol-new-error" hidden></p>
+        </form>
+
+        <div class="editor panel">
+          <div class="editor-head">
+            <p id="pol-info"></p>
+            <div class="actions">
+              <button id="pol-revert" disabled>Discard changes</button>
+              <button id="pol-test">Test this policy</button>
+              <button class="primary" id="pol-save" disabled>Save policy</button>
+            </div>
+          </div>
+          <textarea id="pol-text" spellcheck="false" aria-label="Policy YAML"></textarea>
+          <p class="check" id="pol-check" role="status"></p>
+        </div>
+
+        <details class="how" id="pol-summary-box">
+          <summary>This policy at a glance, with inherited settings</summary>
+          <div id="pol-summary" class="policy-summary"></div>
+        </details>
+      </section>
+
+      <!-- Audit -->
+      <section class="view" id="view-audit" hidden>
+        <div class="page-head">
+          <div>
+            <h2>Audit log</h2>
+            <p class="lede">Every decision is appended to <code>logs/decisions.jsonl</code>, whatever started it: a scenario you ran, a benchmark or the command line. Each record carries the hash of the one before, so editing or deleting a line breaks the chain. Choose a run to see its decisions, then open one to see exactly what was sent to Regolo.</p>
+          </div>
+          <div class="actions"><button id="audit-refresh">Verify and refresh</button></div>
+        </div>
+        <p id="audit-verify" class="verify"></p>
+
+        <h3 class="section-title">Runs</h3>
+        <div class="table-scroll">
+          <table class="grid clickable" id="audit-groups">
+            <thead><tr><th>Started</th><th>What</th><th class="num">Decisions</th><th>Outcome</th><th>Policy</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div class="section-bar">
+          <h3 class="section-title" id="audit-records-title">Latest decisions</h3>
+          <button id="audit-all" hidden>Show all runs</button>
+        </div>
+        <div class="table-scroll">
+          <table class="grid clickable" id="audit-table">
+            <thead><tr><th>Time (UTC)</th><th>Payment</th><th>Decision</th><th>Decided by</th><th class="num">Risk</th><th class="num">Tokens</th><th class="num">Time</th><th>Record hash</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <aside class="side" aria-label="Regolo account and status">
+    <section class="account" id="account">
+      <div class="promo" id="promo" hidden>
+        <h2 class="promo-title">Try Regolo free for 30 days</h2>
+        <p>New accounts get 30 days free. Sign up, copy your API key from the dashboard and paste it below: the console starts calling Clef-Flash right away.</p>
+        <a class="button cta" href="https://regolo.ai/pricing" target="_blank" rel="noopener">Start your free trial</a>
+        <a class="signup" href="https://regolo.ai/signup" target="_blank" rel="noopener">Create your account and API keys</a>
+      </div>
+      <form id="key-form" class="key-form">
+        <h2 class="side-title" id="key-title">Regolo API key</h2>
+        <p class="key-state" id="key-state"></p>
+        <div id="key-fields">
+          <label for="key-input">Paste your key</label>
+          <input id="key-input" name="key" type="password" autocomplete="off" spellcheck="false" placeholder="sk-…" required minlength="8">
+          <button class="primary" type="submit" id="key-save">Check and save key</button>
+        </div>
+        <button type="button" class="link" id="key-replace" hidden>Replace the key</button>
+        <p class="error" id="key-error" hidden></p>
+        <p class="fine">The key is checked with Regolo, then stored only in <code>.env</code> on this computer. The console never shows it again.</p>
+      </form>
+    </section>
+
+    <section class="sets-box panel">
+      <h2 class="side-title">Need another dataset?</h2>
+      <p>Have a Regolo model write customers in the mix of fraud you choose, or take a labelled sample of IBM TabFormer's 24 million card payments.</p>
+      <button class="primary" type="button" data-open-gen>Add a dataset</button>
+    </section>
+
+    <section class="services">
+      <h2 class="side-title">Services</h2>
+      <ul class="lights" id="lights" aria-live="polite"></ul>
+      <p class="fine" id="price"></p>
+    </section>
+  </aside>
+</div>
+
+<dialog id="gen-dialog" class="dialog" aria-labelledby="gen-title">
+  <div class="gen">
+    <header class="dialog-head">
+      <h2 id="gen-title">Add a dataset</h2>
+      <button type="button" class="close" id="gen-close" aria-label="Close">✕</button>
+    </header>
+    <div class="source-switch" role="tablist" aria-label="Where the payments come from">
+      <button type="button" role="tab" data-source="regolo" aria-selected="true" aria-controls="gen-panel">
+        <b>Write with a Regolo model</b><span>Fictional customers in the mix of fraud types you choose. A few cents.</span>
+      </button>
+      <button type="button" role="tab" data-source="tabformer" aria-selected="false" aria-controls="tf-panel">
+        <b>Sample IBM TabFormer</b><span>Labelled card payments from a public dataset of 24.4 million. Free.</span>
+      </button>
+    </div>
+
+    <form id="gen-panel" class="gen-src" role="tabpanel">
+      <div class="dialog-body">
+        <p class="gen-what" id="gen-what">A chat model on Regolo writes fictional customers: each gets a history of past payments and one new payment of the type you choose. Nothing is checked yet: you run the set afterwards on the Test page.</p>
+        <p class="error" id="gen-error" hidden></p>
+
+        <fieldset class="presets">
+          <legend><span class="n">1</span>Start from</legend>
+          <div id="gen-presets" class="preset-list"></div>
+        </fieldset>
+
+        <fieldset class="gen-settings">
+          <legend><span class="n">2</span>Settings</legend>
+          <div class="gen-grid">
+            <label>Name of the set <input name="title" required maxlength="60" autocomplete="off"><small>Shown on the set and next to its results.</small></label>
+            <label>Model <select name="model" id="gen-model"></select><small id="gen-model-note">Prices come from your Regolo account.</small></label>
+            <label>Payments <input type="number" name="n" value="20" min="1" max="100"><small>One customer per payment, 1 to 100.</small></label>
+            <label>Past payments each <input type="number" name="history" value="12" min="3" max="30"><small>The history the engine compares against.</small></label>
+            <label>Vulnerable customers, % <input type="number" name="vulnerable_pct" value="5" min="0" max="100"><small>Elderly or flagged customers get stricter limits.</small></label>
+          </div>
+        </fieldset>
+
+        <fieldset class="mix">
+          <legend><span class="n">3</span>Mix of payment types</legend>
+          <p class="fine">Each new payment is labelled with the type you asked for. The label is what the model was asked to write, not verified fraud.</p>
+          <div id="gen-mix"></div>
+        </fieldset>
+      </div>
+      <footer class="dialog-foot">
+        <div class="gen-cost" id="gen-estimate" aria-live="polite"></div>
+        <div id="gen-progress" class="progress" hidden><div class="progress-fill"></div><span></span></div>
+        <p id="gen-result" hidden></p>
+        <div class="actions">
+          <button type="button" data-close-gen>Cancel</button>
+          <button class="primary" type="submit" id="gen-start">Generate set</button>
+        </div>
+      </footer>
+    </form>
+
+    <form id="tf-panel" class="gen-src" role="tabpanel" hidden>
+      <div class="dialog-body">
+        <p class="gen-what">IBM TabFormer is a public dataset (Apache-2.0) of 24.4 million card payments by 2,000 simulated US customers, 1991 to 2020, each labelled fraud or genuine by the simulator. A sample becomes a dataset: each payment you take comes with the customer's previous 30 payments as history, and failed attempts such as a wrong PIN are kept. Nothing is sent to Regolo.</p>
+        <p class="error" id="tf-error" hidden></p>
+
+        <section class="tf-step">
+          <h3><span class="n">1</span>Download the dataset</h3>
+          <div id="tf-download"></div>
+          <div id="tf-dl-progress" class="progress" hidden><div class="progress-fill"></div><span></span></div>
+        </section>
+
+        <section class="tf-step" id="tf-sample-step">
+          <h3><span class="n">2</span>Take a sample</h3>
+          <div class="gen-grid">
+            <label>Name of the set <input name="title" required maxlength="60" autocomplete="off" value="TabFormer card payments"><small>Shown on the set and next to its results.</small></label>
+            <label>Period <select name="period">
+              <option value="test" selected>2019–2020: test, 0.10% fraud</option>
+              <option value="validation">2018: validation, 0.15% fraud</option>
+              <option value="train">1991–2017: training, 0.12% fraud</option>
+            </select><small>Compare on the test period; tune policies on 2018.</small></label>
+            <label>Fraudulent payments <input type="number" name="fraud" value="50" min="1" max="500"><small>At most one per customer, so one card's burst does not dominate: 2019–2020 has 229 customers with fraud.</small></label>
+            <label>Genuine payments <input type="number" name="legit" value="1000" min="10" max="10000"><small>Picked at random in the period.</small></label>
+            <label>Random seed <input type="number" name="seed" value="7" min="0" max="1000000"><small>The same seed gives the same sample.</small></label>
+          </div>
+          <p class="callout">Before you compare: in 2019–2020 every fraudulent payment is at a merchant outside the US, and about one foreign payment in seven is fraud. A plain "foreign merchant" rule therefore stops all of it. Read results against that baseline, not as real-world accuracy.</p>
+        </section>
+      </div>
+      <footer class="dialog-foot">
+        <div class="gen-cost" id="tf-estimate"></div>
+        <div id="tf-progress" class="progress" hidden><div class="progress-fill"></div><span></span></div>
+        <p id="tf-result" hidden></p>
+        <div class="actions">
+          <button type="button" data-close-gen>Cancel</button>
+          <button class="primary" type="submit" id="tf-start">Create the dataset</button>
+        </div>
+      </footer>
+    </form>
+  </div>
+</dialog>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/yaml/yaml.min.js"></script>
+<script src="/static/app.js"></script>
+</body>
+</html>

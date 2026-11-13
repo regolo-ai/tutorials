@@ -1,0 +1,498 @@
+{
+  "name": "23_milan_monthly_rent_transfer",
+  "description": "Established monthly EUR 650 standing-order rent transfer to Giulia Rossi (VoP match)",
+  "expected": [
+    "approve"
+  ],
+  "label": "legit",
+  "type": "habitual",
+  "request": {
+    "customer": {
+      "id": "cust-0001",
+      "segment": "retail",
+      "vulnerable": false,
+      "account_age_days": 1450,
+      "home_country": "IT",
+      "recent_profile_changes": []
+    },
+    "history": [
+      {
+        "transaction_id": "o19",
+        "timestamp": "2026-08-17T20:07:00+02:00",
+        "amount": 35.6,
+        "channel": "card_present",
+        "merchant": {
+          "name": "OSTERIA DEL CORSO MILANO",
+          "mcc": "5812",
+          "country": "IT"
+        },
+        "location": {
+          "lat": 45.4642,
+          "lon": 9.19,
+          "country": "IT"
+        }
+      },
+      {
+        "transaction_id": "o18",
+        "timestamp": "2026-08-20T15:07:00+02:00",
+        "amount": 26.5,
+        "channel": "card_present",
+        "merchant": {
+          "name": "FARMACIA BRERA MILANO",
+          "mcc": "5912",
+          "country": "IT"
+        },
+        "location": {
+          "lat": 45.4642,
+          "lon": 9.19,
+          "country": "IT"
+        }
+      },
+      {
+        "transaction_id": "o17",
+        "timestamp": "2026-08-23T10:07:00+02:00",
+        "amount": 73.0,
+        "channel": "sepa_direct_debit",
+        "mandate": {
+          "creditor_id": "IT98ZZZ0000000883641",
+          "mandate_id": "MND-ENEL-2023-0042",
+          "signed_at": "2023-03-01T10:00:00+01:00"
+        },
+        "recurring": true
+      },
+      {
+        "transaction_id": "o16",
+        "timestamp": "2026-08-27T17:07:00+02:00",
+        "amount": 57.6,
+        "channel": "card_present",
+        "merchant": {
+          "name": "TRATTORIA MILANESE BRERA",
+          "mcc": "5812",
+          "country": "IT"
+        },
+        "location": {
+          "lat": 45.4642,
+          "lon": 9.19,
+          "country": "IT"
+        }
+      },
+      {
+        "transaction_id": "o15",
+        "timestamp": "2026-08-30T12:07:00+02:00",
+        "amount": 59.25,
+        "channel": "card_present",
+        "merchant": {
+          "name": "ESSELUNGA VIALE PIAVE MILANO",
+          "mcc": "5411",
+          "country": "IT"
+        },
+        "location": {
+          "lat": 45.4642,
+          "lon": 9.19,
+          "country": "IT"
+        }
+      },
+      {
+        "transaction_id": "o14",
+        "timestamp": "2026-09-03T19:07:00+02:00",
+        "amount": 38.6,
+        "channel": "card_present",
+        "merchant": {
+          "name": "OSTERIA DEL CORSO MILANO",
+          "mcc": "5812",
+          "country": "IT"
+        },
+        "location": {
+          "lat": 45.4642,
+          "lon": 9.19,
+          "country": "IT"
+        }
+      },
+      {
+        "transaction_id": "o13",
+        "timestamp": "2026-09-06T14:07:00+02:00",
+        "amount": 650.0,
+        "channel": "sepa_credit_transfer",
+        "beneficiary": {
+          "iban": "IT60X0542811101000000123456",
+          "name": "Giulia Rossi",
+          "vop_result": "match"
+        },
+        "device_id": "dev-home-iphone16",
+        "ip_country": "IT",
+        "authentication": "sca"
+      },
+      {
+        "transaction_id": "o12",
+        "timestamp": "2026-09-09T09:07:00+02:00",
+        "amount": 56.0,
+        "channel": "card_present",
+        "merchant": {
+          "name": "ENI STATION VIALE CERTOSA",
+          "mcc": "5541",
+          "country": "IT"
+        },
+        "location": {
+          "lat": 45.4642,
+          "lon": 9.19,
+          "country": "IT"
+        }
+      },
+      {
+        "transaction_id": "o11",
+        "timestamp": "2026-09-13T16:07:00+02:00",
+        "amount": 32.1,
+        "channel": "card_present",
+        "merchant": {
+          "name": "TRATTORIA MILANESE BRERA",
+          "mcc": "5812",
+          "country": "IT"
+        },
+        "location": {
+          "lat": 45.4642,
+          "lon": 9.19,
+          "country": "IT"
+        }
+      },
+      {
+        "transaction_id": "o10",
+        "timestamp": "2026-09-16T11:07:00+02:00",
+        "amount": 64.5,
+        "channel": "card_present",
+        "merchant": {
+          "name": "ESSELUNGA VIALE PIAVE MILANO",
+          "mcc": "5411",
+          "country": "IT"
+        },
+        "location": {
+          "lat": 45.4642,
+          "lon": 9.19,
+          "country": "IT"
+        }
+      },
+      {
+        "transaction_id": "o09",
+        "timestamp": "2026-09-20T18:07:00+02:00",
+        "amount": 41.6,
+        "channel": "card_present",
+        "merchant": {
+          "name": "OSTERIA DEL CORSO MILANO",
+          "mcc": "5812",
+          "country": "IT"
+        },
+        "location": {
+          "lat": 45.4642,
+          "lon": 9.19,
+          "country": "IT"
+        }
+      },
+      {
+        "transaction_id": "o08",
+        "timestamp": "2026-09-23T13:07:00+02:00",
+        "amount": 34.0,
+        "channel": "card_present",
+        "merchant": {
+          "name": "FARMACIA BRERA MILANO",
+          "mcc": "5912",
+          "country": "IT"
+        },
+        "location": {
+          "lat": 45.4642,
+          "lon": 9.19,
+          "country": "IT"
+        }
+      },
+      {
+        "transaction_id": "o07",
+        "timestamp": "2026-09-26T20:07:00+02:00",
+        "amount": 72.0,
+        "channel": "sepa_direct_debit",
+        "mandate": {
+          "creditor_id": "IT98ZZZ0000000883641",
+          "mandate_id": "MND-ENEL-2023-0042",
+          "signed_at": "2023-03-01T10:00:00+01:00"
+        },
+        "recurring": true
+      },
+      {
+        "transaction_id": "o06",
+        "timestamp": "2026-09-30T15:07:00+02:00",
+        "amount": 36.6,
+        "channel": "card_present",
+        "merchant": {
+          "name": "TRATTORIA MILANESE BRERA",
+          "mcc": "5812",
+          "country": "IT"
+        },
+        "location": {
+          "lat": 45.4642,
+          "lon": 9.19,
+          "country": "IT"
+        }
+      },
+      {
+        "transaction_id": "o05",
+        "timestamp": "2026-10-03T10:07:00+02:00",
+        "amount": 69.75,
+        "channel": "card_present",
+        "merchant": {
+          "name": "ESSELUNGA VIALE PIAVE MILANO",
+          "mcc": "5411",
+          "country": "IT"
+        },
+        "location": {
+          "lat": 45.4642,
+          "lon": 9.19,
+          "country": "IT"
+        }
+      },
+      {
+        "transaction_id": "o04",
+        "timestamp": "2026-10-07T17:07:00+02:00",
+        "amount": 44.6,
+        "channel": "card_present",
+        "merchant": {
+          "name": "OSTERIA DEL CORSO MILANO",
+          "mcc": "5812",
+          "country": "IT"
+        },
+        "location": {
+          "lat": 45.4642,
+          "lon": 9.19,
+          "country": "IT"
+        }
+      },
+      {
+        "transaction_id": "o03",
+        "timestamp": "2026-10-10T12:07:00+02:00",
+        "amount": 650.0,
+        "channel": "sepa_credit_transfer",
+        "beneficiary": {
+          "iban": "IT60X0542811101000000123456",
+          "name": "Giulia Rossi",
+          "vop_result": "match"
+        },
+        "device_id": "dev-home-iphone16",
+        "ip_country": "IT",
+        "authentication": "sca"
+      },
+      {
+        "transaction_id": "o02",
+        "timestamp": "2026-10-13T19:07:00+02:00",
+        "amount": 63.5,
+        "channel": "card_present",
+        "merchant": {
+          "name": "ENI STATION VIALE CERTOSA",
+          "mcc": "5541",
+          "country": "IT"
+        },
+        "location": {
+          "lat": 45.4642,
+          "lon": 9.19,
+          "country": "IT"
+        }
+      },
+      {
+        "transaction_id": "o01",
+        "timestamp": "2026-10-17T14:07:00+02:00",
+        "amount": 41.1,
+        "channel": "card_present",
+        "merchant": {
+          "name": "TRATTORIA MILANESE BRERA",
+          "mcc": "5812",
+          "country": "IT"
+        },
+        "location": {
+          "lat": 45.4642,
+          "lon": 9.19,
+          "country": "IT"
+        }
+      },
+      {
+        "transaction_id": "o00",
+        "timestamp": "2026-10-20T09:07:00+02:00",
+        "amount": 40.0,
+        "channel": "card_present",
+        "merchant": {
+          "name": "ESSELUNGA VIALE PIAVE MILANO",
+          "mcc": "5411",
+          "country": "IT"
+        },
+        "location": {
+          "lat": 45.4642,
+          "lon": 9.19,
+          "country": "IT"
+        }
+      },
+      {
+        "transaction_id": "h01",
+        "timestamp": "2026-10-21T18:12:00+02:00",
+        "amount": 62.4,
+        "channel": "card_present",
+        "merchant": {
+          "name": "ESSELUNGA VIALE PIAVE MILANO",
+          "mcc": "5411",
+          "country": "IT"
+        },
+        "location": {
+          "lat": 45.4642,
+          "lon": 9.19,
+          "country": "IT"
+        }
+      },
+      {
+        "transaction_id": "h02",
+        "timestamp": "2026-10-23T09:12:00+02:00",
+        "amount": 74.0,
+        "channel": "sepa_direct_debit",
+        "mandate": {
+          "creditor_id": "IT98ZZZ0000000883641",
+          "mandate_id": "MND-ENEL-2023-0042",
+          "signed_at": "2023-03-01T10:00:00+01:00"
+        },
+        "recurring": true
+      },
+      {
+        "transaction_id": "h03",
+        "timestamp": "2026-10-26T20:12:00+02:00",
+        "amount": 38.5,
+        "channel": "card_present",
+        "merchant": {
+          "name": "TRATTORIA MILANESE BRERA",
+          "mcc": "5812",
+          "country": "IT"
+        },
+        "location": {
+          "lat": 45.4642,
+          "lon": 9.19,
+          "country": "IT"
+        }
+      },
+      {
+        "transaction_id": "h04",
+        "timestamp": "2026-10-29T08:12:00+02:00",
+        "amount": 55.0,
+        "channel": "card_present",
+        "merchant": {
+          "name": "ENI STATION VIALE CERTOSA",
+          "mcc": "5541",
+          "country": "IT"
+        },
+        "location": {
+          "lat": 45.4642,
+          "lon": 9.19,
+          "country": "IT"
+        }
+      },
+      {
+        "transaction_id": "h05",
+        "timestamp": "2026-10-31T10:12:00+02:00",
+        "amount": 13.99,
+        "channel": "card_not_present",
+        "merchant": {
+          "name": "NETFLIX EUROPE BV",
+          "mcc": "4899",
+          "country": "NL"
+        },
+        "device_id": "dev-home-iphone16",
+        "ip_country": "IT",
+        "authentication": "exemption",
+        "recurring": true
+      },
+      {
+        "transaction_id": "h06",
+        "timestamp": "2026-11-02T19:12:00+02:00",
+        "amount": 48.2,
+        "channel": "card_present",
+        "merchant": {
+          "name": "ESSELUNGA VIALE PIAVE MILANO",
+          "mcc": "5411",
+          "country": "IT"
+        },
+        "location": {
+          "lat": 45.4642,
+          "lon": 9.19,
+          "country": "IT"
+        }
+      },
+      {
+        "transaction_id": "h07",
+        "timestamp": "2026-11-04T11:12:00+02:00",
+        "amount": 22.9,
+        "channel": "card_present",
+        "merchant": {
+          "name": "FARMACIA BRERA MILANO",
+          "mcc": "5912",
+          "country": "IT"
+        },
+        "location": {
+          "lat": 45.4642,
+          "lon": 9.19,
+          "country": "IT"
+        }
+      },
+      {
+        "transaction_id": "h08",
+        "timestamp": "2026-11-05T09:12:00+02:00",
+        "amount": 650.0,
+        "channel": "sepa_credit_transfer",
+        "beneficiary": {
+          "iban": "IT60X0542811101000000123456",
+          "name": "Giulia Rossi",
+          "vop_result": "match"
+        },
+        "device_id": "dev-home-iphone16",
+        "ip_country": "IT",
+        "authentication": "sca",
+        "recurring": true
+      },
+      {
+        "transaction_id": "h09",
+        "timestamp": "2026-11-07T18:12:00+02:00",
+        "amount": 71.3,
+        "channel": "card_present",
+        "merchant": {
+          "name": "ESSELUNGA VIALE PIAVE MILANO",
+          "mcc": "5411",
+          "country": "IT"
+        },
+        "location": {
+          "lat": 45.4642,
+          "lon": 9.19,
+          "country": "IT"
+        }
+      },
+      {
+        "transaction_id": "h10",
+        "timestamp": "2026-11-09T21:12:00+02:00",
+        "amount": 44.0,
+        "channel": "card_present",
+        "merchant": {
+          "name": "OSTERIA DEL CORSO MILANO",
+          "mcc": "5812",
+          "country": "IT"
+        },
+        "location": {
+          "lat": 45.4642,
+          "lon": 9.19,
+          "country": "IT"
+        }
+      }
+    ],
+    "candidate": {
+      "transaction_id": "c23",
+      "timestamp": "2026-11-10T09:30:00+02:00",
+      "amount": 650.0,
+      "channel": "sepa_credit_transfer",
+      "beneficiary": {
+        "iban": "IT60X0542811101000000123456",
+        "name": "Giulia Rossi",
+        "vop_result": "match"
+      },
+      "device_id": "dev-home-iphone16",
+      "ip_country": "IT",
+      "authentication": "sca",
+      "recurring": true
+    }
+  }
+}
