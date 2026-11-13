@@ -287,4 +287,4 @@ embeddinggemma-2-vs-qwen3-embedding/
 
 ## License
 
-MIT, like the rest of the `regolo-ai/tutorials` repository.
+Apache 2.0, like the rest of the `regolo-ai/tutorials` repository.

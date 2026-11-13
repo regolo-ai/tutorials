@@ -10,7 +10,7 @@
   <img src="https://img.shields.io/badge/Code-Runnable_Examples-2ea44f.svg" alt="Code: Runnable Examples" />
   <img src="https://img.shields.io/badge/GPU-100%25_Ready-0078D4.svg" alt="GPU 100% Ready" />
   <img src="https://img.shields.io/badge/API-OpenAI_Compatible-313236.svg" alt="API OpenAI Compatible" />
-  <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" />
+  <img src="https://img.shields.io/badge/License-Apache_2.0-blue.svg" alt="License: Apache 2.0" />
 </div>
 
 <br />
@@ -97,7 +97,7 @@ Dovrebbe stampare:
 
 ## Licenza
 
-MIT.
+Apache 2.0.
 
 ### How to Use
 1. Clone this repository: `git clone https://github.com/regolo-ai/tutorials.git`

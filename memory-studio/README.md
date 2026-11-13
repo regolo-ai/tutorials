@@ -68,10 +68,10 @@ python3 regolo_memory_tui.py
 
 ## License & Third-Party Notices
 
-MIT, like the rest of the `regolo-ai/tutorials` repository. Fonts: Space Grotesk (SIL Open Font License).
+Apache 2.0, like the rest of the `regolo-ai/tutorials` repository. Fonts: Space Grotesk (SIL Open Font License).
 
 ### Third-Party Notices
 
 This repository is an independent Python implementation (web app, terminal TUI, and benchmark runner) and does not bundle or redistribute code from `ai-memory`. Its cross-agent handoff and repository wiki consolidation concepts are inspired by [akitaonrails/ai-memory](https://github.com/akitaonrails/ai-memory):
 
-- **ai-memory** — Copyright (c) 2026 Fabio Akita (`@akitaonrails`), licensed under the [MIT License](https://github.com/akitaonrails/ai-memory/blob/main/LICENSE).
+- **ai-memory** — Copyright (c) 2026 Fabio Akita (`@akitaonrails`), licensed under the [Apache 2.0 License](https://github.com/akitaonrails/ai-memory/blob/main/LICENSE).

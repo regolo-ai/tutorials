@@ -12,7 +12,7 @@
   <img src="https://img.shields.io/badge/build-passing-brightgreen.svg?style=flat-square" alt="Build passing" />
   <img src="https://img.shields.io/badge/python-3.10+-blue.svg?logo=python&logoColor=white&style=flat-square" alt="Python 3.10+" />
   <img src="https://img.shields.io/badge/Code-Runnable_Examples-2ea44f.svg?style=flat-square" alt="Code: Runnable Examples" />
-  <img src="https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square" alt="License: MIT" />
+  <img src="https://img.shields.io/badge/License-Apache_2.0-blue.svg?style=flat-square" alt="License: Apache 2.0" />
 </p>
 
 ---
@@ -270,4 +270,4 @@ We welcome contributions to expand and improve the Analytics Assistant!
 
 ## 📄 License
 
-Distributed under the MIT License. See [LICENSE](../LICENSE) for more information.
+Distributed under the Apache 2.0 License. See [LICENSE](../LICENSE) for more information.

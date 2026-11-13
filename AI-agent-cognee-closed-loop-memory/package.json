@@ -17,6 +17,6 @@
     "mcp"
   ],
   "author": "Regolo.ai (DHH Group)",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "type": "module"
 }

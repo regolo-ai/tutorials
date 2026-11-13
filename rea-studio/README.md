@@ -68,10 +68,10 @@ python3 regolo_rea_tui.py
 
 ## License & Third-Party Notices
 
-MIT, like the rest of the `regolo-ai/tutorials` repository. Fonts: Space Grotesk (SIL Open Font License).
+Apache 2.0, like the rest of the `regolo-ai/tutorials` repository. Fonts: Space Grotesk (SIL Open Font License).
 
 ### Third-Party Notices
 
 This repository is an independent Python implementation (web app, terminal TUI, and benchmark runner) and does not bundle or redistribute code from `rea`. Its static evidence inspection and reverse-engineering workflow concepts are inspired by [morluto/rea](https://github.com/morluto/rea):
 
-- **rea (Reverse Engineer Anything)** — Copyright (c) morluto (`@morluto`), licensed under the [MIT License](https://github.com/morluto/rea/blob/main/LICENSE).
+- **rea (Reverse Engineer Anything)** — Copyright (c) morluto (`@morluto`), licensed under the [Apache 2.0 License](https://github.com/morluto/rea/blob/main/LICENSE).
