@@ -215,6 +215,6 @@ Configure `REGOLO_API_KEY` in your `.env` and start using VS Code tasks or run `
 
 ## License & Attribution
 
-This project is licensed under the Apache 2.0 License - see the [LICENSE](../LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 Powered by **[Regolo.ai](https://regolo.ai)**.
 

@@ -10,7 +10,7 @@
   <img src="https://img.shields.io/badge/SoL--Pi-0.85-green.svg" alt="SoL-Pi 0.85" />
   <img src="https://img.shields.io/badge/Pi_Code_Agent-0.85-green.svg" alt="Pi Coding Agent 0.85" />
   <img src="https://img.shields.io/badge/API-OpenAI_Compatible-313236.svg" alt="API OpenAI Compatible" />
-  <img src="https://img.shields.io/badge/License-Apache--2.0-blue.svg" alt="License: Apache-2.0" />
+  <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" />
 </div>
 
 <br />

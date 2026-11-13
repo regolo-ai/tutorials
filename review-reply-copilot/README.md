@@ -92,4 +92,4 @@ Run the tests with `.venv/bin/python -m pytest`. They use a fake client, so they
 
 ## License
 
-Apache 2.0, like the rest of the repository. Fonts: Space Grotesk (SIL Open Font License).
+MIT, like the rest of the repository. Fonts: Space Grotesk (SIL Open Font License).

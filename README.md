@@ -16,7 +16,7 @@
   <img src="https://img.shields.io/badge/Code-Runnable_Examples-2ea44f.svg" alt="Code: runnable examples" />
   <img src="https://img.shields.io/badge/API-OpenAI_Compatible-313236.svg" alt="OpenAI-compatible API" />
   <img src="https://img.shields.io/badge/MCP-Ready-7c3aed.svg" alt="MCP ready" />
-  <img src="https://img.shields.io/badge/License-Apache_2.0-blue.svg" alt="License: Apache 2.0" />
+  <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" />
 </div>
 
 <div align="center">
@@ -122,7 +122,7 @@ Contributions are welcome: new tutorials, fixes and clearer explanations. Open a
 
 ## License
 
-Apache 2.0. See [LICENSE](LICENSE) for details.
+MIT. See [LICENSE](LICENSE) for details.
 
 ## Powered by
 

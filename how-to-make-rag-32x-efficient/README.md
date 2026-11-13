@@ -47,7 +47,7 @@ Copy the provided `how-to-make-rag-32x-efficient/.env.example` to `how-to-make-r
 
 ## 📄 License
 
-This tutorial is licensed under the Apache 2.0 license. See the repository root for details.
+This tutorial is licensed under the MIT license. See the repository root for details.
 
 ---
 

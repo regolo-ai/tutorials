@@ -8,7 +8,7 @@
 [![Zero Dependencies](https://img.shields.io/badge/Dependencies-None-brightgreen?style=flat-square)](https://docs.python.org/3/library/)
 [![Regolo API](https://img.shields.io/badge/Regolo_API-open--weight_models-05df72?style=flat-square)](https://regolo.ai)
 [![Langfuse](https://img.shields.io/badge/Langfuse-v4_SDK-7c3aed?style=flat-square)](https://langfuse.com)
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue?style=flat-square)](../LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](../LICENSE)
 
 > A local web studio and command line tool that benchmarks open-weight models on your own dataset through the Regolo API. It scores each answer, works out whether PAYG or the flat Regolo Core plan is cheaper for your workload, optionally streams traces into Langfuse, and generates a GitHub Actions gate that fails a pull request when faithfulness drops.
 
@@ -181,6 +181,6 @@ If a model is not in `prices.json`, its PAYG cost shows as `n/a (unpriced slug)`
 
 ## License & third-party notices
 
-Apache 2.0, like the rest of the `regolo-ai/tutorials` repository. See [LICENSE](../LICENSE).
+MIT, like the rest of the `regolo-ai/tutorials` repository. See [LICENSE](../LICENSE).
 
 The web design follows the Regolo Studio system, with the Space Grotesk font under the SIL Open Font License.

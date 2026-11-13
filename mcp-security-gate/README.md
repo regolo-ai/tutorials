@@ -10,7 +10,7 @@
   <img src="https://img.shields.io/badge/Code-Runnable_Examples-2ea44f.svg" alt="Code: Runnable Examples" />
   <img src="https://img.shields.io/badge/Security-OWASP_LLM_Top_10-red.svg" alt="Security: OWASP LLM Top 10" />
   <img src="https://img.shields.io/badge/API-OpenAI_Compatible-313236.svg" alt="API OpenAI Compatible" />
-  <img src="https://img.shields.io/badge/License-Apache_2.0-blue.svg" alt="License: Apache 2.0" />
+  <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" />
 </div>
 
 <br />

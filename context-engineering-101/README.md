@@ -8,7 +8,7 @@
 [![Zero Dependencies](https://img.shields.io/badge/Dependencies-None-brightgreen?style=flat-square)](https://docs.python.org/3/library/)
 [![Regolo API](https://img.shields.io/badge/Regolo_API-brick--v1--beta-05df72?style=flat-square)](https://regolo.ai)
 [![MCP](https://img.shields.io/badge/MCP-stdio_server-7c3aed?style=flat-square)](https://modelcontextprotocol.io)
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue?style=flat-square)](../LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](../LICENSE)
 
 > Four runnable Python modules and one MCP stdio server that put the context engineering patterns from the "Context engineering for agents 101" series into practice: progressive skill disclosure, retrieve-offload-delegate, reversible compaction with cache-safe memory, and a long-running harness with an independent evaluator. Every module calls the Regolo API at `https://api.regolo.ai/v1` and reports its own measured token savings.
 
@@ -223,4 +223,4 @@ Restart the agent after you edit its configuration, then check that the four too
 
 ## License & third-party notices
 
-Apache 2.0, like the rest of the `regolo-ai/tutorials` repository. See [LICENSE](../LICENSE).
+MIT, like the rest of the `regolo-ai/tutorials` repository. See [LICENSE](../LICENSE).

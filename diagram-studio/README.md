@@ -411,10 +411,10 @@ Tunable constants live at the top of `diagram_wizard/server.py`: `MAX_FILES` (fi
 
 ## License & Third-Party Notices
 
-Apache 2.0, like the rest of the `regolo-ai/tutorials` repository. Fonts: Space Grotesk (SIL Open Font License). The Regolo name and logo belong to Regolo.
+MIT, like the rest of the `regolo-ai/tutorials` repository. Fonts: Space Grotesk (SIL Open Font License). The Regolo name and logo belong to Regolo.
 
 ### Third-Party Notices
 
 This repository is an independent Python implementation (web app, terminal TUI, and benchmark runner) and does not bundle or redistribute code from `diagram-design`. Its six diagram type categories and 4px-grid editorial layout concepts are inspired by [cathrynlavery/diagram-design](https://github.com/cathrynlavery/diagram-design) (and the terminal TUI optionally invokes `npx skills add cathrynlavery/diagram-design` from the official upstream repository):
 
-- **diagram-design** — Copyright (c) 2025 Cathryn Lavery ([littlemight.com](https://littlemight.com)), licensed under the [Apache 2.0 License](https://github.com/cathrynlavery/diagram-design/blob/main/LICENSE).
+- **diagram-design** — Copyright (c) 2025 Cathryn Lavery ([littlemight.com](https://littlemight.com)), licensed under the [MIT License](https://github.com/cathrynlavery/diagram-design/blob/main/LICENSE).

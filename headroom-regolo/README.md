@@ -310,4 +310,4 @@ Tunable constants live at the top of `benchmark.py` and `compressor.py`: `top_k`
 
 ## License
 
-Apache 2.0, like the rest of the `regolo-ai/tutorials` repository.
+MIT, like the rest of the `regolo-ai/tutorials` repository.

@@ -9,7 +9,7 @@
   <img src="https://img.shields.io/badge/Python-3.11%2B-blue?style=flat-square" alt="Python 3.11+" />
   <img src="https://img.shields.io/badge/GitHub_Action-Marketplace_Ready-purple?style=flat-square" alt="GitHub Action: Marketplace Ready" />
   <img src="https://img.shields.io/badge/Open_Models-gpt--oss--120b%2C_Llama--3.3--70B-008000?style=flat-square" alt="Open Models" />
-  <img src="https://img.shields.io/badge/License-Apache_2.0-blue?style=flat-square" alt="License: Apache 2.0" />
+  <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="License: MIT" />
 </div>
 
 > **Production Code Review, Automated Fixes & Benchmark Parity on Open Models with EU Zero Data Retention.**

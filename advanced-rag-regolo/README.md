@@ -571,7 +571,7 @@ print(f"Estimated monthly cost: ${monthly_cost:.2f}")
 
 This code is provided as reference material for the Regolo.ai blog guide.
 
-- **Code**: Apache 2.0 License (adapt for your projects)
+- **Code**: MIT License (adapt for your projects)
 - **Regolo API**: Subject to Regolo.ai Terms of Service
 - **Models**: Check individual model licenses (gte-Qwen2, Llama-3.3)
 
