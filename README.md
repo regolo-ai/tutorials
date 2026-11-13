@@ -1,6 +1,9 @@
 <div align="center">
   <a href="https://regolo.ai/?utm_source=github&utm_medium=readme&utm_campaign=tutorials">
-    <img src="https://regolo.ai/wp-content/themes/regolo/img/regolo-logo.svg" alt="Regolo.ai logo" width="320" />
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://regolo.ai/wp-content/themes/regolo/img/regolo-logo.svg" />
+      <img src="static-assets/regolo-logo-light-background.svg" alt="Regolo.ai logo" width="320" />
+    </picture>
   </a>
 </div>
 
