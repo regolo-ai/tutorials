@@ -5,7 +5,7 @@
 ![Brick Complexity Pro](https://img.shields.io/badge/Model-brick--complexity-pro-purple)
 ![Cost Currency](https://img.shields.io/badge/Cost-EUR-yellow)
 ![Python](https://img.shields.io/badge/Python-3.10+-blue?logo=python)
-![License](https://img.shields.io/badge/License-Apache%202.0-blue)
+![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
 **Interactive Terminal User Interface for BACO Security Scanner**, powered
 exclusively by **Regolo.ai** European cloud infrastructure with real-time cost
