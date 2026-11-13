@@ -1,0 +1,53 @@
+{
+  "piece1_progressive_skills.py": {
+    "skills_scanned": 10,
+    "full_preload_tokens": 38843,
+    "progressive_menu_tokens": 327,
+    "skill_prefix_reduction_pct": 99.2,
+    "tool_detailed_tokens": 1140,
+    "tool_concise_tokens": 330,
+    "tool_response_reduction_pct": 71.1,
+    "live_api_model": "qwen3.8-27b",
+    "live_api_prompt_tokens": 624,
+    "live_api_latency_s": 4.99,
+    "live_api_reply": "There are 8 open webhook issues."
+  },
+  "piece2_retrieve_offload_delegate.py": {
+    "raw_tool_dump_tokens": 9493,
+    "offloaded_preview_tokens": 318,
+    "offload_token_savings_pct": 96.7,
+    "saved_path": ".harness/large_tool_results/fetch_audit_export_9bfee9b606.txt",
+    "top_embedding_hit": {
+      "id": "doc_2",
+      "text": "Invoice #INV-2026-9941 on tenant acme_eu showed a EUR 4,350.00 reconciliation delta during the 08:31 UTC billing check.",
+      "score": 0.7826
+    },
+    "served_by_model": "qwen3.5-9b",
+    "subagent_prompt_tokens": 19643,
+    "subagent_completion_tokens": 114,
+    "distilled_summary": "- A CRITICAL billing reconciliation mismatch was detected on line 223 for invoice **INV-2026-9941** with a EUR delta of **4,350.00**.\n- The mismatch occurred for tenant `acme_eu`, where the expected amount was EUR 14,200.00 but the found amount was EUR 9,850.00.\n- This is the only non-INFO log entry in the file, appearing amidst standard worker batch processing logs.",
+    "distilled_tokens_in_main_agent": 92,
+    "main_agent_context_reduction_pct": 99.0
+  },
+  "piece3_compaction_and_cache_memory.py": {
+    "turn_15_total_tokens": 2550,
+    "naive_system_injection_cached_tokens": 0,
+    "naive_cache_hit_pct": 0.0,
+    "cache_safe_layout_cached_tokens": 2498,
+    "cache_safe_hit_pct": 98.0,
+    "compaction_served_by": "qwen3.5-9b",
+    "history_tokens_before_compaction": 2445,
+    "history_tokens_after_compaction": 195,
+    "compaction_reduction_pct": 92.0,
+    "archive_path": ".harness/conversation_history/session_demo_01.md"
+  },
+  "piece4_long_running_harness.py": {
+    "worker_model": "qwen3.8-27b",
+    "worker_clean_context_prompt_tokens": 269,
+    "evaluator_model": "qwen3.5-9b",
+    "evaluator_prompt_tokens": 284,
+    "evaluator_verdict": "{\"verdict\": \"PASS\", \"reason\": \"The unit test output indicates that feat_1 passed (correctly parsed amounts) and feat_2 passed (correctly raised ValueError for negative input). Although the feature titles mention parsing text, the implemented function signature and the test results confirm the logic requirements (returning rounded floats and raising ValueError) are met based on the provided test output.\"}",
+    "features_passing": 2,
+    "features_total": 2
+  }
+}

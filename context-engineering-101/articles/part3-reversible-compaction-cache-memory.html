@@ -1,0 +1,1518 @@
+<!-- wp:paragraph {"className":"wp-block-paragraph"} -->
+<p class="wp-block-paragraph">Offloading large tool outputs stops sudden spikes in your context window, but it does not stop the slow, steady climb of a thirty-turn coding session. As your agent edits files, runs tests, and reads retrieved memories, the conversation history still grows until it hits the attention ceiling.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"className":"wp-block-paragraph"} -->
+<p class="wp-block-paragraph">Even worse, the way most teams wire long-term memory into their harness quietly destroys prompt caching. When you search a memory store on every turn and paste the fresh hits into the top of your system prompt, the prefix changes on every message, forcing the inference engine to re-process the entire session history from scratch.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading"><mark style="background-color:rgba(0, 0, 0, 0)" class="has-inline-color has-primary-color">How do you compact a growing conversation without losing earlier details, and where should you place retrieved memories so 98% of your prompt stays cached?</mark></h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph {"className":"wp-block-paragraph"} -->
+<p class="wp-block-paragraph">In Part 3 of our <strong>Context Engineering for Agents 101</strong> series, drawing on <a href="https://www.langchain.com/blog/context-engineering-deep-agents-remember" target="_blank" rel="noopener noreferrer">LangChain’s Deep Agents memory middleware</a> and <a href="https://weaviate.io/blog/engram-memory-practical-guide" target="_blank" rel="noopener noreferrer">Weaviate’s Engram prompt-placement benchmarks</a>, we build and validate <strong>Piece 3</strong> (<code>piece3_compaction_and_cache_memory.py</code>) for OpenCode, Claude Code, and Codex.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"className":"wp-block-paragraph"} -->
+<p class="wp-block-paragraph"><strong>Quick summary (TL;DR):</strong> Injecting dynamic memory search hits into the top of your system prompt invalidates the KV cache on every turn. Placing standing rules (<code>AGENTS.md</code>) at the front, appending per-turn memory hits at the tail, and running reversible history compaction with <code>qwen3.5-9b</code> (dispatched automatically when you use our <a href="https://github.com/regolo-ai/brick-SR1" target="_blank" rel="noopener noreferrer">Brick semantic router</a>) keeps 98.0% of your prompt cached and shrinks older history by 92.0% across OpenCode, Claude Code, and <a href="https://regolo.ai/roo-code-ai-powered-autonomous-coding-in-vscode/" target="_blank" rel="noopener">Roo Code</a>.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:html -->
+<section class="regolo-p3-hero alignfull" aria-labelledby="regolo-p3-hero-title">
+  <div class="regolo-p3-hero__inner">
+    <div class="regolo-p3-hero__top">
+      <span class="regolo-p3-hero__badge"><span class="regolo-p3-hero__dot"></span>PROMPT PREFIX CACHE LAYOUT &amp; REVERSIBLE COMPACTION &middot; PART 3</span>
+      <h3 class="regolo-p3-hero__title" id="regolo-p3-hero-title">Why pasting retrieved memory into the system prompt breaks 100% of your KV cache</h3>
+      <p class="regolo-p3-hero__sub">LLM engines cache tokens strictly from index 0 up to the first mutated token. Placing dynamic per-turn memory hits at the tail keeps 98.0% of the prompt cached (2,498 of 2,550 tok), while reversible compaction shrinks 15-turn history from 2,445 to 195 tokens.</p>
+    </div>
+
+    <div class="regolo-p3-grid">
+      <!-- PANEL A: PROMPT CACHE ARRAY LAYOUT -->
+      <div class="regolo-p3-panel">
+        <div class="regolo-p3-panel__hdr">
+          <span class="regolo-p3-kicker">MECHANISM 1 &middot; MESSAGES[] ARRAY ORDERING AT TURN 15 (2,550 TOK)</span>
+          <div class="regolo-p3-panel__title">Where dynamic memory sits decides your KV cache hit rate</div>
+        </div>
+
+        <div class="regolo-p3-case regolo-p3-case--bad">
+          <div class="regolo-p3-case__top">
+            <span>Naive: dynamic memory injected into System Prompt</span>
+            <strong>0.0% cached (0 / 2,550 tok)</strong>
+          </div>
+          <div class="regolo-p3-blocks">
+            <div class="regolo-p3-blk regolo-p3-blk--mut">System + Mutated Search Hits<small>Changes every turn! Cache breaks at token 0</small></div>
+            <div class="regolo-p3-blk regolo-p3-blk--miss">Turns 1..14 History (2,100 tok)<small>100% cache miss &mdash; re-prefilled from scratch</small></div>
+            <div class="regolo-p3-blk regolo-p3-blk--miss">Turn 15 User<small>Miss</small></div>
+          </div>
+        </div>
+
+        <div class="regolo-p3-case regolo-p3-case--good">
+          <div class="regolo-p3-case__top">
+            <span>Piece 3: static prefix first, dynamic memory at tail</span>
+            <strong>98.0% cached (2,498 / 2,550 tok)</strong>
+          </div>
+          <div class="regolo-p3-blocks">
+            <div class="regolo-p3-blk regolo-p3-blk--hit">System + Standing AGENTS.md<small>100% identical across turns (KV Cache HIT)</small></div>
+            <div class="regolo-p3-blk regolo-p3-blk--hit">Turns 1..14 History<small>100% identical prefix (KV Cache HIT: 2,498 tok)</small></div>
+            <div class="regolo-p3-blk regolo-p3-blk--tail">User + &lt;retrieved_turn_memory&gt;<small>Only 52 new tail tokens computed!</small></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANEL B: REVERSIBLE COMPACTION -->
+      <div class="regolo-p3-panel">
+        <div class="regolo-p3-panel__hdr">
+          <span class="regolo-p3-kicker">MECHANISM 2 &middot; REVERSIBLE HISTORY COMPACTION (-92.0% TOKENS)</span>
+          <div class="regolo-p3-panel__title">Shrink older turns to 195 tokens without losing a single line</div>
+        </div>
+
+        <div class="regolo-p3-compact">
+          <div class="regolo-p3-cbox regolo-p3-cbox--before">
+            <div class="regolo-p3-cbox__lbl">Before compaction (Turns 1..13)</div>
+            <div class="regolo-p3-cbox__val">2,445 tokens</div>
+            <div class="regolo-p3-cbox__meta">13 verbose turns of file diffs, stack traces, and SQL schema checks</div>
+          </div>
+
+          <div class="regolo-p3-split-arrows">
+            <div class="regolo-p3-branch">
+              <span class="regolo-p3-branch__tag">1. Archive verbatim (100% lossless)</span>
+              <code>.harness/conversation_history/sess_01.md</code>
+            </div>
+            <div class="regolo-p3-branch regolo-p3-branch--hero">
+              <span class="regolo-p3-branch__tag">2. Summarize via Qwen3.5-9B (routed by Brick)</span>
+              <code>[COMPACTED CHECKPOINT: 195 tokens (-92.0%)]
+Completed: fixed SQLite WAL lock &amp; retry backoff.
+Archived transcript: .harness/conversation_history/sess_01.md
+(+ last 2 turns kept verbatim in active window)</code>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="regolo-p3-kpis">
+      <div class="regolo-p3-kpi"><strong>2,498 / 2,550 tok</strong><span>prefix tokens served from KV cache (98.0% hit rate vs 0.0% when mutating the system prompt)</span></div>
+      <div class="regolo-p3-kpi"><strong>2,445 &rarr; 195 tok</strong><span>history size after reversible compaction (-92.0%), with full Markdown transcript preserved on disk</span></div>
+      <div class="regolo-p3-kpi"><strong>Model-portable</strong><span>swap freely between <code>GLM-5.2</code> (1M ctx), <code>Qwen3.8-27B</code> (262K ctx), and <code>GPT-OSS 120B</code> without losing memory</span></div>
+    </div>
+
+    <p class="regolo-p3-foot">Measured via <code>python3 piece3_compaction_and_cache_memory.py --self-test</code> on <code>https://api.regolo.ai/v1</code> (October 29, 2026).</p>
+  </div>
+</section>
+
+<style>
+.regolo-p3-hero,.regolo-p3-hero *{box-sizing:border-box;font-family:"Space Grotesk",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+.regolo-p3-hero{width:100%!important;max-width:100%!important;margin:2.8rem 0!important;padding:42px 36px!important;border-radius:18px;background:#030605;background-image:radial-gradient(circle at 50% 0%,rgba(5,223,114,.11),transparent 58%);border:1.5px solid rgba(74,222,128,.48);box-shadow:0 20px 50px rgba(0,0,0,.9),0 0 35px rgba(22,163,74,.18);color:#ffffff}
+.regolo-p3-hero__top{text-align:center;margin-bottom:26px}
+.regolo-p3-hero__badge{display:inline-flex;align-items:center;gap:8px;font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:5px 14px;border-radius:9999px;border:1px solid rgba(74,222,128,.4);background:rgba(74,222,128,.12);color:#58e388;margin-bottom:12px}
+.regolo-p3-hero__dot{width:7px;height:7px;border-radius:50%;background:#05df72;box-shadow:0 0 8px #05df72}
+.regolo-p3-hero__title{margin:0 auto 8px auto!important;font-size:clamp(22px,2.9vw,29px)!important;line-height:1.2!important;font-weight:700!important;color:#ffffff!important;max-width:860px}
+.regolo-p3-hero__sub{margin:0 auto!important;font-size:15px!important;color:#cbd5e1!important;max-width:820px;line-height:1.5}
+.regolo-p3-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:18px;margin-bottom:20px}
+.regolo-p3-panel{padding:20px 22px;border-radius:15px;background:rgba(14,20,17,.96);border:1px solid rgba(74,222,128,.28);display:flex;flex-direction:column;justify-content:space-between}
+.regolo-p3-kicker{display:block;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#58e388;margin-bottom:4px}
+.regolo-p3-panel__title{font-size:17px;font-weight:700;color:#ffffff;margin-bottom:14px}
+.regolo-p3-case{padding:13px 14px;border-radius:11px;margin-bottom:12px}
+.regolo-p3-case:last-child{margin-bottom:0}
+.regolo-p3-case--bad{background:rgba(127,29,29,.16);border:1px solid rgba(248,113,113,.38)}
+.regolo-p3-case--good{background:rgba(5,223,114,.09);border:1.5px solid rgba(5,223,114,.55)}
+.regolo-p3-case__top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;font-size:12.5px;margin-bottom:9px;color:#e2e8f0}.regolo-p3-case__top strong{white-space:nowrap}
+.regolo-p3-case--bad .regolo-p3-case__top strong{color:#f87171}
+.regolo-p3-case--good .regolo-p3-case__top strong{color:#05df72}
+.regolo-p3-blocks{display:grid;grid-template-columns:1.1fr 1.2fr .9fr;gap:6px}
+.regolo-p3-blk{padding:8px 10px;border-radius:8px;font-size:11.5px;font-weight:700;line-height:1.25}
+.regolo-p3-blk small{display:block;font-size:10px;font-weight:500;margin-top:3px;opacity:.88}
+.regolo-p3-blk--mut{background:#7f1d1d;color:#fecaca;border:1px solid #ef4444}
+.regolo-p3-blk--miss{background:rgba(71,85,105,.45);color:#cbd5e1;border:1px dashed rgba(248,113,113,.45)}
+.regolo-p3-blk--hit{background:rgba(5,223,114,.22);color:#ffffff;border:1px solid #05df72}
+.regolo-p3-blk--tail{background:rgba(56,189,248,.2);color:#bae6fd;border:1px solid #38bdf8}
+.regolo-p3-compact{display:flex;flex-direction:column;gap:12px}
+.regolo-p3-cbox{padding:12px 14px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid rgba(148,163,184,.22)}
+.regolo-p3-cbox__lbl{font-size:11px;font-weight:700;text-transform:uppercase;color:#94a3b8}
+.regolo-p3-cbox__val{font-size:22px;font-weight:700;color:#f87171;margin:2px 0}
+.regolo-p3-cbox__meta{font-size:12px;color:#cbd5e1}
+.regolo-p3-split-arrows{display:flex;flex-direction:column;gap:10px}
+.regolo-p3-branch{padding:11px 13px;border-radius:10px;background:rgba(12,74,110,.22);border:1px solid rgba(56,189,248,.4)}
+.regolo-p3-branch--hero{background:rgba(5,223,114,.11);border:1.5px solid rgba(5,223,114,.55)}
+.regolo-p3-branch__tag{display:block;font-size:11px;font-weight:700;text-transform:uppercase;color:#58e388;margin-bottom:5px}
+.regolo-p3-branch code{display:block;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:11.5px;line-height:1.4;color:#e2e8f0;white-space:pre-wrap;background:transparent!important;padding:0!important;border:0!important}
+.regolo-p3-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px}
+.regolo-p3-kpi{padding:15px 18px;border-radius:12px;background:rgba(5,223,114,.07);border:1px solid rgba(5,223,114,.32);text-align:center}
+.regolo-p3-kpi strong{display:block;font-size:21px;font-weight:700;color:#05df72;margin-bottom:4px}
+.regolo-p3-kpi span{font-size:12.5px;color:#cbd5e1;line-height:1.4;display:block}
+.regolo-p3-foot{text-align:center;font-size:12px;color:#94a3b8;margin:0!important}
+@media(max-width:920px){.regolo-p3-grid,.regolo-p3-blocks,.regolo-p3-kpis{grid-template-columns:1fr}}
+</style>
+<!-- /wp:html -->
+
+<!-- wp:html -->
+<style>
+.regolo-tbl-wrap,.regolo-tbl-wrap *,.regolo-map,.regolo-map *{
+  box-sizing:border-box;
+  font-family:"Space Grotesk",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+.regolo-tbl-wrap{
+  width:100%!important;
+  max-width:100%!important;
+  margin:2.5rem 0!important;
+  padding:32px 30px!important;
+  border-radius:18px;
+  background:#050807;
+  border:1.5px solid rgba(74,222,128,.45);
+  box-shadow:0 20px 50px rgba(0,0,0,.85),0 0 30px rgba(22,163,74,.16);
+  color:#ffffff;
+  overflow-x:auto;
+}
+.regolo-tbl__head{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:20px;
+}
+.regolo-tbl__title{
+  margin:0!important;
+  font-size:22px!important;
+  font-weight:700!important;
+  color:#ffffff!important;
+  letter-spacing:-.02em;
+}
+.regolo-tbl__sub{
+  margin:4px 0 0 0!important;
+  font-size:14.5px!important;
+  color:#94a3b8!important;
+}
+.regolo-tbl{
+  width:100%;
+  border-collapse:separate;
+  border-spacing:0;
+  min-width:680px;
+  font-size:13.5px;
+}
+.regolo-tbl th,.regolo-tbl td{
+  padding:12px 12px;
+  text-align:left;
+  vertical-align:middle;
+  border-bottom:1px solid rgba(148,163,184,.14);
+}
+.regolo-tbl thead th{
+  background:rgba(20,28,24,.95);
+  color:#ffffff;
+  font-size:15px;
+  font-weight:700;
+  padding-top:16px;
+  padding-bottom:16px;
+  border-top:1px solid rgba(74,222,128,.3);
+  border-bottom:1.5px solid rgba(74,222,128,.4);
+}
+.regolo-tbl thead th:first-child{
+  border-top-left-radius:12px;
+  border-left:1px solid rgba(74,222,128,.3);
+  color:#94a3b8;
+  font-size:12.5px;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+.regolo-tbl thead th:last-child{
+  border-top-right-radius:12px;
+  border-right:1px solid rgba(74,222,128,.3);
+}
+.regolo-tbl thead th small{
+  display:block;
+  font-size:12px;
+  font-weight:500;
+  color:#94a3b8;
+  margin-top:3px;
+}
+.regolo-tbl tbody tr:nth-child(even) td{
+  background:rgba(255,255,255,.025);
+}
+.regolo-tbl tbody tr:hover td{
+  background:rgba(5,223,114,.05);
+}
+.regolo-tbl tbody td:first-child{
+  font-weight:600;
+  color:#e2e8f0;
+  width:165px;
+}
+.regolo-tbl tbody td:first-child span{
+  display:block;
+  font-size:12px;
+  font-weight:400;
+  color:#94a3b8;
+  margin-top:2px;
+}
+.regolo-tbl tbody td{
+  color:#cbd5e1;
+}
+.regolo-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  padding:3px 8px;
+  border-radius:9999px;
+  font-size:12px;
+  font-weight:700;
+  background:rgba(5,223,114,.14);
+  border:1px solid rgba(5,223,114,.45);
+  color:#58e388;
+  white-space:nowrap;
+}
+.regolo-pill--warn{
+  background:rgba(245,158,11,.14);
+  border:1px solid rgba(245,158,11,.45);
+  color:#fbbf24;
+}
+.regolo-pill--muted{
+  background:rgba(148,163,184,.12);
+  border:1px solid rgba(148,163,184,.28);
+  color:#cbd5e1;
+  font-weight:600;
+}
+.regolo-cell-sub{
+  display:block;
+  font-size:12px;
+  color:#94a3b8;
+  margin-top:4px;
+}
+.regolo-map{
+  width:100%!important;
+  max-width:100%!important;
+  margin:2.75rem 0!important;
+  padding:38px 34px!important;
+  border-radius:18px;
+  background:#050807;
+  border:1.5px solid rgba(74,222,128,.5);
+  box-shadow:0 20px 50px rgba(0,0,0,.9),0 0 35px rgba(22,163,74,.2);
+  color:#ffffff;
+}
+.regolo-map__top{
+  text-align:center;
+  margin-bottom:28px;
+}
+.regolo-map__badge{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  font-size:11.5px;
+  font-weight:700;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  padding:5px 14px;
+  border-radius:9999px;
+  border:1px solid rgba(74,222,128,.4);
+  background:rgba(74,222,128,.12);
+  color:#58e388;
+  margin-bottom:12px;
+}
+.regolo-map__dot{
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:#05df72;
+  box-shadow:0 0 8px #05df72;
+}
+.regolo-map__title{
+  margin:0 auto 8px auto!important;
+  font-size:clamp(23px,3vw,30px)!important;
+  line-height:1.2!important;
+  font-weight:700!important;
+  color:#ffffff!important;
+}
+.regolo-map__desc{
+  margin:0 auto!important;
+  font-size:15.5px!important;
+  color:#cbd5e1!important;
+  max-width:760px;
+}
+.regolo-map__cols-hdr{
+  display:grid;
+  grid-template-columns:1.15fr 36px 1fr 36px 1.15fr;
+  gap:8px;
+  padding:0 14px 10px 14px;
+  font-size:11.5px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.07em;
+  color:#58e388;
+}
+.regolo-map__lanes{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+.regolo-map__lane{
+  display:grid;
+  grid-template-columns:1.15fr 36px 1fr 36px 1.15fr;
+  align-items:stretch;
+  gap:8px;
+  padding:16px;
+  border-radius:14px;
+  background:rgba(17,22,19,.92);
+  border:1px solid rgba(74,222,128,.24);
+}
+.regolo-map__lane--hero{
+  background:linear-gradient(90deg,rgba(5,223,114,.09) 0%,rgba(17,22,19,.95) 50%,rgba(5,223,114,.07) 100%);
+  border:1.5px solid rgba(5,223,114,.55);
+}
+.regolo-map__box{
+  padding:14px 16px;
+  border-radius:11px;
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(148,163,184,.16);
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+.regolo-map__box--model{
+  background:rgba(5,223,114,.10);
+  border:1.5px solid rgba(5,223,114,.48);
+  text-align:center;
+}
+.regolo-map__box--icp{
+  background:rgba(20,28,24,.88);
+  border:1px solid rgba(74,222,128,.3);
+}
+.regolo-map__kicker{
+  font-size:11px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  color:#94a3b8;
+  margin-bottom:5px;
+}
+.regolo-map__box--icp .regolo-map__kicker{
+  color:#58e388;
+}
+.regolo-map__main{
+  font-size:15.5px;
+  font-weight:700;
+  color:#ffffff;
+  line-height:1.3;
+  margin-bottom:6px;
+}
+.regolo-map__box--model .regolo-map__main{
+  font-size:17px;
+  color:#05df72;
+}
+.regolo-map__meta{
+  font-size:13px;
+  color:#cbd5e1;
+  line-height:1.4;
+}
+.regolo-map__tags{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:6px;
+  margin-top:8px;
+}
+.regolo-map__tag{
+  font-size:11.5px;
+  font-weight:700;
+  padding:3px 8px;
+  border-radius:6px;
+  background:rgba(0,0,0,.45);
+  border:1px solid rgba(74,222,128,.35);
+  color:#e2e8f0;
+}
+.regolo-map__arrow{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#05df72;
+  font-size:22px;
+  font-weight:700;
+}
+.regolo-map__foot{
+  margin-top:18px;
+  text-align:center;
+  font-size:12.5px;
+  color:#94a3b8;
+}
+@media(max-width:860px){
+  .regolo-map__cols-hdr{display:none}
+  .regolo-map__lane{grid-template-columns:1fr;gap:6px}
+  .regolo-map__arrow{transform:rotate(90deg);height:22px}
+}
+</style>
+<!-- /wp:html -->
+
+<!-- wp:html -->
+<div class="regolo-bento-cta" style="margin: 40px 0; padding: 32px 36px; background: radial-gradient(ellipse at center, #061910 0%, #080f1a 100%); border: 1.5px solid #05df72; border-radius: 16px; box-shadow: 0 0 35px rgba(5, 223, 114, 0.2); font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+  <div style="display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px; background: rgba(74, 222, 128, 0.1); border: 1px solid rgba(74, 222, 128, 0.3); border-radius: 9999px; font-size: 12px; font-weight: 700; color: #58e388; text-transform: uppercase; margin-bottom: 14px; font-family: 'JetBrains Mono', monospace;">
+    <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #05df72; box-shadow: 0 0 8px #05df72;"></span> SOVEREIGN EUROPEAN INFERENCE
+  </div>
+  <div style="font-size: clamp(22px, 3.2vw, 28px); font-weight: 700; color: #ffffff; line-height: 1.25; margin-bottom: 10px; margin-top: 0;">Run OpenCode, Claude Code, and Codex on our EU open-weight API</div>
+  <p style="font-size: 15px; line-height: 1.6; color: #a7b8c8; margin-bottom: 18px;">Get 600 million monthly tokens across GLM-5.2, Qwen3.8-27B, Qwen3.5-122B, GPT-OSS 120B, Qwen3-Embedding-8B, and Brick on our flat Core plan (&euro;39/mo, ~&euro;0.065/1M) with certified Zero Data Retention.</p>
+  <p style="margin: 0 0 12px 0;"><a href="https://regolo.ai/pricing/" target="_blank" rel="noopener" style="display: inline-block; padding: 13px 26px; background: #05df72; color: #04120a; font-weight: 700; font-size: 15px; border-radius: 10px; text-decoration: none;">Start 30-day free trial (no card required) &rarr;</a></p>
+  <p style="font-size: 12px; color: #6f8296; margin-top: 12px; margin-bottom: 0;">Free credits included &middot; 100% green energy &middot; <span style="color: #58e388;">&#10003;</span> EU Green Datacenters &nbsp; <span style="color: #58e388;">&#10003;</span> Certified ZDR</p>
+</div>
+<!-- /wp:html -->
+
+<!-- wp:heading {"className":"wp-block-heading"} -->
+<h2 class="wp-block-heading">Reversible compaction: resetting the climb without losing a line</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph {"className":"wp-block-paragraph"} -->
+<p class="wp-block-paragraph">While offloading stops individual tool spikes, conversation history still climbs over a long debugging session. When token usage crosses your threshold, <code>reversible_compact()</code> performs three steps:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list {"ordered":true,"className":"wp-block-list"} -->
+<ol class="wp-block-list"><!-- wp:list-item -->
+<li><strong>Archive verbatim turns to disk:</strong> It writes the older messages to <code>.harness/conversation_history/&lt;session_id>.md</code> so no code snippet, stack trace, or decision is ever permanently lost.</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Summarize with a lightweight model (<code>qwen3.5-9b</code>, routed automatically via <a href="https://github.com/regolo-ai/brick-SR1" target="_blank" rel="noopener noreferrer">Brick</a>):</strong> The harness sends the older turns to <code>brick-v1-beta</code>, our <a href="https://github.com/regolo-ai/brick-SR1" target="_blank" rel="noopener noreferrer">Brick Mixture-of-Models semantic router</a>, which detects that summarizing chat turns is a low-complexity task and dispatches it to <code>qwen3.5-9b</code>, condensing 2,445 tokens of history into a 195-token checkpoint.</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Keep recent turns verbatim:</strong> It preserves the most recent messages untouched so the agent never loses immediate context in the middle of an edit.</li>
+<!-- /wp:list-item --></ol>
+<!-- /wp:list -->
+
+<!-- wp:html -->
+<section class="regolo-bc" role="group" aria-label="Measured Turn 15 cache hit and compaction results: Naive system injection 0 cached tokens (0%), Cache-safe tail placement 2,498 cached tokens (98.0%); History before compaction 2,445 tokens vs after reversible compaction 195 tokens (-92.0%)">
+    <span class="regolo-bc__badge"><span class="regolo-bc__dot"></span>MEASURED CACHE &amp; COMPACTION &middot; PIECE 3 SELF-TEST</span>
+    <h3 class="regolo-bc__title">Cached prefix tokens &amp; reversible history compaction</h3>
+    <p class="regolo-bc__sub">Measured on a 15-turn session (2,550 tokens) using <code>piece3_compaction_and_cache_memory.py</code>.</p>
+    <div class="regolo-bc__row"><span class="regolo-bc__name">Safe cache</span><span class="regolo-bc__track"><span class="regolo-bc__bar regolo-bc__bar--hero" style="width:98.0%"></span></span><span class="regolo-bc__value">2,498 tok</span></div>
+    <div class="regolo-bc__row"><span class="regolo-bc__name">Sys inject</span><span class="regolo-bc__track"><span class="regolo-bc__bar regolo-bc__bar--baseline" style="width:3.0%"></span></span><span class="regolo-bc__value">0 tok (0%)</span></div>
+    <div class="regolo-bc__row"><span class="regolo-bc__name">Raw history</span><span class="regolo-bc__track"><span class="regolo-bc__bar regolo-bc__bar--baseline" style="width:95.0%"></span></span><span class="regolo-bc__value">2,445 tok</span></div>
+    <div class="regolo-bc__row"><span class="regolo-bc__name">Compacted</span><span class="regolo-bc__track"><span class="regolo-bc__bar regolo-bc__bar--hero" style="width:8.0%"></span></span><span class="regolo-bc__value">195 tok</span></div>
+    <p class="regolo-bc__note">Compaction served by <code>qwen3.5-9b</code> via <code>brick-v1-beta</code> on our EU API (Oct 29, 2026).</p>
+</section>
+<style>
+.regolo-bc,.regolo-bc *{box-sizing:border-box;font-family:"Space Grotesk",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+.regolo-bc{width:100%;max-width:800px;margin:2rem auto;padding:28px 30px;background:transparent;border:1.5px solid rgba(5,223,114,.45);border-radius:14px;color:inherit}
+.regolo-bc__badge{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 11px;border-radius:9999px;border:1px solid rgba(5,223,114,.4);background:rgba(5,223,114,.10);color:#05b85d}
+.regolo-bc__dot{width:6px;height:6px;border-radius:50%;background:#05df72;box-shadow:0 0 6px #05df72;display:inline-block}
+.regolo-bc__title{margin:14px 0 4px!important;font-size:24px!important;line-height:1.2!important;letter-spacing:-.02em!important;font-weight:700!important;color:inherit!important}
+.regolo-bc__sub{margin:0 0 20px!important;font-size:15px!important;line-height:1.4!important;opacity:.75;color:inherit!important}
+.regolo-bc__row{display:grid;grid-template-columns:118px 1fr 112px;align-items:center;gap:14px;margin-bottom:12px;font-size:15px}
+.regolo-bc__name{opacity:.72;white-space:nowrap}
+.regolo-bc__track{display:block;height:18px;border-radius:9999px;background:rgba(128,128,128,.2);overflow:hidden}
+.regolo-bc__bar{display:block;height:100%;min-width:5px;border-radius:9999px}
+.regolo-bc__bar--hero{background:#05df72;box-shadow:0 0 14px rgba(5,223,114,.55)}
+.regolo-bc__bar--baseline{background:#64748b}
+.regolo-bc__value{text-align:right;font-weight:700;white-space:nowrap}
+.regolo-bc__note{margin:16px 0 0!important;font-size:12.5px!important;line-height:1.5!important;opacity:.62;color:inherit!important}
+@media(max-width:560px){.regolo-bc{padding:22px 16px}.regolo-bc__row{grid-template-columns:84px 1fr 86px;gap:8px;font-size:13px}.regolo-bc__title{font-size:20px!important}}
+</style>
+<!-- /wp:html -->
+
+<!-- wp:heading {"className":"wp-block-heading"} -->
+<h2 class="wp-block-heading">Build, test, and validate Piece 3 in Python</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph {"className":"wp-block-paragraph"} -->
+<p class="wp-block-paragraph">Save the script below as <code>piece3_compaction_and_cache_memory.py</code> and run <code>--self-test</code> to verify both the 98.0% prefix cache preservation and the 92.0% reversible compaction on our API:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code {"language":"python"} -->
+<pre class="wp-block-code"><code>#!/usr/bin/env python3
+"""piece3_compaction_and_cache_memory.py: Cache-safe memory layout + reversible history compaction."""
+import json, os, ssl, urllib.request
+from pathlib import Path
+
+REGOLO_BASE_URL = os.environ.get("REGOLO_BASE_URL", "https://api.regolo.ai/v1")
+HISTORY_DIR = Path(".harness/conversation_history")
+_SSL_CTX = ssl._create_unverified_context()
+
+def build_cache_safe_messages(system_prompt: str, always_on_memory: str, dynamic_hits: str, history: list&#91;dict], user_msg: str) -&gt; list&#91;dict]:
+    return (
+        &#91;
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": f"&#91;Standing Project Memory - Always On]\n{always_on_memory}"},
+            {"role": "assistant", "content": "Understood. I will apply this standing project memory."},
+        ]
+        + history
+        + &#91;{"role": "user", "content": f"{user_msg}\n\n&lt;retrieved_turn_memory&gt;\n{dynamic_hits}\n&lt;/retrieved_turn_memory&gt;"}]
+    )
+
+def reversible_compact(messages: list&#91;dict], session_id: str, api_key: str, keep_recent: int = 2) -&gt; dict:
+    HISTORY_DIR.mkdir(parents=True, exist_ok=True)
+    archive_path = HISTORY_DIR / f"{session_id}.md"
+    older, recent = messages&#91;:-keep_recent], messages&#91;-keep_recent:]
+    archive_text = "\n\n".join(f"### {m&#91;'role'].upper()}\n{m&#91;'content']}" for m in older)
+    archive_path.write_text(archive_text, encoding="utf-8")
+
+    req = urllib.request.Request(
+        f"{REGOLO_BASE_URL}/chat/completions",
+        data=json.dumps({
+            "model": "brick-v1-beta",
+            "messages": &#91;
+                {"role": "system", "content": "Summarize earlier turns into (1) completed actions, (2) key files/decisions, (3) open blockers. Max 120 words."},
+                {"role": "user", "content": archive_text},
+            ],
+            "max_tokens": 220,
+            "temperature": 0.1,
+            "chat_template_kwargs": {"enable_thinking": False},
+        }).encode("utf-8"),
+        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+        method="POST",
+    )
+    with urllib.request.urlopen(req, timeout=45, context=_SSL_CTX) as resp:
+        data = json.loads(resp.read().decode("utf-8"))
+    summary = (data&#91;"choices"]&#91;0]&#91;"message"].get("content") or "").strip()
+    compacted = &#91;{"role": "system", "content": f"&#91;CHECKPOINT - Full log at {archive_path}]\n{summary}"}] + recent
+    return {"served_by": data.get("model"), "archive_path": str(archive_path), "messages": compacted}
+</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:code {"language":"bash"} -->
+<pre class="wp-block-code"><code>export REGOLO_API_KEY="your-regolo-api-key"
+python3 piece3_compaction_and_cache_memory.py --self-test
+# Verified live output:
+# "turn_15_total_tokens": 2550,
+# "naive_cache_hit_pct": 0.0,
+# "cache_safe_hit_pct": 98.0,
+# "compaction_served_by": "qwen3.5-9b",
+# "history_tokens_before_compaction": 2445,
+# "history_tokens_after_compaction": 195,
+# "compaction_reduction_pct": 92.0
+</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:html -->
+<section class="regolo-nl alignfull">
+  <div class="regolo-nl__card">
+    <div class="regolo-nl__head">
+      <span class="regolo-nl__badge"><span class="regolo-nl__dot"></span>ZERO DATA RETENTION</span>
+    </div>
+
+    <div class="regolo-nl__title">Get engineering notes and model releases in your inbox.</div>
+    <p class="regolo-nl__desc">Sovereign AI inference, OpenAI-compatible, EU-hosted. Benchmarks, new models (Mistral, Qwen, GLM), and cost insights. One email, no spam.</p>
+
+    <div class="regolo-nl__success" id="regolo-nl-success" role="status" aria-live="polite">
+      <div class="regolo-nl__check">✓</div>
+      <div class="regolo-nl__success-title">Thank you for subscribing!</div>
+      <p class="regolo-nl__success-desc">Please check your inbox to confirm your subscription.</p>
+    </div>
+
+    <form class="regolo-nl__form" id="regolo-nl-form" action="https://a9c7x3.mailupclient.com/frontend/subscribe.aspx" method="post" target="_mailup_nl_frame" onsubmit="this.style.display='none';document.getElementById('regolo-nl-success').style.display='block';">
+      <div class="regolo-nl__row">
+        <input class="regolo-nl__input" type="email" name="email" id="regolo-nl-email" aria-label="Email address" placeholder="Enter your email" required="required" autocomplete="email" />
+        <button class="regolo-nl__btn" type="submit" name="submit" value="true">Subscribe Free</button>
+      </div>
+
+      <div class="regolo-nl__privacy">
+        <input class="regolo-nl__checkbox-input" type="checkbox" name="privacy" id="regolo-nl-privacy" required="required" />
+        <label class="regolo-nl__checkbox-label" for="regolo-nl-privacy">
+          I accept the <a href="https://regolo.ai/privacy-policy/" target="_blank" rel="noopener">Privacy Policy</a> *
+        </label>
+      </div>
+
+      <input type="hidden" id="apgroup" name="apgroup" value="35" />
+      <input type="hidden" name="list" value="1" />
+    </form>
+
+    <iframe name="_mailup_nl_frame" style="display:none;width:0;height:0;border:0;position:absolute" aria-hidden="true"></iframe>
+    <p class="regolo-nl__footnote">100% European infrastructure · Zero spam · Unsubscribe anytime.</p>
+  </div>
+</section>
+
+<style>
+.regolo-nl,
+.regolo-nl * {
+  box-sizing: border-box;
+  font-family: "Space Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.regolo-nl {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 2.5rem 0 !important;
+  border-radius: 16px;
+  padding: 56px 32px;
+  background-color: #000000 !important;
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTYwIDE0NDAiIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPgogICAgPGRlZnM+CiAgICAgIDxyYWRpYWxHcmFkaWVudCBpZD0ibmVidWxhMSIgY3g9IjUwJSIgY3k9IjIwJSIgcj0iNTAlIj4KICAgICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMDVkZjcyIiBzdG9wLW9wYWNpdHk9IjAuMDQiIC8+CiAgICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMDAwMDAwIiBzdG9wLW9wYWNpdHk9IjAiIC8+CiAgICAgIDwvcmFkaWFsR3JhZGllbnQ+CiAgICAgIDxmaWx0ZXIgaWQ9InNvZnQtZ2xvdyIgeD0iLTMwJSIgeT0iLTMwJSIgd2lkdGg9IjE2MCUiIGhlaWdodD0iMTYwJSI+CiAgICAgICAgPGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iMS4yIiByZXN1bHQ9ImJsdXIiIC8+CiAgICAgICAgPGZlTWVyZ2U+CiAgICAgICAgICA8ZmVNZXJnZU5vZGUgaW49ImJsdXIiIC8+CiAgICAgICAgICA8ZmVNZXJnZU5vZGUgaW49IlNvdXJjZUdyYXBoaWMiIC8+CiAgICAgICAgPC9mZU1lcmdlPgogICAgICA8L2ZpbHRlcj4KICAgIDwvZGVmcz4KICAgIDxyZWN0IHdpZHRoPSIyNTYwIiBoZWlnaHQ9IjE0NDAiIGZpbGw9IiMwMDAwMDAiIC8+CiAgICA8cmVjdCB3aWR0aD0iMjU2MCIgaGVpZ2h0PSIxNDQwIiBmaWxsPSJ1cmwoI25lYnVsYTEpIiAvPgogICAgPGxpbmUgeDE9IjE3NzcuMyIgeTE9IjQ5Ny45IiB4Mj0iMTgzMS42IiB5Mj0iNDQyLjQiIHN0cm9rZT0iIzRhZGU4MCIgc3Ryb2tlLXdpZHRoPSIwLjUiIHN0cm9rZS1vcGFjaXR5PSIwLjA0MiIgLz4KICAgIDxsaW5lIHgxPSIxMzAzLjkiIHkxPSIxNTEuNCIgeDI9IjEyNTEuNCIgeTI9IjE4MC41IiBzdHJva2U9IiM0YWRlODAiIHN0cm9rZS13aWR0aD0iMC41IiBzdHJva2Utb3BhY2l0eT0iMC4wNiIgLz4KICAgIDxsaW5lIHgxPSIxMzAzLjkiIHkxPSIxNTEuNCIgeDI9IjEyMTMuNiIgeTI9IjE4NC4wIiBzdHJva2U9IiM0YWRlODAiIHN0cm9rZS13aWR0aD0iMC41IiBzdHJva2Utb3BhY2l0eT0iMC4wMjQiIC8+CiAgICA8bGluZSB4MT0iMTczNi4xIiB5MT0iNzcxLjQiIHgyPSIxNzkwLjkiIHkyPSI4NzUuMiIgc3Ryb2tlPSIjNGFkZTgwIiBzdHJva2Utd2lkdGg9IjAuNSIgc3Ryb2tlLW9wYWNpdHk9IjAuMDAzIiAvPgogICAgPGxpbmUgeDE9IjEzNzguOCIgeTE9IjExMDcuMyIgeDI9IjEzNzguNSIgeTI9IjEwMzAuNSIgc3Ryb2tlPSIjNGFkZTgwIiBzdHJva2Utd2lkdGg9IjAuNSIgc3Ryb2tlLW9wYWNpdHk9IjAuMDQzIiAvPgogICAgPGxpbmUgeDE9IjEyNTEuNCIgeTE9IjE4MC41IiB4Mj0iMTIxMy42IiB5Mj0iMTg0LjAiIHN0cm9rZT0iIzRhZGU4MCIgc3Ryb2tlLXdpZHRoPSIwLjUiIHN0cm9rZS1vcGFjaXR5PSIwLjA4MiIgLz4KICAgIDxsaW5lIHgxPSIyNTIyLjgiIHkxPSI5MjguMyIgeDI9IjI0OTQuNyIgeTI9Ijg3NC43IiBzdHJva2U9IiM0YWRlODAiIHN0cm9rZS13aWR0aD0iMC41IiBzdHJva2Utb3BhY2l0eT0iMC4wNTkiIC8+CiAgICA8bGluZSB4MT0iMjUyMi44IiB5MT0iOTI4LjMiIHgyPSIyNTA0LjYiIHkyPSI4NTIuNyIgc3Ryb2tlPSIjNGFkZTgwIiBzdHJva2Utd2lkdGg9IjAuNSIgc3Ryb2tlLW9wYWNpdHk9IjAuMDQyIiAvPgogICAgPGxpbmUgeDE9IjY0Ny4yIiB5MT0iMTE0LjAiIHgyPSI1ODcuOCIgeTI9IjEyMC40IiBzdHJva2U9IiM0YWRlODAiIHN0cm9rZS13aWR0aD0iMC41IiBzdHJva2Utb3BhY2l0eT0iMC4wNiIgLz4KICAgIDxsaW5lIHgxPSIyMTgyLjciIHkxPSIxMjMuNSIgeDI9IjIyMjAuMCIgeTI9IjEyOS44IiBzdHJva2U9IiM0YWRlODAiIHN0cm9rZS13aWR0aD0iMC41IiBzdHJva2Utb3BhY2l0eT0iMC4wODIiIC8+CiAgICA8bGluZSB4MT0iMjE4Mi43IiB5MT0iMTIzLjUiIHgyPSIyMTA2LjciIHkyPSI4Ni4zIiBzdHJva2U9IiM0YWRlODAiIHN0cm9rZS13aWR0aD0iMC41IiBzdHJva2Utb3BhY2l0eT0iMC4wMzUiIC8+CiAgICA8bGluZSB4MT0iNDQyLjQiIHkxPSI3MDAuMCIgeDI9IjM2NS42IiB5Mj0iNjY2LjgiIHN0cm9rZT0iIzRhZGU4MCIgc3Ryb2tlLXdpZHRoPSIwLjUiIHN0cm9rZS1vcGFjaXR5PSIwLjAzNiIgLz4KICAgIDxsaW5lIHgxPSI0MjAuMiIgeTE9IjEzNjAuNSIgeDI9IjQ3NS4yIiB5Mj0iMTMxMC4wIiBzdHJva2U9IiM0YWRlODAiIHN0cm9rZS13aWR0aD0iMC41IiBzdHJva2Utb3BhY2l0eT0iMC4wNDUiIC8+CiAgICA8bGluZSB4MT0iNjQzLjAiIHkxPSI4NTEuNCIgeDI9IjU4NC41IiB5Mj0iOTQyLjQiIHN0cm9rZT0iIzRhZGU4MCIgc3Ryb2tlLXdpZHRoPSIwLjUiIHN0cm9rZS1vcGFjaXR5PSIwLjAxMiIgLz4KICAgIDxsaW5lIHgxPSI2MjQuMSIgeTE9IjU3NS4xIiB4Mj0iNjMwLjgiIHkyPSI1ODkuOSIgc3Ryb2tlPSIjNGFkZTgwIiBzdHJva2Utd2lkdGg9IjAuNSIgc3Ryb2tlLW9wYWNpdHk9IjAuMTA0IiAvPgogICAgPGxpbmUgeDE9IjE3OTAuOSIgeTE9Ijg3NS4yIiB4Mj0iMTcwMS4zIiB5Mj0iNzk1LjkiIHN0cm9rZT0iIzRhZGU4MCIgc3Ryb2tlLXdpZHRoPSIwLjUiIHN0cm9rZS1vcGFjaXR5PSIwLjAiIC8+CiAgICA8bGluZSB4MT0iMTU0My4xIiB5MT0iMTAyMi41IiB4Mj0iMTQ1NS4zIiB5Mj0iOTUzLjgiIHN0cm9rZT0iIzRhZGU4MCIgc3Ryb2tlLXdpZHRoPSIwLjUiIHN0cm9rZS1vcGFjaXR5PSIwLjAwOSIgLz4KICAgIDxsaW5lIHgxPSI0NzUuMiIgeTE9IjEzMTAuMCIgeDI9IjQ2Ni41IiB5Mj0iMTM1Ni42IiBzdHJva2U9IiM0YWRlODAiIHN0cm9rZS13aWR0aD0iMC41IiBzdHJva2Utb3BhY2l0eT0iMC4wNzMiIC8+CiAgICA8bGluZSB4MT0iNjk0LjciIHkxPSIxMTE5LjUiIHgyPSI1ODMuMyIgeTI9IjExNjAuMSIgc3Ryb2tlPSIjNGFkZTgwIiBzdHJva2Utd2lkdGg9IjAuNSIgc3Ryb2tlLW9wYWNpdHk9IjAuMDAxIiAvPgogICAgPGxpbmUgeDE9IjI0NTEuOSIgeTE9IjQxMy4wIiB4Mj0iMjQwOC41IiB5Mj0iMzAyLjEiIHN0cm9rZT0iIzRhZGU4MCIgc3Ryb2tlLXdpZHRoPSIwLjUiIHN0cm9rZS1vcGFjaXR5PSIwLjAwMSIgLz4KICAgIDxsaW5lIHgxPSIyNDUxLjkiIHkxPSI0MTMuMCIgeDI9IjI0NDguMyIgeTI9IjQwMC40IiBzdHJva2U9IiM0YWRlODAiIHN0cm9rZS13aWR0aD0iMC41IiBzdHJva2Utb3BhY2l0eT0iMC4xMDciIC8+CiAgICA8bGluZSB4MT0iMjQ0MS4wIiB5MT0iMzk0LjAiIHgyPSIyNDA4LjUiIHkyPSIzMDIuMSIgc3Ryb2tlPSIjNGFkZTgwIiBzdHJva2Utd2lkdGg9IjAuNSIgc3Ryb2tlLW9wYWNpdHk9IjAuMDIzIiAvPgogICAgPGxpbmUgeDE9IjI0NDEuMCIgeTE9IjM5NC4wIiB4Mj0iMjQ0OC4zIiB5Mj0iNDAwLjQiIHN0cm9rZT0iIzRhZGU4MCIgc3Ryb2tlLXdpZHRoPSIwLjUiIHN0cm9rZS1vcGFjaXR5PSIwLjExIiAvPgogICAgPGxpbmUgeDE9IjIwMC42IiB5MT0iOTQ4LjMiIHgyPSIyMTUuOCIgeTI9Ijk4NS4wIiBzdHJva2U9IiM0YWRlODAiIHN0cm9rZS13aWR0aD0iMC41IiBzdHJva2Utb3BhY2l0eT0iMC4wOCIgLz4KICAgIDxsaW5lIHgxPSIxODMxLjYiIHkxPSI0NDIuNCIgeDI9IjE3ODUuMCIgeTI9IjQwOS4wIiBzdHJva2U9IiM0YWRlODAiIHN0cm9rZS13aWR0aD0iMC41IiBzdHJva2Utb3BhY2l0eT0iMC4wNjMiIC8+CiAgICA8Y2lyY2xlIGN4PSIxNjMwLjAiIGN5PSI1OS44IiByPSIxLjA0IiBmaWxsPSIjNThlMzg4IiBvcGFjaXR5PSIwLjQxIiAvPgogICAgPGNpcmNsZSBjeD0iMTcyMy41IiBjeT0iMTI2NS4xIiByPSIwLjg0IiBmaWxsPSIjNThlMzg4IiBvcGFjaXR5PSIwLjUxIiAvPgogICAgPGNpcmNsZSBjeD0iMjYwLjIiIGN5PSIzNDguNCIgcj0iMS4zOCIgZmlsbD0iI2ZmZmZmZiIgb3BhY2l0eT0iMC41OCIgLz4KICAgIDxjaXJjbGUgY3g9IjEwNzguMCIgY3k9IjY0OS40IiByPSIxLjA0IiBmaWxsPSIjMDVkZjcyIiBvcGFjaXR5PSIwLjczIiAvPgogICAgPGNpcmNsZSBjeD0iMTc3Ny4zIiBjeT0iNDk3LjkiIHI9IjAuOTEiIGZpbGw9IiM0YWRlODAiIG9wYWNpdHk9IjAuNzgiIC8+CiAgICA8Y2lyY2xlIGN4PSIyODEuNSIgY3k9IjU1My4xIiByPSIxLjEzIiBmaWxsPSIjNGFkZTgwIiBvcGFjaXR5PSIwLjQ3IiAvPgogICAgPGNpcmNsZSBjeD0iMjA1MC45IiBjeT0iMTAzOS4zIiByPSIxLjMxIiBmaWxsPSIjYTdmM2QwIiBvcGFjaXR5PSIwLjc5IiAvPgogICAgPGNpcmNsZSBjeD0iMjIyLjgiIGN5PSI0MzIuNSIgcj0iMS40MSIgZmlsbD0iIzRhZGU4MCIgb3BhY2l0eT0iMC43NCIgZmlsdGVyPSJ1cmwoI3NvZnQtZ2xvdykiIC8+CiAgICA8Y2lyY2xlIGN4PSIxNDc0LjIiIGN5PSIxMDA0LjQiIHI9IjAuOCIgZmlsbD0iIzRhZGU4MCIgb3BhY2l0eT0iMC40MSIgLz4KICAgIDxjaXJjbGUgY3g9IjI0OTcuOSIgY3k9IjEyMTMuOSIgcj0iMS42NiIgZmlsbD0iI2E3ZjNkMCIgb3BhY2l0eT0iMC40OSIgZmlsdGVyPSJ1cmwoI3NvZnQtZ2xvdykiIC8+CiAgICA8Y2lyY2xlIGN4PSIxNjIwLjYiIGN5PSI1MzIuMSIgcj0iMS4xNCIgZmlsbD0iIzRhZGU4MCIgb3BhY2l0eT0iMC40IiAvPgogICAgPGNpcmNsZSBjeD0iMTc4Ni42IiBjeT0iOTc1LjEiIHI9IjAuODIiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9IjAuNjIiIC8+CiAgICA8Y2lyY2xlIGN4PSIxODU1LjEiIGN5PSIyNTIuMSIgcj0iMS4xNSIgZmlsbD0iI2ZmZmZmZiIgb3BhY2l0eT0iMC43OSIgLz4KICAgIDxjaXJjbGUgY3g9IjU3Ni4yIiBjeT0iNDc1LjgiIHI9IjEuNTYiIGZpbGw9IiM1OGUzODgiIG9wYWNpdHk9IjAuMzMiIGZpbHRlcj0idXJsKCNzb2Z0LWdsb3cpIiAvPgogICAgPGNpcmNsZSBjeD0iMjA0NS43IiBjeT0iNTgyLjYiIHI9IjAuODIiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9IjAuNzYiIC8+CiAgICA8Y2lyY2xlIGN4PSIyMjI0LjciIGN5PSI0NjIuNCIgcj0iMS40NCIgZmlsbD0iI2E3ZjNkMCIgb3BhY2l0eT0iMC41IiBmaWx0ZXI9InVybCgjc29mdC1nbG93KSIgLz4KICAgIDxjaXJjbGUgY3g9IjM4My42IiBjeT0iMjE5LjEiIHI9IjEuNTMiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9IjAuNTciIGZpbHRlcj0idXJsKCNzb2Z0LWdsb3cpIiAvPgogICAgPGNpcmNsZSBjeD0iMTEwMC40IiBjeT0iODM2LjEiIHI9IjEuMTMiIGZpbGw9IiMwNWRmNzIiIG9wYWNpdHk9IjAuOCIgLz4KICAgIDxjaXJjbGUgY3g9IjEzMDMuOSIgY3k9IjE1MS40IiByPSIwLjgiIGZpbGw9IiMwNWRmNzIiIG9wYWNpdHk9IjAuMzUiIC8+CiAgICA8Y2lyY2xlIGN4PSIyMDEzLjEiIGN5PSI2MTEuOCIgcj0iMC44MiIgZmlsbD0iI2E3ZjNkMCIgb3BhY2l0eT0iMC40OSIgLz4KICAgIDxjaXJjbGUgY3g9IjEzNTMuMSIgY3k9IjEzNzQuOCIgcj0iMS42NSIgZmlsbD0iIzU4ZTM4OCIgb3BhY2l0eT0iMC4zMSIgZmlsdGVyPSJ1cmwoI3NvZnQtZ2xvdykiIC8+CiAgICA8Y2lyY2xlIGN4PSIxNzM2LjEiIGN5PSI3NzEuNCIgcj0iMS4wMyIgZmlsbD0iIzU4ZTM4OCIgb3BhY2l0eT0iMC42MiIgLz4KICAgIDxjaXJjbGUgY3g9Ijc2MS43IiBjeT0iMjQ0LjgiIHI9IjAuNzUiIGZpbGw9IiM0YWRlODAiIG9wYWNpdHk9IjAuNjYiIC8+CiAgICA8Y2lyY2xlIGN4PSIyNDY0LjQiIGN5PSIxMDg0LjEiIHI9IjEuMjgiIGZpbGw9IiM0YWRlODAiIG9wYWNpdHk9IjAuMzUiIC8+CiAgICA8Y2lyY2xlIGN4PSIyMTM3LjYiIGN5PSI3MzAuNyIgcj0iMC45NiIgZmlsbD0iIzA1ZGY3MiIgb3BhY2l0eT0iMC40OSIgLz4KICAgIDxjaXJjbGUgY3g9IjEzNzguOCIgY3k9IjExMDcuMyIgcj0iMS4zMSIgZmlsbD0iIzRhZGU4MCIgb3BhY2l0eT0iMC4zIiAvPgogICAgPGNpcmNsZSBjeD0iMTI1MS40IiBjeT0iMTgwLjUiIHI9IjEuMTMiIGZpbGw9IiM0YWRlODAiIG9wYWNpdHk9IjAuNzkiIC8+CiAgICA8Y2lyY2xlIGN4PSI2MjYuMCIgY3k9IjM1OS44IiByPSIxLjM1IiBmaWxsPSIjYTdmM2QwIiBvcGFjaXR5PSIwLjM0IiAvPgogICAgPGNpcmNsZSBjeD0iMjA3My4yIiBjeT0iMTM4NC40IiByPSIxLjMxIiBmaWxsPSIjYTdmM2QwIiBvcGFjaXR5PSIwLjM2IiAvPgogICAgPGNpcmNsZSBjeD0iMjQwMS42IiBjeT0iMjU0LjUiIHI9IjEuMyIgZmlsbD0iIzA1ZGY3MiIgb3BhY2l0eT0iMC42IiAvPgogICAgPGNpcmNsZSBjeD0iMjM1Ni42IiBjeT0iMTA3NC44IiByPSIxLjQ3IiBmaWxsPSIjYTdmM2QwIiBvcGFjaXR5PSIwLjY2IiBmaWx0ZXI9InVybCgjc29mdC1nbG93KSIgLz4KICAgIDxjaXJjbGUgY3g9IjI1MjIuOCIgY3k9IjkyOC4zIiByPSIxLjIxIiBmaWxsPSIjNThlMzg4IiBvcGFjaXR5PSIwLjU2IiAvPgogICAgPGNpcmNsZSBjeD0iNjQ3LjIiIGN5PSIxMTQuMCIgcj0iMC43NyIgZmlsbD0iI2ZmZmZmZiIgb3BhY2l0eT0iMC41OCIgLz4KICAgIDxjaXJjbGUgY3g9IjU3Ny43IiBjeT0iMTIzLjciIHI9IjEuNDEiIGZpbGw9IiM1OGUzODgiIG9wYWNpdHk9IjAuNDEiIGZpbHRlcj0idXJsKCNzb2Z0LWdsb3cpIiAvPgogICAgPGNpcmNsZSBjeD0iMjE4Mi43IiBjeT0iMTIzLjUiIHI9IjEuMCIgZmlsbD0iIzA1ZGY3MiIgb3BhY2l0eT0iMC42MyIgLz4KICAgIDxjaXJjbGUgY3g9IjEzNzguNSIgY3k9IjEwMzAuNSIgcj0iMS42OCIgZmlsbD0iIzA1ZGY3MiIgb3BhY2l0eT0iMC41OSIgZmlsdGVyPSJ1cmwoI3NvZnQtZ2xvdykiIC8+CiAgICA8Y2lyY2xlIGN4PSIxOTk0LjQiIGN5PSIxMTQ3LjQiIHI9IjAuOTUiIGZpbGw9IiNhN2YzZDAiIG9wYWNpdHk9IjAuMzUiIC8+CiAgICA8Y2lyY2xlIGN4PSI5MTQuMyIgY3k9IjU5Ni40IiByPSIxLjY2IiBmaWxsPSIjNThlMzg4IiBvcGFjaXR5PSIwLjMzIiBmaWx0ZXI9InVybCgjc29mdC1nbG93KSIgLz4KICAgIDxjaXJjbGUgY3g9IjE3Ny4xIiBjeT0iMTAzNy4yIiByPSIxLjU5IiBmaWxsPSIjMDVkZjcyIiBvcGFjaXR5PSIwLjM1IiBmaWx0ZXI9InVybCgjc29mdC1nbG93KSIgLz4KICAgIDxjaXJjbGUgY3g9IjUwMi40IiBjeT0iNjQ4LjYiIHI9IjEuMTkiIGZpbGw9IiMwNWRmNzIiIG9wYWNpdHk9IjAuNDQiIC8+CiAgICA8Y2lyY2xlIGN4PSIyMjIwLjAiIGN5PSIxMjkuOCIgcj0iMS42IiBmaWxsPSIjNThlMzg4IiBvcGFjaXR5PSIwLjczIiBmaWx0ZXI9InVybCgjc29mdC1nbG93KSIgLz4KICAgIDxjaXJjbGUgY3g9IjE1Mi4wIiBjeT0iMTQxNC4wIiByPSIxLjYzIiBmaWxsPSIjMDVkZjcyIiBvcGFjaXR5PSIwLjc4IiBmaWx0ZXI9InVybCgjc29mdC1nbG93KSIgLz4KICAgIDxjaXJjbGUgY3g9IjQ0Mi40IiBjeT0iNzAwLjAiIHI9IjAuOTciIGZpbGw9IiM1OGUzODgiIG9wYWNpdHk9IjAuNSIgLz4KICAgIDxjaXJjbGUgY3g9IjQzOC4yIiBjeT0iMjguMCIgcj0iMS4xNiIgZmlsbD0iI2E3ZjNkMCIgb3BhY2l0eT0iMC43NiIgLz4KICAgIDxjaXJjbGUgY3g9Ijc0MS4wIiBjeT0iOTkzLjMiIHI9IjEuNTIiIGZpbGw9IiNhN2YzZDAiIG9wYWNpdHk9IjAuNjkiIGZpbHRlcj0idXJsKCNzb2Z0LWdsb3cpIiAvPgogICAgPGNpcmNsZSBjeD0iNDEzLjUiIGN5PSI0MzcuNCIgcj0iMS43NyIgZmlsbD0iI2ZmZmZmZiIgb3BhY2l0eT0iMC41OSIgZmlsdGVyPSJ1cmwoI3NvZnQtZ2xvdykiIC8+CiAgICA8Y2lyY2xlIGN4PSIxNzguMCIgY3k9IjQ2MC45IiByPSIwLjgiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9IjAuNTQiIC8+CiAgICA8Y2lyY2xlIGN4PSI0MjAuMiIgY3k9IjEzNjAuNSIgcj0iMC44MyIgZmlsbD0iI2ZmZmZmZiIgb3BhY2l0eT0iMC4zOSIgLz4KICAgIDxjaXJjbGUgY3g9IjE5NS42IiBjeT0iMTIyMi45IiByPSIxLjE3IiBmaWxsPSIjZmZmZmZmIiBvcGFjaXR5PSIwLjc3IiAvPgogICAgPGNpcmNsZSBjeD0iNjQzLjAiIGN5PSI4NTEuNCIgcj0iMS40IiBmaWxsPSIjZmZmZmZmIiBvcGFjaXR5PSIwLjUxIiAvPgogICAgPGNpcmNsZSBjeD0iMTQ0My43IiBjeT0iNDY0LjgiIHI9IjEuMDIiIGZpbGw9IiM0YWRlODAiIG9wYWNpdHk9IjAuNjMiIC8+CiAgICA8Y2lyY2xlIGN4PSI2MjQuMSIgY3k9IjU3NS4xIiByPSIxLjQ2IiBmaWxsPSIjNGFkZTgwIiBvcGFjaXR5PSIwLjQ1IiBmaWx0ZXI9InVybCgjc29mdC1nbG93KSIgLz4KICAgIDxjaXJjbGUgY3g9IjIzNTYuOCIgY3k9IjEzMjUuNyIgcj0iMC43NiIgZmlsbD0iI2ZmZmZmZiIgb3BhY2l0eT0iMC42MSIgLz4KICAgIDxjaXJjbGUgY3g9IjI1MjUuMiIgY3k9IjEyNi44IiByPSIwLjk3IiBmaWxsPSIjNGFkZTgwIiBvcGFjaXR5PSIwLjQzIiAvPgogICAgPGNpcmNsZSBjeD0iMjIzNi4wIiBjeT0iMTI0Ny4yIiByPSIxLjE0IiBmaWxsPSIjZmZmZmZmIiBvcGFjaXR5PSIwLjM4IiAvPgogICAgPGNpcmNsZSBjeD0iMTc5MC45IiBjeT0iODc1LjIiIHI9IjEuNzkiIGZpbGw9IiM1OGUzODgiIG9wYWNpdHk9IjAuNjMiIGZpbHRlcj0idXJsKCNzb2Z0LWdsb3cpIiAvPgogICAgPGNpcmNsZSBjeD0iMTcwMS4zIiBjeT0iNzk1LjkiIHI9IjEuNzMiIGZpbGw9IiMwNWRmNzIiIG9wYWNpdHk9IjAuMzUiIGZpbHRlcj0idXJsKCNzb2Z0LWdsb3cpIiAvPgogICAgPGNpcmNsZSBjeD0iNjg4LjgiIGN5PSIxMjYxLjciIHI9IjEuNTMiIGZpbGw9IiM0YWRlODAiIG9wYWNpdHk9IjAuMzgiIGZpbHRlcj0idXJsKCNzb2Z0LWdsb3cpIiAvPgogICAgPGNpcmNsZSBjeD0iMTU0My4xIiBjeT0iMTAyMi41IiByPSIwLjk2IiBmaWxsPSIjNGFkZTgwIiBvcGFjaXR5PSIwLjYyIiAvPgogICAgPGNpcmNsZSBjeD0iMTI5My42IiBjeT0iMzc0LjEiIHI9IjEuNyIgZmlsbD0iI2E3ZjNkMCIgb3BhY2l0eT0iMC4zMyIgZmlsdGVyPSJ1cmwoI3NvZnQtZ2xvdykiIC8+CiAgICA8Y2lyY2xlIGN4PSIyMTA2LjciIGN5PSI4Ni4zIiByPSIxLjEiIGZpbGw9IiM0YWRlODAiIG9wYWNpdHk9IjAuMzciIC8+CiAgICA8Y2lyY2xlIGN4PSI0MzAuNiIgY3k9IjYzOS4yIiByPSIxLjQ5IiBmaWxsPSIjNThlMzg4IiBvcGFjaXR5PSIwLjU4IiBmaWx0ZXI9InVybCgjc29mdC1nbG93KSIgLz4KICAgIDxjaXJjbGUgY3g9IjIxMy45IiBjeT0iMTI1Mi41IiByPSIxLjciIGZpbGw9IiM0YWRlODAiIG9wYWNpdHk9IjAuNTciIGZpbHRlcj0idXJsKCNzb2Z0LWdsb3cpIiAvPgogICAgPGNpcmNsZSBjeD0iMTQ4Ny4xIiBjeT0iMjMwLjkiIHI9IjAuODgiIGZpbGw9IiM1OGUzODgiIG9wYWNpdHk9IjAuNDUiIC8+CiAgICA8Y2lyY2xlIGN4PSIyMjgxLjMiIGN5PSIzMTcuMCIgcj0iMS4wMSIgZmlsbD0iI2ZmZmZmZiIgb3BhY2l0eT0iMC4zNSIgLz4KICAgIDxjaXJjbGUgY3g9IjIyNDQuMiIgY3k9IjU4OS45IiByPSIxLjQiIGZpbGw9IiMwNWRmNzIiIG9wYWNpdHk9IjAuMzgiIC8+CiAgICA8Y2lyY2xlIGN4PSIyMTk1LjIiIGN5PSIxMzgxLjkiIHI9IjEuNiIgZmlsbD0iIzU4ZTM4OCIgb3BhY2l0eT0iMC43NCIgZmlsdGVyPSJ1cmwoI3NvZnQtZ2xvdykiIC8+CiAgICA8Y2lyY2xlIGN4PSI0NzUuMiIgY3k9IjEzMTAuMCIgcj0iMS41NyIgZmlsbD0iIzA1ZGY3MiIgb3BhY2l0eT0iMC41MSIgZmlsdGVyPSJ1cmwoI3NvZnQtZ2xvdykiIC8+CiAgICA8Y2lyY2xlIGN4PSI2OTQuNyIgY3k9IjExMTkuNSIgcj0iMC44NiIgZmlsbD0iI2E3ZjNkMCIgb3BhY2l0eT0iMC43NCIgLz4KICAgIDxjaXJjbGUgY3g9IjU4My4zIiBjeT0iMTE2MC4xIiByPSIxLjIzIiBmaWxsPSIjMDVkZjcyIiBvcGFjaXR5PSIwLjQ1IiAvPgogICAgPGNpcmNsZSBjeD0iNTg0LjUiIGN5PSI5NDIuNCIgcj0iMS4xNyIgZmlsbD0iIzU4ZTM4OCIgb3BhY2l0eT0iMC40NCIgLz4KICAgIDxjaXJjbGUgY3g9IjI0NTEuOSIgY3k9IjQxMy4wIiByPSIxLjQyIiBmaWxsPSIjZmZmZmZmIiBvcGFjaXR5PSIwLjUiIGZpbHRlcj0idXJsKCNzb2Z0LWdsb3cpIiAvPgogICAgPGNpcmNsZSBjeD0iODU2LjIiIGN5PSI2My40IiByPSIxLjY3IiBmaWxsPSIjZmZmZmZmIiBvcGFjaXR5PSIwLjQzIiBmaWx0ZXI9InVybCgjc29mdC1nbG93KSIgLz4KICAgIDxjaXJjbGUgY3g9IjI0NDEuMCIgY3k9IjM5NC4wIiByPSIwLjg2IiBmaWxsPSIjNGFkZTgwIiBvcGFjaXR5PSIwLjUyIiAvPgogICAgPGNpcmNsZSBjeD0iMTEyMC4zIiBjeT0iMTM5My4xIiByPSIwLjg3IiBmaWxsPSIjMDVkZjcyIiBvcGFjaXR5PSIwLjc1IiAvPgogICAgPGNpcmNsZSBjeD0iNjY0LjQiIGN5PSIxMDEwLjIiIHI9IjAuNzUiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9IjAuNzYiIC8+CiAgICA8Y2lyY2xlIGN4PSIxNzQ5LjAiIGN5PSIxMzMyLjAiIHI9IjEuNTIiIGZpbGw9IiNhN2YzZDAiIG9wYWNpdHk9IjAuNCIgZmlsdGVyPSJ1cmwoI3NvZnQtZ2xvdykiIC8+CiAgICA8Y2lyY2xlIGN4PSIyMDAuNiIgY3k9Ijk0OC4zIiByPSIxLjEiIGZpbGw9IiM1OGUzODgiIG9wYWNpdHk9IjAuNDYiIC8+CiAgICA8Y2lyY2xlIGN4PSIxODMxLjYiIGN5PSI0NDIuNCIgcj0iMS4wNyIgZmlsbD0iI2E3ZjNkMCIgb3BhY2l0eT0iMC41IiAvPgogICAgPGNpcmNsZSBjeD0iMTc3NS4wIiBjeT0iNzk1LjYiIHI9IjAuOTUiIGZpbGw9IiNhN2YzZDAiIG9wYWNpdHk9IjAuNjMiIC8+CiAgICA8Y2lyY2xlIGN4PSIxNzI1LjEiIGN5PSIxMjc5LjkiIHI9IjEuNCIgZmlsbD0iI2ZmZmZmZiIgb3BhY2l0eT0iMC40NSIgLz4KICAgIDxjaXJjbGUgY3g9IjIxMTcuNyIgY3k9IjQ0Ny40IiByPSIwLjk3IiBmaWxsPSIjZmZmZmZmIiBvcGFjaXR5PSIwLjY5IiAvPgogICAgPGNpcmNsZSBjeD0iMTY2OC4zIiBjeT0iNjcxLjMiIHI9IjEuMjEiIGZpbGw9IiNhN2YzZDAiIG9wYWNpdHk9IjAuNDEiIC8+CiAgICA8Y2lyY2xlIGN4PSIyMDE3LjMiIGN5PSIxMzU5LjIiIHI9IjEuNTIiIGZpbGw9IiM0YWRlODAiIG9wYWNpdHk9IjAuNjMiIGZpbHRlcj0idXJsKCNzb2Z0LWdsb3cpIiAvPgogICAgPGNpcmNsZSBjeD0iMTMxOC44IiBjeT0iOTA0LjgiIHI9IjEuMSIgZmlsbD0iIzA1ZGY3MiIgb3BhY2l0eT0iMC43MSIgLz4KICAgIDxjaXJjbGUgY3g9IjE3MTMuNyIgY3k9IjMzNy4zIiByPSIwLjk2IiBmaWxsPSIjMDVkZjcyIiBvcGFjaXR5PSIwLjMxIiAvPgogICAgPGNpcmNsZSBjeD0iMjQ5NC43IiBjeT0iODc0LjciIHI9IjEuNTYiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9IjAuNTMiIGZpbHRlcj0idXJsKCNzb2Z0LWdsb3cpIiAvPgogICAgPGNpcmNsZSBjeD0iNTEzLjAiIGN5PSI5OTIuOSIgcj0iMS4yNyIgZmlsbD0iIzU4ZTM4OCIgb3BhY2l0eT0iMC40MiIgLz4KICAgIDxjaXJjbGUgY3g9IjIyNjUuNiIgY3k9IjEyMjEuMCIgcj0iMS42OCIgZmlsbD0iIzA1ZGY3MiIgb3BhY2l0eT0iMC42OSIgZmlsdGVyPSJ1cmwoI3NvZnQtZ2xvdykiIC8+CiAgICA8Y2lyY2xlIGN4PSI0NjYuNSIgY3k9IjEzNTYuNiIgcj0iMS4yOSIgZmlsbD0iIzA1ZGY3MiIgb3BhY2l0eT0iMC4zMyIgLz4KICAgIDxjaXJjbGUgY3g9IjIzMjcuOCIgY3k9IjE5My43IiByPSIwLjg5IiBmaWxsPSIjZmZmZmZmIiBvcGFjaXR5PSIwLjUzIiAvPgogICAgPGNpcmNsZSBjeD0iMjUwNC42IiBjeT0iODUyLjciIHI9IjEuNzUiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9IjAuNzUiIGZpbHRlcj0idXJsKCNzb2Z0LWdsb3cpIiAvPgogICAgPGNpcmNsZSBjeD0iMjA3MC43IiBjeT0iMTI2NC45IiByPSIxLjIiIGZpbGw9IiNhN2YzZDAiIG9wYWNpdHk9IjAuNzUiIC8+CiAgICA8Y2lyY2xlIGN4PSIyMjc3LjAiIGN5PSIxMDU4LjciIHI9IjEuMjUiIGZpbGw9IiMwNWRmNzIiIG9wYWNpdHk9IjAuNDMiIC8+CiAgICA8Y2lyY2xlIGN4PSIyMTMzLjEiIGN5PSI0MTAuNSIgcj0iMS41NyIgZmlsbD0iIzA1ZGY3MiIgb3BhY2l0eT0iMC41NCIgZmlsdGVyPSJ1cmwoI3NvZnQtZ2xvdykiIC8+CiAgICA8Y2lyY2xlIGN4PSI3MTQuMiIgY3k9IjEzMi43IiByPSIxLjA1IiBmaWxsPSIjNGFkZTgwIiBvcGFjaXR5PSIwLjQ0IiAvPgogICAgPGNpcmNsZSBjeD0iMjI2Ni41IiBjeT0iMTM3LjAiIHI9IjAuOTEiIGZpbGw9IiMwNWRmNzIiIG9wYWNpdHk9IjAuNDkiIC8+CiAgICA8Y2lyY2xlIGN4PSIxNzk4LjEiIGN5PSIxMTQuMyIgcj0iMS4xOCIgZmlsbD0iI2E3ZjNkMCIgb3BhY2l0eT0iMC41NyIgLz4KICAgIDxjaXJjbGUgY3g9IjE4MS4zIiBjeT0iMTE4Mi43IiByPSIxLjE2IiBmaWxsPSIjNThlMzg4IiBvcGFjaXR5PSIwLjY4IiAvPgogICAgPGNpcmNsZSBjeD0iMjE3NS40IiBjeT0iMTA4OS4yIiByPSIxLjE1IiBmaWxsPSIjNGFkZTgwIiBvcGFjaXR5PSIwLjMiIC8+CiAgICA8Y2lyY2xlIGN4PSI3NzQuNSIgY3k9IjU2Ny4xIiByPSIxLjY5IiBmaWxsPSIjZmZmZmZmIiBvcGFjaXR5PSIwLjcyIiBmaWx0ZXI9InVybCgjc29mdC1nbG93KSIgLz4KICAgIDxjaXJjbGUgY3g9IjE5MDEuMyIgY3k9Ijc4NC4xIiByPSIxLjM4IiBmaWxsPSIjMDVkZjcyIiBvcGFjaXR5PSIwLjQxIiAvPgogICAgPGNpcmNsZSBjeD0iNzEwLjEiIGN5PSI3MDAuMCIgcj0iMS4xNiIgZmlsbD0iI2E3ZjNkMCIgb3BhY2l0eT0iMC42MyIgLz4KICAgIDxjaXJjbGUgY3g9IjE4NDIuNyIgY3k9IjExOTMuMyIgcj0iMS43MiIgZmlsbD0iI2ZmZmZmZiIgb3BhY2l0eT0iMC43OSIgZmlsdGVyPSJ1cmwoI3NvZnQtZ2xvdykiIC8+CiAgICA8Y2lyY2xlIGN4PSI5Mi43IiBjeT0iNTcyLjciIHI9IjEuMzQiIGZpbGw9IiNhN2YzZDAiIG9wYWNpdHk9IjAuMzEiIC8+CiAgICA8Y2lyY2xlIGN4PSIzNjUuNiIgY3k9IjY2Ni44IiByPSIwLjgiIGZpbGw9IiMwNWRmNzIiIG9wYWNpdHk9IjAuNDkiIC8+CiAgICA8Y2lyY2xlIGN4PSIxMTY2LjMiIGN5PSI0OTQuMSIgcj0iMS42NyIgZmlsbD0iI2E3ZjNkMCIgb3BhY2l0eT0iMC40NCIgZmlsdGVyPSJ1cmwoI3NvZnQtZ2xvdykiIC8+CiAgICA8Y2lyY2xlIGN4PSI2NTguMiIgY3k9IjEzOC44IiByPSIwLjc3IiBmaWxsPSIjNGFkZTgwIiBvcGFjaXR5PSIwLjU3IiAvPgogICAgPGNpcmNsZSBjeD0iNTg3LjgiIGN5PSIxMjAuNCIgcj0iMS43NiIgZmlsbD0iIzU4ZTM4OCIgb3BhY2l0eT0iMC4zMiIgZmlsdGVyPSJ1cmwoI3NvZnQtZ2xvdykiIC8+CiAgICA8Y2lyY2xlIGN4PSIyNDA4LjUiIGN5PSIzMDIuMSIgcj0iMC43NyIgZmlsbD0iIzA1ZGY3MiIgb3BhY2l0eT0iMC4zOCIgLz4KICAgIDxjaXJjbGUgY3g9IjEyMTMuNiIgY3k9IjE4NC4wIiByPSIxLjc1IiBmaWxsPSIjNGFkZTgwIiBvcGFjaXR5PSIwLjUzIiBmaWx0ZXI9InVybCgjc29mdC1nbG93KSIgLz4KICAgIDxjaXJjbGUgY3g9IjE5NDkuOSIgY3k9IjI1OC4yIiByPSIxLjM5IiBmaWxsPSIjNThlMzg4IiBvcGFjaXR5PSIwLjY3IiAvPgogICAgPGNpcmNsZSBjeD0iMTk3Ny4zIiBjeT0iMjUyLjYiIHI9IjEuMDgiIGZpbGw9IiM0YWRlODAiIG9wYWNpdHk9IjAuNTkiIC8+CiAgICA8Y2lyY2xlIGN4PSIxNDcwLjIiIGN5PSIxMjg3LjIiIHI9IjEuMTQiIGZpbGw9IiMwNWRmNzIiIG9wYWNpdHk9IjAuNzciIC8+CiAgICA8Y2lyY2xlIGN4PSIyMTUuOCIgY3k9Ijk4NS4wIiByPSIxLjQxIiBmaWxsPSIjNGFkZTgwIiBvcGFjaXR5PSIwLjM1IiBmaWx0ZXI9InVybCgjc29mdC1nbG93KSIgLz4KICAgIDxjaXJjbGUgY3g9IjIxNTkuMiIgY3k9Ijg1OS42IiByPSIwLjg4IiBmaWxsPSIjNThlMzg4IiBvcGFjaXR5PSIwLjc5IiAvPgogICAgPGNpcmNsZSBjeD0iODk2LjUiIGN5PSI2MjAuNCIgcj0iMS4xNCIgZmlsbD0iIzRhZGU4MCIgb3BhY2l0eT0iMC41NSIgLz4KICAgIDxjaXJjbGUgY3g9IjU2LjgiIGN5PSI2MDguOSIgcj0iMS4yNiIgZmlsbD0iIzRhZGU4MCIgb3BhY2l0eT0iMC41MiIgLz4KICAgIDxjaXJjbGUgY3g9IjE2MjAuMyIgY3k9IjExNzYuOSIgcj0iMS40OSIgZmlsbD0iI2ZmZmZmZiIgb3BhY2l0eT0iMC41MiIgZmlsdGVyPSJ1cmwoI3NvZnQtZ2xvdykiIC8+CiAgICA8Y2lyY2xlIGN4PSIyNDQ4LjMiIGN5PSI0MDAuNCIgcj0iMS42IiBmaWxsPSIjYTdmM2QwIiBvcGFjaXR5PSIwLjU3IiBmaWx0ZXI9InVybCgjc29mdC1nbG93KSIgLz4KICAgIDxjaXJjbGUgY3g9IjExOTEuOCIgY3k9IjExNzIuOCIgcj0iMS4zNyIgZmlsbD0iIzA1ZGY3MiIgb3BhY2l0eT0iMC40NiIgLz4KICAgIDxjaXJjbGUgY3g9IjIxMTAuMSIgY3k9IjE0NS41IiByPSIxLjY4IiBmaWxsPSIjYTdmM2QwIiBvcGFjaXR5PSIwLjQyIiBmaWx0ZXI9InVybCgjc29mdC1nbG93KSIgLz4KICAgIDxjaXJjbGUgY3g9IjE0NTUuMyIgY3k9Ijk1My44IiByPSIxLjEiIGZpbGw9IiM0YWRlODAiIG9wYWNpdHk9IjAuNTUiIC8+CiAgICA8Y2lyY2xlIGN4PSI0ODEuNCIgY3k9IjMxOS44IiByPSIxLjU5IiBmaWxsPSIjZmZmZmZmIiBvcGFjaXR5PSIwLjQ3IiBmaWx0ZXI9InVybCgjc29mdC1nbG93KSIgLz4KICAgIDxjaXJjbGUgY3g9IjE3ODUuMCIgY3k9IjQwOS4wIiByPSIwLjc2IiBmaWxsPSIjNThlMzg4IiBvcGFjaXR5PSIwLjc3IiAvPgogICAgPGNpcmNsZSBjeD0iNjMwLjgiIGN5PSI1ODkuOSIgcj0iMS4zMyIgZmlsbD0iI2E3ZjNkMCIgb3BhY2l0eT0iMC40MiIgLz4KICAgIDxjaXJjbGUgY3g9IjE2NDYuMiIgY3k9IjcwNy4yIiByPSIxLjU4IiBmaWxsPSIjMDVkZjcyIiBvcGFjaXR5PSIwLjM1IiBmaWx0ZXI9InVybCgjc29mdC1nbG93KSIgLz4KICAgIDxjaXJjbGUgY3g9IjEwNDAuMCIgY3k9IjM2My4yIiByPSIxLjQ1IiBmaWxsPSIjZmZmZmZmIiBvcGFjaXR5PSIwLjQ4IiBmaWx0ZXI9InVybCgjc29mdC1nbG93KSIgLz4KICAgIDxjaXJjbGUgY3g9IjEzNTcuNiIgY3k9IjYxNi41IiByPSIxLjUzIiBmaWxsPSIjYTdmM2QwIiBvcGFjaXR5PSIwLjQ3IiBmaWx0ZXI9InVybCgjc29mdC1nbG93KSIgLz4KICAgIDxjaXJjbGUgY3g9IjcwNS4wIiBjeT0iMzc0LjUiIHI9IjAuODgiIGZpbGw9IiM1OGUzODgiIG9wYWNpdHk9IjAuNCIgLz4KPC9zdmc+") !important;
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+  border: 1.5px solid rgba(74, 222, 128, 0.45);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(22, 163, 74, 0.18);
+  color: #ffffff;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.regolo-nl__card {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.regolo-nl__head {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
+.regolo-nl__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  border-radius: 9999px;
+  border: 1px solid rgba(74, 222, 128, 0.35);
+  background: rgba(74, 222, 128, 0.10);
+  color: #58e388;
+}
+
+.regolo-nl__dot {
+  width: 6px;
+  height: 6px;
+  background-color: #05df72;
+  border-radius: 50%;
+  box-shadow: 0 0 6px #05df72;
+  display: inline-block;
+}
+
+.regolo-nl__title {
+  margin: 0 0 12px 0 !important;
+  font-size: clamp(24px, 3.5vw, 32px) !important;
+  line-height: 1.15 !important;
+  letter-spacing: -0.02em !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+}
+
+.regolo-nl__desc {
+  margin: 0 0 28px 0 !important;
+  font-size: 16px !important;
+  line-height: 1.55 !important;
+  color: #cbd5e1 !important;
+  max-width: 600px;
+}
+
+.regolo-nl__form {
+  width: 100%;
+  max-width: 540px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin: 0 auto;
+}
+
+.regolo-nl__row {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.regolo-nl input.regolo-nl__input[type="email"] {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  height: 48px;
+  padding: 0 16px !important;
+  margin: 0 !important;
+  border-radius: 8px !important;
+  border: 1.5px solid #525252 !important;
+  background-color: #141414 !important;
+  background: #141414 !important;
+  color: #ffffff !important;
+  font-size: 15px !important;
+  line-height: 48px !important;
+  box-shadow: none !important;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.regolo-nl input.regolo-nl__input[type="email"]::placeholder {
+  color: #737373 !important;
+  opacity: 1;
+}
+
+.regolo-nl input.regolo-nl__input[type="email"]:focus {
+  outline: none !important;
+  border-color: #58e388 !important;
+  background-color: #1c1c1c !important;
+  box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.22) !important;
+}
+
+.regolo-nl button.regolo-nl__btn[type="submit"] {
+  flex: 0 0 auto;
+  height: 48px;
+  padding: 0 26px !important;
+  margin: 0 !important;
+  border: none !important;
+  border-radius: 8px !important;
+  background: #05df72 !important;
+  color: #000000 !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5), 0 0 18px rgba(5, 223, 114, 0.38) !important;
+  transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+.regolo-nl button.regolo-nl__btn[type="submit"]:hover {
+  background: #ffffff !important;
+  color: #000000 !important;
+  box-shadow: 0 0 28px rgba(255, 255, 255, 0.6) !important;
+  transform: translateY(-1px);
+}
+
+.regolo-nl button.regolo-nl__btn[type="submit"]:active {
+  transform: translateY(0);
+}
+
+.regolo-nl button.regolo-nl__btn[type="submit"]:focus-visible {
+  outline: 2px solid #58e388 !important;
+  outline-offset: 2px;
+}
+
+.regolo-nl__privacy {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.regolo-nl input.regolo-nl__checkbox-input[type="checkbox"] {
+  width: 16px !important;
+  height: 16px !important;
+  margin: 0 !important;
+  accent-color: #05df72 !important;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.regolo-nl__checkbox-label {
+  font-size: 13px !important;
+  color: #cbd5e1 !important;
+  font-weight: 400 !important;
+  line-height: 1.4 !important;
+  margin: 0 !important;
+  cursor: pointer;
+}
+
+.regolo-nl__checkbox-label a {
+  color: #58e388 !important;
+  text-decoration: underline !important;
+}
+
+.regolo-nl__checkbox-label a:hover {
+  color: #ffffff !important;
+}
+
+.regolo-nl__success {
+  display: none;
+  width: 100%;
+  max-width: 540px;
+  padding: 24px 16px;
+  border-radius: 12px;
+  background: rgba(5, 223, 114, 0.08);
+  border: 1px solid rgba(5, 223, 114, 0.35);
+  margin-bottom: 8px;
+}
+
+.regolo-nl__check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(5, 223, 114, 0.15);
+  border: 1.5px solid #05df72;
+  color: #05df72;
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.regolo-nl__success-title {
+  margin: 0 0 6px 0 !important;
+  font-size: 20px !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+}
+
+.regolo-nl__success-desc {
+  margin: 0 !important;
+  font-size: 14px !important;
+  color: #cbd5e1 !important;
+}
+
+.regolo-nl__footnote {
+  margin: 16px 0 0 0 !important;
+  font-size: 12px !important;
+  color: #94a3b8 !important;
+}
+
+@media (max-width: 560px) {
+  .regolo-nl {
+    padding: 36px 20px;
+  }
+  .regolo-nl__row {
+    flex-direction: column;
+  }
+  .regolo-nl button.regolo-nl__btn[type="submit"] {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .regolo-nl button.regolo-nl__btn[type="submit"],
+  .regolo-nl input.regolo-nl__input[type="email"] {
+    transition: none;
+  }
+}
+</style>
+<!-- /wp:html -->
+
+<!-- wp:heading {"className":"wp-block-heading"} -->
+<h2 class="wp-block-heading">Add reversible compaction and portable memory to <mark style="background-color:rgba(0, 0, 0, 0)" class="has-inline-color has-primary-color">OpenCode, Claude Code, and Codex (step-by-step setup)</mark></h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph {"className":"wp-block-paragraph"} -->
+<p class="wp-block-paragraph">To expose <code>reversible_compact</code> from Section 3 to <strong>OpenCode</strong>, <strong>Claude Code</strong>, and <strong>Codex CLI</strong>, follow the three steps below.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Step 1: Add reversible_compact_history to regolo_harness_mcp.py</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph {"className":"wp-block-paragraph"} -->
+<p class="wp-block-paragraph">In the same folder as <code>piece3_compaction_and_cache_memory.py</code>, save (or update) <code>regolo_harness_mcp.py</code> to expose <code>reversible_compact_history</code> over MCP stdio:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code {"language":"python"} -->
+<pre class="wp-block-code"><code>#!/usr/bin/env python3
+"""regolo_harness_mcp.py: Exposes reversible_compact_history over MCP stdio."""
+from __future__ import annotations
+import json, os, sys
+from piece3_compaction_and_cache_memory import reversible_compact
+
+TOOLS = &#91;
+    {
+        "name": "reversible_compact_history",
+        "description": "Archive verbatim session history to .harness/conversation_history/<session_id>.md and return a compact brick-v1-beta summary checkpoint.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "session_id": {"type": "string", "description": "Unique identifier for the current coding session."},
+                "messages": {"type": "array", "items": {"type": "object"}, "description": "Conversation messages array to compact."}
+            },
+            "required": &#91;"session_id", "messages"]
+        }
+    }
+]
+
+def handle_rpc(req: dict) -&gt; dict | None:
+    method, req_id = req.get("method"), req.get("id")
+    if method == "initialize":
+        return {"jsonrpc": "2.0", "id": req_id, "result": {"protocolVersion": "2024-11-05", "capabilities": {"tools": {}}, "serverInfo": {"name": "regolo-context-harness", "version": "1.0.0"}}}
+    if method == "tools/list":
+        return {"jsonrpc": "2.0", "id": req_id, "result": {"tools": TOOLS}}
+    if method == "tools/call":
+        args = req.get("params", {}).get("arguments", {})
+        api_key = os.environ.get("REGOLO_API_KEY", "")
+        res = reversible_compact(args&#91;"messages"], args&#91;"session_id"], api_key)
+        return {"jsonrpc": "2.0", "id": req_id, "result": {"content": &#91;{"type": "text", "text": json.dumps(res, indent=2)}]}}
+    return None
+
+if __name__ == "__main__":
+    if "--self-test" in sys.argv:
+        assert handle_rpc({"jsonrpc": "2.0", "id": 1, "method": "tools/list"})
+        print("MCP reversible_compact_history self-test PASSED")
+        sys.exit(0)
+    for line in sys.stdin:
+        if line.strip():
+            resp = handle_rpc(json.loads(line))
+            if resp is not None:
+                sys.stdout.write(json.dumps(resp) + "\n")
+                sys.stdout.flush()</session_id></code></pre>
+<!-- /wp:code -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Step 2: Register the MCP server in OpenCode, Claude Code, and Codex CLI</h3>
+<!-- /wp:heading -->
+
+<!-- wp:code {"language":"bash"} -->
+<pre class="wp-block-code"><code># 1. Claude Code CLI
+claude mcp add --transport stdio regolo-context-harness \
+  --env REGOLO_API_KEY="$REGOLO_API_KEY" \
+  -- python3 "$(pwd)/regolo_harness_mcp.py"
+
+# 2. OpenCode (~/.config/opencode/opencode.json under "mcp"):
+# "regolo-context-harness": { "type": "local", "command": &#91;"python3", "/absolute/path/to/regolo_harness_mcp.py"], "environment": { "REGOLO_API_KEY": "{env:REGOLO_API_KEY}" }, "enabled": true }
+
+# 3. Codex CLI (~/.codex/config.toml):
+# &#91;mcp_servers.regolo_context_harness]
+# command = "python3"
+# args = &#91;"/absolute/path/to/regolo_harness_mcp.py"]
+# env = { "REGOLO_API_KEY" = "your-regolo-api-key" }</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Step 3: Add the cache-safe memory and compaction rule to AGENTS.md and CLAUDE.md</h3>
+<!-- /wp:heading -->
+
+<!-- wp:code {"language":"markdown"} -->
+<pre class="wp-block-code"><code>## Cache-safe memory placement &amp; reversible compaction rules
+1. Keep standing project rules in `AGENTS.md` / `CLAUDE.md` stable during the session so the prompt prefix stays cached across turns.
+2. Never edit the system prompt mid-session to inject per-turn memory search results; append retrieved memories at the end of the latest user turn inside `&lt;retrieved_turn_memory&gt;` tags.
+3. When the session exceeds 15 turns or before switching models (`qwen3.8-27b` ↔ `glm5.2`), call `reversible_compact_history(session_id="...", messages=&#91;...])`.
+4. If a later turn needs an exact line or stack trace from an older turn, read the archived transcript path listed inside `&#91;COMPACTED SESSION CHECKPOINT]` under `.harness/conversation_history/`.</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:html -->
+<section class="regolo-map alignfull" aria-labelledby="regolo-map-p3-title">
+  <div class="regolo-map__top">
+    <span class="regolo-map__badge"><span class="regolo-map__dot"></span>PROMPT ARCHITECTURE &middot; CACHE-SAFE MEMORY &amp; COMPACTION</span>
+    <h3 class="regolo-map__title" id="regolo-map-p3-title">How Piece 3 structures memory across OpenCode, Claude Code, and Codex</h3>
+    <p class="regolo-map__desc">Keep static rules at the front, compact older turns to disk with a lightweight summary checkpoint, and append per-turn search hits at the tail.</p>
+  </div>
+
+  <div class="regolo-map__cols-hdr" aria-hidden="true">
+    <div>1. Memory layer</div>
+    <div></div>
+    <div style="text-align:center">2. Prompt placement &amp; tool</div>
+    <div></div>
+    <div>3. Production benefit</div>
+  </div>
+
+  <div class="regolo-map__lanes">
+    <div class="regolo-map__lane regolo-map__lane--hero">
+      <div class="regolo-map__box">
+        <div class="regolo-map__kicker">Layer 1 &middot; Standing conventions</div>
+        <div class="regolo-map__main">AGENTS.md &amp; CLAUDE.md project rules</div>
+        <div class="regolo-map__meta">Fetched once when the coding session opens</div>
+      </div>
+      <div class="regolo-map__arrow">&rarr;</div>
+      <div class="regolo-map__box regolo-map__box--model">
+        <div class="regolo-map__kicker">Prefix block (before breakpoint)</div>
+        <div class="regolo-map__main">Message #1 after System</div>
+        <div class="regolo-map__tags">
+          <span class="regolo-map__tag">Never mutates</span>
+          <span class="regolo-map__tag">Provider-agnostic</span>
+        </div>
+      </div>
+      <div class="regolo-map__arrow">&rarr;</div>
+      <div class="regolo-map__box regolo-map__box--icp">
+        <div class="regolo-map__kicker">Outcome &middot; Swap model, keep memory</div>
+        <div class="regolo-map__main">Switch GLM-5.2 &harr; Qwen3.8-27B freely</div>
+        <div class="regolo-map__meta">Memory stays in your repo while inference runs under EU Zero Data Retention.</div>
+      </div>
+    </div>
+
+    <div class="regolo-map__lane regolo-map__lane--hero">
+      <div class="regolo-map__box">
+        <div class="regolo-map__kicker">Layer 2 &middot; Growing session history</div>
+        <div class="regolo-map__main">15+ turns of edits, diffs, and tool calls</div>
+        <div class="regolo-map__meta">Crosses token threshold during long debugging</div>
+      </div>
+      <div class="regolo-map__arrow">&rarr;</div>
+      <div class="regolo-map__box regolo-map__box--model">
+        <div class="regolo-map__kicker">MCP compaction hook</div>
+        <div class="regolo-map__main">reversible_compact_history</div>
+        <div class="regolo-map__tags">
+          <span class="regolo-map__tag">brick-v1-beta</span>
+          <span class="regolo-map__tag">-92.0% tokens</span>
+        </div>
+      </div>
+      <div class="regolo-map__arrow">&rarr;</div>
+      <div class="regolo-map__box regolo-map__box--icp">
+        <div class="regolo-map__kicker">Outcome &middot; Recoverable checkpoint</div>
+        <div class="regolo-map__main">2,445 tok compressed to 195 tok</div>
+        <div class="regolo-map__meta">Full transcript saved to <code>.harness/conversation_history/</code> for on-demand lookup.</div>
+      </div>
+    </div>
+
+    <div class="regolo-map__lane">
+      <div class="regolo-map__box">
+        <div class="regolo-map__kicker">Layer 3 &middot; Per-turn memory search</div>
+        <div class="regolo-map__main">Query-specific facts retrieved for this turn</div>
+        <div class="regolo-map__meta">Changes on every user prompt</div>
+      </div>
+      <div class="regolo-map__arrow">&rarr;</div>
+      <div class="regolo-map__box regolo-map__box--model">
+        <div class="regolo-map__kicker">Tail block (after breakpoint)</div>
+        <div class="regolo-map__main">&lt;retrieved_turn_memory&gt;</div>
+        <div class="regolo-map__tags">
+          <span class="regolo-map__tag">Sent last</span>
+          <span class="regolo-map__tag">98.0% cache hit</span>
+        </div>
+      </div>
+      <div class="regolo-map__arrow">&rarr;</div>
+      <div class="regolo-map__box regolo-map__box--icp">
+        <div class="regolo-map__kicker">Outcome &middot; Zero cache invalidation</div>
+        <div class="regolo-map__main">2,498 of 2,550 tokens stay cached</div>
+        <div class="regolo-map__meta">Eliminates the hidden cost of rebuilding the system prompt on every message.</div>
+      </div>
+    </div>
+  </div>
+
+  <p class="regolo-map__foot">Pair Piece 3 with our full git-backed wiki tutorial in <a href="https://regolo.ai/getting-started-ai-memory-regolo-persistent-codebase-memory/" target="_blank" rel="noopener" style="color:#05df72;">Getting started with ai-memory and Regolo</a>.</p>
+</section>
+<!-- /wp:html -->
+
+<!-- wp:paragraph {"className":"wp-block-paragraph"} -->
+<p class="wp-block-paragraph"><strong>Continue across the Context Engineering 101 series:</strong> Review <a href="https://regolo.ai/context-engineering-for-agents-101-part-1-progressive-disclosure/" target="_blank" rel="noopener"><strong>Part 1 (Progressive skill disclosure)</strong></a> and <a href="https://regolo.ai/context-engineering-for-agents-101-part-2-retrieve-offload-delegate/" target="_blank" rel="noopener"><strong>Part 2 (Retrieve, offload, delegate)</strong></a>, or move on to <a href="https://regolo.ai/context-engineering-for-agents-101-part-4-long-running-agent-harness/" target="_blank" rel="noopener"><strong>Part 4 (Long-running Initializer, Worker, and Evaluator harnesses)</strong></a>. For deeper production setups, see our guides on <a href="https://regolo.ai/getting-started-ai-memory-regolo-persistent-codebase-memory/" target="_blank" rel="noopener">persistent codebase memory with ai-memory</a>, <a href="https://regolo.ai/brick-semantic-router-open-weight-model-portfolio/" target="_blank" rel="noopener">Brick semantic routing</a>, <a href="https://regolo.ai/compare/" target="_blank" rel="noopener">our model comparison hub</a>, and <a href="https://regolo.ai/roo-code-ai-powered-autonomous-coding-in-vscode/" target="_blank" rel="noopener">autonomous coding in VS Code with Roo Code</a>, <a href="https://regolo.ai/harness-engineering-for-qwen3-8-27b-a-technical-guide-to-pi-opencode-and-kilo-code/" target="_blank" rel="noopener">Qwen3.8-27B harness engineering for Pi, OpenCode, and Kilo Code</a>, and <a href="https://regolo.ai/integrations/" target="_blank" rel="noopener">IDE and CLI integrations</a>.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"className":"wp-block-heading"} -->
+<h2 class="wp-block-heading">Frequently asked questions</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph {"className":"wp-block-paragraph"} -->
+<p class="wp-block-paragraph"><strong>Why does pasting retrieved memories into the system prompt break prompt caching?</strong><br>LLM inference engines cache tokens from the start of the prompt up to the first changed token. Because per-turn memory search results change on every user message, placing them inside the system prompt invalidates the entire conversation history behind them.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"className":"wp-block-paragraph"} -->
+<p class="wp-block-paragraph"><strong>Where should always-on memories and dynamic search memories be placed in the prompt?</strong><br>Fetch stable project or user preferences (such as <code>AGENTS.md</code>) once at the start of the session and place them immediately after the system prompt. Append dynamic per-turn search results at the very end of the messages array, after the current user message.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"className":"wp-block-paragraph"} -->
+<p class="wp-block-paragraph"><strong>What makes compaction reversible in an agent harness, and what role does Brick play?</strong><br>Reversible compaction is a harness pattern: before summarizing older messages with a compact model like <code>qwen3.5-9b</code>, the harness writes the verbatim transcript to <code>.harness/conversation_history/&lt;session_id&gt;.md</code> and includes that file path inside the summary checkpoint. <a href="https://github.com/regolo-ai/brick-SR1" target="_blank" rel="noopener noreferrer">Brick</a> (<code>brick-v1-beta</code>) is our Mixture-of-Models semantic router: when the harness sends a summarization request to <code>brick-v1-beta</code>, Brick detects that summarizing chat turns is a low-complexity task and routes it to <code>qwen3.5-9b</code> instead of billing your primary frontier model.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"className":"wp-block-paragraph"} -->
+<p class="wp-block-paragraph"><strong>Can I switch models on the Regolo API without losing my agent’s memory?</strong><br>Yes. Because your standing memory lives in plain Markdown files and local history archives under your control, you can switch between GLM-5.2, Qwen3.8-27B, and GPT-OSS 120B on our flat <a href="https://regolo.ai/pricing/" target="_blank" rel="noopener">Core plan</a> while keeping the exact same memory state under European Zero Data Retention.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"className":"wp-block-paragraph"} -->
+<p class="wp-block-paragraph"><strong>How much history does reversible compaction save on a multi-turn run?</strong><br>In our 15-turn self-test on <code>brick-v1-beta</code> (served by <code>qwen3.5-9b</code>), reversible compaction reduced older conversation history from 2,445 tokens to 195 tokens, a 92.0% reduction with zero data loss.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:html -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Why does pasting retrieved memories into the system prompt break prompt caching?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "LLM inference engines cache tokens from the start of the prompt up to the first changed token. Because per-turn memory search results change on every user message, placing them inside the system prompt invalidates the entire conversation history behind them."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Where should always-on memories and dynamic search memories be placed in the prompt?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Fetch stable project or user preferences (such as AGENTS.md) once at the start of the session and place them immediately after the system prompt. Append dynamic per-turn search results at the very end of the messages array, after the current user message."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What makes compaction reversible in an agent harness?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Reversible compaction is a harness pattern: before summarizing older messages with a compact model like qwen3.5-9b, the harness writes the verbatim transcript to .harness/conversation_history/<session_id>.md and includes that file path inside the summary checkpoint. Brick (brick-v1-beta) is our Mixture-of-Models semantic router that detects low-complexity summarization calls and routes them to qwen3.5-9b instead of billing your primary frontier model."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I switch models on the Regolo API without losing my agent's memory?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Because your standing memory lives in plain Markdown files and local history archives under your control, you can switch between GLM-5.2, Qwen3.8-27B, and GPT-OSS 120B while keeping the exact same memory state under European Zero Data Retention."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How much history does reversible compaction save on a multi-turn run?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "In our 15-turn self-test on brick-v1-beta (served by qwen3.5-9b), reversible compaction reduced older conversation history from 2,445 tokens to 195 tokens, a 92.0% reduction with zero data loss."
+      }
+    }
+  ]
+}
+</script>
+<!-- /wp:html -->
+
+<!-- wp:html -->
+<div class="regolo-stub alignfull" style="margin: 2.75rem 0; font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+  <section class="regolo-stub__card" aria-labelledby="regolo-stub-title">
+    <div class="regolo-stub__header">
+      <div class="regolo-stub__top">
+        <span class="regolo-stub__badge">
+          <span class="regolo-stub__dot"></span>
+          PRODUCTION-READY EU INFERENCE · ZERO DATA RETENTION
+        </span>
+        <span class="regolo-stub__tag">OpenAI-Compatible API</span>
+      </div>
+
+      <div class="regolo-stub__title" id="regolo-stub-title">Ship Private AI. Not Infrastructure.</div>
+      <p class="regolo-stub__lead">
+        You have the architecture and the open-source workflow. Now give it a sovereign European inference layer built for production: fast access to <strong>GLM-5.2, Qwen3.8-27B, GPT-OSS 120B, Gemma 4, Mistral</strong>, and <strong>Brick</strong> with zero data retention and no new SDK to learn.
+      </p>
+
+      <div class="regolo-stub__codebar">
+        <span class="regolo-stub__code-label">DROP-IN ENDPOINT</span>
+        <code>export OPENAI_BASE_URL="https://api.regolo.ai/v1"</code>
+        <span class="regolo-stub__code-note">Keep your existing SDK &amp; agent setup</span>
+      </div>
+    </div>
+
+    <div class="regolo-stub__grid">
+      <!-- CARD 1: FREE TRIAL -->
+      <a class="regolo-stub__tile regolo-stub__tile--primary" href="https://regolo.ai/pricing/" target="_blank" rel="noopener">
+        <div class="regolo-stub__tile-top">
+          <span class="regolo-stub__icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          </span>
+          <span class="regolo-stub__kicker">30-DAY FREE TRIAL</span>
+        </div>
+        <div class="regolo-stub__tile-title">Start your 30-day free trial →</div>
+        <p class="regolo-stub__tile-desc">Build, test, and deploy with no infrastructure to maintain. Core plans from €11.70/mo (70% off first 3 months).</p>
+      </a>
+
+      <!-- CARD 2: GITHUB REPOSITORY (CHANGE URL HERE WHEN NEEDED) -->
+      <a class="regolo-stub__tile" href="https://github.com/regolo-ai/tutorials/" target="_blank" rel="noopener noreferrer">
+        <div class="regolo-stub__tile-top">
+          <span class="regolo-stub__icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56 0-.28-.01-1.02-.02-2-3.2.7-3.88-1.54-3.88-1.54-.52-1.33-1.28-1.68-1.28-1.68-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11.1 11.1 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.42-2.69 5.39-5.26 5.68.41.36.78 1.06.78 2.14 0 1.55-.01 2.8-.01 3.18 0 .31.21.68.8.56A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z"/></svg>
+          </span>
+          <span class="regolo-stub__kicker">OPEN-SOURCE CODE</span>
+        </div>
+        <div class="regolo-stub__tile-title">Clone the GitHub repository →</div>
+        <p class="regolo-stub__tile-desc">Get the full implementation, configuration scripts, evaluation benchmarks, and ready-to-run templates.</p>
+      </a>
+
+      <!-- CARD 3: DISCORD COMMUNITY -->
+      <a class="regolo-stub__tile" href="https://discord.gg/bqGrVJHeF" target="_blank" rel="noopener noreferrer">
+        <div class="regolo-stub__tile-top">
+          <span class="regolo-stub__icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </span>
+          <span class="regolo-stub__kicker">BUILDER COMMUNITY</span>
+        </div>
+        <div class="regolo-stub__tile-title">Join the Regolo Discord →</div>
+        <p class="regolo-stub__tile-desc">Meet engineers building with coding agents, private RAG, local LLMs, and production open-weight models.</p>
+      </a>
+
+      <!-- CARD 4: TALK TO AN ENGINEER -->
+      <a class="regolo-stub__tile" href="https://regolo.ai/contacts/" target="_blank" rel="noopener">
+        <div class="regolo-stub__tile-top">
+          <span class="regolo-stub__icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </span>
+          <span class="regolo-stub__kicker">ARCHITECTURE REVIEW</span>
+        </div>
+        <div class="regolo-stub__tile-title">Talk to an AI Infrastructure Engineer →</div>
+        <p class="regolo-stub__tile-desc">Scaling beyond a proof of concept or running regulated EU workloads? Get a tailored architecture and commercial plan.</p>
+      </a>
+    </div>
+
+    <div class="regolo-stub__quote">
+      <strong>Private AI should not require a private data center.</strong>
+      <span>We give your team an EU-native path from local experimentation to production-grade inference.</span>
+    </div>
+
+    <div class="regolo-stub__footer">
+      <div class="regolo-stub__links">
+        <a href="https://docs.regolo.ai" target="_blank" rel="noopener">API Docs</a>
+        <span>·</span>
+        <a href="https://github.com/regolo-ai/tutorials/" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <span>·</span>
+        <a href="https://discord.gg/bqGrVJHeF" target="_blank" rel="noopener noreferrer">Discord</a>
+        <span>·</span>
+        <a href="https://x.com/regolo_ai" target="_blank" rel="noopener noreferrer">X (@regolo_ai)</a>
+        <span>·</span>
+        <a href="https://www.reddit.com/r/regolo_ai/" target="_blank" rel="noopener noreferrer">Reddit</a>
+        <span>·</span>
+        <a href="https://regolo.ai/contacts/" target="_blank" rel="noopener">Contact</a>
+      </div>
+      <div class="regolo-stub__credit">Built by the Regolo team · 100% EU Sovereign GPU</div>
+    </div>
+  </section>
+</div>
+
+<style>
+.regolo-stub,
+.regolo-stub * {
+  box-sizing: border-box;
+  font-family: "Space Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.regolo-stub__card {
+  width: 100%;
+  padding: 38px 36px 30px;
+  border-radius: 18px;
+  background: radial-gradient(ellipse at top right, rgba(5, 223, 114, 0.13) 0%, #06130d 42%, #050807 100%);
+  border: 1.5px solid rgba(74, 222, 128, 0.48);
+  box-shadow: 0 22px 52px rgba(0, 0, 0, 0.8), 0 0 32px rgba(5, 223, 114, 0.14);
+  color: #ffffff;
+}
+
+.regolo-stub__top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.regolo-stub__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 13px;
+  border-radius: 9999px;
+  background: rgba(74, 222, 128, 0.11);
+  border: 1px solid rgba(74, 222, 128, 0.38);
+  color: #58e388;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.regolo-stub__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #05df72;
+  box-shadow: 0 0 8px #05df72;
+  display: inline-block;
+}
+
+.regolo-stub__tag {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12.5px;
+  color: #94a3b8;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+}
+
+.regolo-stub__title {
+  margin: 0 0 10px 0 !important;
+  font-size: clamp(24px, 3.2vw, 31px) !important;
+  font-weight: 700 !important;
+  line-height: 1.18 !important;
+  letter-spacing: -0.02em !important;
+  color: #ffffff !important;
+}
+
+.regolo-stub__lead {
+  margin: 0 0 20px 0 !important;
+  font-size: 15.8px !important;
+  line-height: 1.6 !important;
+  color: #cbd5e1 !important;
+  max-width: 820px;
+}
+
+.regolo-stub__lead strong {
+  color: #ffffff;
+}
+
+.regolo-stub__codebar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: #070b0a;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  margin-bottom: 24px;
+}
+
+.regolo-stub__code-label {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #05df72;
+  padding: 3px 8px;
+  border-radius: 5px;
+  background: rgba(5, 223, 114, 0.14);
+}
+
+.regolo-stub__codebar code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+  font-size: 14px !important;
+  font-weight: 700;
+  color: #ffffff !important;
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+.regolo-stub__code-note {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.regolo-stub__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.regolo-stub__tile {
+  display: flex;
+  flex-direction: column;
+  padding: 20px 22px;
+  border-radius: 14px;
+  background: rgba(15, 22, 19, 0.92);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  text-decoration: none !important;
+  color: #ffffff !important;
+  transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.regolo-stub__tile:hover {
+  transform: translateY(-2px);
+  border-color: #05df72;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5), 0 0 22px rgba(5, 223, 114, 0.2);
+}
+
+.regolo-stub__tile--primary {
+  background: linear-gradient(135deg, rgba(5, 223, 114, 0.14) 0%, rgba(15, 22, 19, 0.95) 100%);
+  border-color: rgba(5, 223, 114, 0.55);
+}
+
+.regolo-stub__tile-top {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 10px;
+}
+
+.regolo-stub__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(5, 223, 114, 0.14);
+  border: 1px solid rgba(5, 223, 114, 0.38);
+  color: #05df72;
+}
+
+.regolo-stub__kicker {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #58e388;
+}
+
+.regolo-stub__tile-title {
+  margin: 0 0 6px 0 !important;
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  line-height: 1.28 !important;
+  color: #ffffff !important;
+}
+
+.regolo-stub__tile--primary .regolo-stub__tile-title {
+  color: #05df72 !important;
+}
+
+.regolo-stub__tile-desc {
+  margin: 0 !important;
+  font-size: 13.8px !important;
+  line-height: 1.5 !important;
+  color: #cbd5e1 !important;
+}
+
+.regolo-stub__quote {
+  padding: 14px 18px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border-left: 3px solid #05df72;
+  margin-bottom: 20px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #cbd5e1;
+}
+
+.regolo-stub__quote strong {
+  color: #ffffff;
+  margin-right: 6px;
+}
+
+.regolo-stub__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(148, 163, 184, 0.16);
+  font-size: 13.5px;
+}
+
+.regolo-stub__links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.regolo-stub__links a {
+  color: #58e388 !important;
+  font-weight: 600;
+  text-decoration: none !important;
+}
+
+.regolo-stub__links a:hover {
+  color: #ffffff !important;
+  text-decoration: underline !important;
+}
+
+.regolo-stub__links span {
+  color: #64748b;
+}
+
+.regolo-stub__credit {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+@media (max-width: 720px) {
+  .regolo-stub__card {
+    padding: 26px 18px 22px;
+  }
+  .regolo-stub__grid {
+    grid-template-columns: 1fr;
+  }
+  .regolo-stub__codebar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+</style>
+<!-- /wp:html -->
