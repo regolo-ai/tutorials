@@ -220,3 +220,7 @@ __marimo__/
 
 # SQLite and local vector databases
 *.db
+
+# Local agent tooling state (never publish)
+.claude-flow/
+.swarm/
