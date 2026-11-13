@@ -1,0 +1,146 @@
+{
+  "dataset_name": "regolo-docs-qa",
+  "description": "20-question RAG evaluation dataset covering Regolo plans, PAYG pricing, Zero Data Retention, and Langfuse EU observability (October 2026).",
+  "items": [
+    {
+      "id": "q01",
+      "category": "Core Plan",
+      "question": "What is the daily token limit on the Regolo Core plan?",
+      "context": "The Regolo Core subscription costs 39.00 euro per month (discounted by 70% to 11.70 euro/month for the first 3 months) and includes up to 600 million tokens per month with a daily cap of 20 million tokens per day.",
+      "expected_output": "20 million"
+    },
+    {
+      "id": "q02",
+      "category": "Core Plan",
+      "question": "How many monthly tokens are included in the Regolo Core subscription?",
+      "context": "The Regolo Core subscription costs 39.00 euro per month and includes a monthly pool of up to 600 million tokens across all included Core chat models.",
+      "expected_output": "600 million"
+    },
+    {
+      "id": "q03",
+      "category": "Core Plan",
+      "question": "What is the promotional monthly price of the Regolo Core plan during the first 3 months?",
+      "context": "Regolo offers a 70% introductory discount on the Core subscription for the first 3 months, bringing the monthly price from 39.00 euro down to 11.70 euro per month.",
+      "expected_output": "11.70"
+    },
+    {
+      "id": "q04",
+      "category": "PAYG Pricing",
+      "question": "What are the Pay-As-You-Go input and output prices per 1M tokens for Gemma 4 31B on Regolo?",
+      "context": "On Regolo Pay-As-You-Go (October 2026), Gemma 4 31B (model slug gemma4-31b) costs 0.40 euro per 1 million input tokens and 2.10 euro per 1 million output tokens.",
+      "expected_output": "0.40"
+    },
+    {
+      "id": "q05",
+      "category": "PAYG Pricing",
+      "question": "What is the Pay-As-You-Go input price per 1M tokens for Qwen 3.8 27B on Regolo?",
+      "context": "On Regolo Pay-As-You-Go (October 2026), Qwen 3.8 27B (model slug qwen3.8-27b) is priced at 0.50 euro per 1 million input tokens and 2.10 euro per 1 million output tokens.",
+      "expected_output": "0.50"
+    },
+    {
+      "id": "q06",
+      "category": "PAYG Pricing",
+      "question": "What is the Pay-As-You-Go output price per 1M tokens for GLM 5.2 on Regolo?",
+      "context": "On Regolo Pay-As-You-Go (October 2026), GLM 5.2 (model slug glm5.2) costs 2.00 euro per 1 million input tokens and 5.20 euro per 1 million output tokens.",
+      "expected_output": "5.20"
+    },
+    {
+      "id": "q07",
+      "category": "Evaluation Cost",
+      "question": "How much does a 700-token RAG evaluation turn (500 input + 200 output tokens) cost on Gemma 4 31B under Regolo PAYG?",
+      "context": "A standard RAG evaluation turn with 500 input tokens and 200 output tokens (700 tokens total) costs 0.00062 euro on Gemma 4 31B, 0.00067 euro on Qwen 3.8 27B, and 0.00204 euro on GLM 5.2 under Regolo PAYG.",
+      "expected_output": "0.00062"
+    },
+    {
+      "id": "q08",
+      "category": "Evaluation Cost",
+      "question": "What is the effective cost of a 700-token evaluation turn at full utilization on the standard 39 euro/month Regolo Core plan?",
+      "context": "At full utilization of the 600M token monthly pool on the 39.00 euro/month Regolo Core subscription (0.065 euro per 1M tokens), a 700-token evaluation turn costs 0.000045 euro.",
+      "expected_output": "0.000045"
+    },
+    {
+      "id": "q09",
+      "category": "Verbosity & Benchmarks",
+      "question": "How many average output tokens per task does GLM 5.2 generate on the Artificial Analysis Intelligence Index?",
+      "context": "According to Artificial Analysis (June 2026), GLM 5.2 leads open-weight models on the Intelligence Index at $0.46 per task, generating an average of 43,000 output tokens per task, of which 37,000 are hidden reasoning tokens.",
+      "expected_output": "43,000"
+    },
+    {
+      "id": "q10",
+      "category": "Verbosity & Benchmarks",
+      "question": "How many total output tokens does Gemma 4 31B generate across the full Artificial Analysis Intelligence Index suite?",
+      "context": "Gemma 4 31B generates 39 million output tokens across the full Artificial Analysis Intelligence Index evaluation suite (April 2026), making it a concise choice for RAG and LLM-as-a-judge scoring.",
+      "expected_output": "39 million"
+    },
+    {
+      "id": "q11",
+      "category": "Privacy & Compliance",
+      "question": "Does Regolo store or reuse customer prompts and completions for model training?",
+      "context": "Regolo operates in certified European green datacenters under certified Zero Data Retention (ZDR): customer prompts and completions are never stored on disk and never reused for training.",
+      "expected_output": "never"
+    },
+    {
+      "id": "q12",
+      "category": "API Integration",
+      "question": "What is the OpenAI-compatible base URL for calling models on Regolo?",
+      "context": "To route OpenAI SDK or Langfuse OpenAI wrapper calls to Regolo's European datacenters, set base_url to https://api.regolo.ai/v1 and pass your REGOLO_API_KEY.",
+      "expected_output": "https://api.regolo.ai/v1"
+    },
+    {
+      "id": "q13",
+      "category": "Embeddings",
+      "question": "Which embedding model on Regolo is priced at 0.001 euro per request on Pay-As-You-Go?",
+      "context": "Regolo serves Qwen3-Embedding-8B for document and code retrieval at 0.001 euro per request on Pay-As-You-Go alongside Qwen3-Reranker-4B.",
+      "expected_output": "Qwen3-Embedding-8B"
+    },
+    {
+      "id": "q14",
+      "category": "Langfuse Integration",
+      "question": "Under which open-source license is the core Langfuse observability platform released?",
+      "context": "Langfuse is an MIT-licensed open-source LLM observability and evaluation platform that can be self-hosted via Docker or Kubernetes on your own EU servers or used via its Frankfurt EU cloud region.",
+      "expected_output": "MIT"
+    },
+    {
+      "id": "q15",
+      "category": "Langfuse Integration",
+      "question": "What is the execution time limit for deterministic code evaluators running inside Langfuse?",
+      "context": "Langfuse executes deterministic Python and TypeScript code evaluators directly in the platform within a 2-second execution limit and without external network access.",
+      "expected_output": "2"
+    },
+    {
+      "id": "q16",
+      "category": "Langfuse Integration",
+      "question": "What production sampling rate does the guide recommend for online LLM-as-a-judge evaluators in Langfuse?",
+      "context": "Run deterministic code evaluators on 100% of live observations for free, and configure your online LLM-as-a-judge evaluator in Langfuse to sample 5% of production observations.",
+      "expected_output": "5%"
+    },
+    {
+      "id": "q17",
+      "category": "Langfuse Integration",
+      "question": "On what date does Langfuse sunset legacy trace-level judges in favor of observation-level evaluators?",
+      "context": "Attach online judges directly to the root observation of your RAG workflow because Langfuse sunsets legacy trace-level judges on November 16, 2026.",
+      "expected_output": "November 16, 2026"
+    },
+    {
+      "id": "q18",
+      "category": "CI Gates",
+      "question": "What minimum faithfulness threshold is used in the CI pull-request gate example?",
+      "context": "When a teammate edits the RAG prompt or swaps the model slug in a pull request, the GitHub Actions CI pipeline blocks the merge and raises a RegressionError if average faithfulness drops below 0.85.",
+      "expected_output": "0.85"
+    },
+    {
+      "id": "q19",
+      "category": "Subscription Tiers",
+      "question": "What is the monthly token allowance and daily limit on the Regolo Boost plan (89 euro/month)?",
+      "context": "For multi-step agents in CI and production, the Regolo Boost plan costs 89 euro/month and includes up to 1.5 billion tokens per month with a limit of 50 million tokens per day.",
+      "expected_output": "1.5 billion"
+    },
+    {
+      "id": "q20",
+      "category": "Subscription Tiers",
+      "question": "How many monthly tokens are included in the Regolo Scale plan at 319 euro/month?",
+      "context": "For heavy enterprise R&D reasoning workloads, the Regolo Pro plan costs 169 euro/month (3B tokens/month) and the Scale plan costs 319 euro/month (6B tokens/month).",
+      "expected_output": "6B"
+    }
+  ]
+}

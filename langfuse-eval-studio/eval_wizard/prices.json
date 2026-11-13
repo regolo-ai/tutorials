@@ -1,0 +1,25 @@
+{
+  "currency": "EUR",
+  "unit": "per 1M tokens",
+  "source": "Regolo Pay-As-You-Go and Core subscription rates (October 2026). Models not listed are metered by tokens and Core plan pool rate.",
+  "core_plan": {
+    "monthly_eur": 39.0,
+    "promo_monthly_eur": 11.7,
+    "monthly_tokens": 600000000,
+    "daily_tokens": 20000000,
+    "effective_per_1m_eur": 0.065,
+    "promo_per_1m_eur": 0.0195
+  },
+  "models": {
+    "gemma4-31b": {"in": 0.40, "out": 2.10},
+    "gemma-4-31b": {"in": 0.40, "out": 2.10},
+    "qwen3.8-27b": {"in": 0.50, "out": 2.10},
+    "glm5.2": {"in": 2.00, "out": 5.20},
+    "glm-5.2": {"in": 2.00, "out": 5.20},
+    "qwen3.5-122b": {"in": 1.00, "out": 4.20},
+    "gpt-oss-120b": {"in": 0.15, "out": 0.60},
+    "mistral-small-4": {"in": 0.15, "out": 0.60},
+    "mistral-small-4-119b": {"in": 0.15, "out": 0.60},
+    "brick-complexity-pro": {"in": 0.10, "out": 0.40}
+  }
+}

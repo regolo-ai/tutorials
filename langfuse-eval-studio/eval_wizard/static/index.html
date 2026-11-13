@@ -1,0 +1,626 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Regolo Eval Studio · Multi-Model FinOps &amp; Langfuse CI</title>
+<link rel="icon" type="image/png" href="/static/regolo-icon-light-bg.png">
+<style>
+@font-face{font-family:"Space Grotesk";font-weight:300 700;src:url(/static/fonts/space-grotesk-latin.woff2) format("woff2")}
+:root{
+  --bg:#f6f8f7; --surface:#fff; --line:#e3e8e5; --ink:#0b0b0b; --body:#334155; --muted:#5b6472;
+  --green:#05df72; --green-ink:#047a3f; --green-soft:rgba(5,223,114,.12); --green-line:rgba(5,223,114,.45);
+  --neg:#c62828; --neg-bg:#fdecec; --warn:#a35a00; --warn-bg:#fff4e0;
+  --shadow:0 1px 2px rgba(11,11,11,.04),0 8px 24px rgba(11,11,11,.05); --r:14px;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{font-family:"Space Grotesk",system-ui,sans-serif;color:var(--body);-webkit-font-smoothing:antialiased;min-height:100vh;
+  background:var(--bg) radial-gradient(1200px 640px at 88% -12%,rgba(5,223,114,.16),transparent 62%) no-repeat}
+a{color:var(--green-ink)}
+:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+button,input,select,textarea{font:inherit;color:inherit}
+
+header{display:flex;align-items:center;gap:16px;padding:18px 32px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.72);backdrop-filter:blur(8px);position:sticky;top:0;z-index:5}
+header img{height:26px;display:block}
+.sep{width:1px;height:24px;background:var(--line)}
+.product{font-weight:600;color:var(--ink);font-size:17px}
+.trial{margin-left:auto;display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-weight:700;font-size:13px;letter-spacing:.04em;text-transform:uppercase;
+  color:var(--green-ink);border:1.5px solid var(--green-line);background:var(--green-soft);padding:9px 16px;border-radius:999px;transition:background .15s}
+.trial:hover{background:rgba(5,223,114,.22)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px rgba(5,223,114,.7);flex:none}
+
+.shell{display:grid;grid-template-columns:300px minmax(0,1fr);gap:28px;max-width:1240px;margin:0 auto;padding:32px}
+nav[role=tablist]{display:flex;flex-direction:column;gap:8px;align-self:start;position:sticky;top:92px}
+.tab{display:flex;align-items:center;gap:14px;text-align:left;width:100%;padding:14px 16px;border-radius:var(--r);border:1px solid transparent;background:transparent;cursor:pointer;transition:background .15s,border-color .15s}
+.tab:hover:not(:disabled){background:rgba(255,255,255,.7)}
+.tab:disabled{cursor:not-allowed;opacity:.5}
+.tab[aria-selected=true]{background:var(--surface);border-color:var(--line);box-shadow:var(--shadow)}
+.num{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:14px;border:1.5px solid var(--line);background:#fff;color:var(--muted);flex:none}
+.tab[aria-selected=true] .num{border-color:var(--green);background:var(--green);color:#000}
+.tab.done .num{border-color:var(--green-line);background:var(--green-soft);color:var(--green-ink)}
+.tab .t{display:block;font-weight:700;color:var(--ink);font-size:15px}
+.tab .s{display:block;font-size:13px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:190px}
+.promo{margin-top:12px;padding:18px;border-radius:var(--r);border:1.5px solid var(--green-line);background:linear-gradient(180deg,var(--green-soft),rgba(255,255,255,.7))}
+.promo b{display:block;color:var(--ink);font-size:16px;margin-bottom:4px}
+.promo p{margin:0 0 12px;font-size:14px;line-height:1.45}
+.oss{display:flex;align-items:center;gap:12px;margin-top:12px;padding:14px 16px;border-radius:var(--r);border:1px solid var(--line);background:rgba(255,255,255,.7);text-decoration:none;color:var(--body);transition:border-color .15s,background .15s}
+.oss:hover{border-color:var(--green-line);background:#fff}
+.oss svg{width:22px;height:22px;flex:none;fill:var(--ink)}
+.oss b{display:block;color:var(--ink);font-size:14px}
+.oss span{display:block;font-size:12.5px;color:var(--muted);margin-top:1px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:999px;padding:13px 24px;font-weight:700;font-size:15px;cursor:pointer;text-decoration:none;transition:transform .1s,box-shadow .15s,background .15s}
+.btn.primary{background:var(--green);color:#000;box-shadow:0 6px 18px rgba(5,223,114,.28)}
+.btn.primary:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 10px 24px rgba(5,223,114,.36)}
+.btn.primary:disabled{background:#cfd8d3;box-shadow:none;cursor:not-allowed;color:#6b7570}
+.btn.ghost{background:#fff;color:var(--ink);border:1.5px solid var(--line)}
+.btn.ghost:hover{border-color:var(--green-line)}
+.btn.sm{padding:9px 16px;font-size:14px}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:36px;min-height:520px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--green-ink)}
+h1{margin:10px 0 8px;font-size:34px;letter-spacing:-.03em;color:var(--ink);line-height:1.1}
+h2{font-size:15px;margin:26px 0 10px;color:var(--ink)}
+.lead{margin:0 0 26px;font-size:17px;line-height:1.5;max-width:680px}
+label.f{display:block;font-weight:700;color:var(--ink);font-size:14px;margin-bottom:8px}
+.field{display:flex;gap:8px;max-width:560px}.field.wide{max-width:760px}
+input[type=password],input[type=text],input[type=number],select,textarea{flex:1;min-width:0;padding:12px 15px;border-radius:12px;border:1.5px solid var(--line);background:#fff;font-size:15px}
+input:focus,select:focus,textarea:focus{border-color:var(--green);outline:2px solid rgba(5,223,114,.3)}
+.hint{font-size:13px;color:var(--muted);margin:10px 0 0;max-width:640px;line-height:1.5}
+.err{display:none;margin-top:16px;padding:12px 16px;border-radius:12px;background:var(--neg-bg);color:var(--neg);font-size:14px;font-weight:600;max-width:640px}
+.err.show{display:block}
+.actions{display:flex;gap:12px;align-items:center;margin-top:28px;flex-wrap:wrap}
+.spin{width:16px;height:16px;border-radius:50%;border:2.5px solid rgba(0,0,0,.2);border-top-color:#000;animation:spin .8s linear infinite;display:none}
+.loading .spin{display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.modelbar{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.count{font-size:13px;font-weight:700;color:var(--green-ink);background:var(--green-soft);border:1px solid var(--green-line);border-radius:999px;padding:5px 12px}
+.models{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;max-height:360px;overflow:auto;padding:4px}
+.opt{position:relative;display:block;cursor:pointer}
+.opt input{position:absolute;opacity:0;inset:0;width:100%;height:100%;margin:0;cursor:pointer}
+.opt .card{display:flex;align-items:center;gap:12px;padding:13px 15px;border-radius:12px;border:1.5px solid var(--line);background:#fff;transition:border-color .15s,background .15s}
+.opt:hover .card{border-color:var(--green-line)}
+.opt input:checked + .card{border-color:var(--green);background:var(--green-soft);box-shadow:0 0 0 3px rgba(5,223,114,.18)}
+.chk{width:18px;height:18px;border-radius:5px;border:2px solid #b8c2bc;flex:none;display:grid;place-items:center;font-size:12px;font-weight:800;color:#fff}
+.opt input:checked + .card .chk{border-color:var(--green-ink);background:var(--green-ink)}
+.opt input:checked + .card .chk::after{content:"✓"}
+.mname{font-weight:700;color:var(--ink);font-size:14.5px;min-width:0;overflow-wrap:anywhere}
+.tag{margin-left:auto;flex:none;white-space:nowrap;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--green-ink)}
+
+.perfcard{border:1px solid var(--line);border-radius:var(--r);padding:20px 22px;margin:0 0 20px;background:#fbfdfc}
+.perf{width:100%;border-collapse:collapse;font-size:13.5px;margin:6px 0 0}
+.perf th{font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);text-align:left;padding:8px 10px;border-bottom:1.5px solid var(--line)}
+.perf td{padding:10px 10px;border-bottom:1px solid var(--line);color:var(--ink);vertical-align:top}
+.perf td.n,.perf th.n{text-align:right;font-variant-numeric:tabular-nums}
+.delta{display:inline-block;font-weight:700;padding:3px 10px;border-radius:999px;background:#eef2f0;color:var(--muted)}
+.delta.good{background:var(--green-soft);border:1px solid var(--green-line);color:var(--green-ink)}
+.bar{height:12px;border-radius:999px;background:#e8eeea;overflow:hidden;margin:6px 0 22px}
+.bar i{display:block;height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,#05df72,#58e388);box-shadow:0 0 14px rgba(5,223,114,.55);transition:width .5s ease}
+.steps{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.steps li{display:flex;align-items:center;gap:12px;font-size:15px;color:var(--muted)}
+.steps li .mk{width:22px;height:22px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-size:12px;font-weight:700;flex:none}
+.steps li.on{color:var(--ink);font-weight:700}
+.steps li.on .mk{border-color:var(--green)}
+.steps li.ok{color:var(--ink)}
+.steps li.ok .mk{background:var(--green);border-color:var(--green);color:#000}
+.seg{display:inline-flex;padding:4px;border-radius:999px;background:#eef2f0;border:1px solid var(--line);margin-bottom:16px;flex-wrap:wrap}
+.seg button{border:0;background:transparent;padding:9px 18px;border-radius:999px;font-weight:700;font-size:14px;color:var(--muted);cursor:pointer}
+.seg button[aria-selected=true]{background:#fff;color:var(--ink);box-shadow:var(--shadow)}
+pre.md{margin:0;padding:20px;border-radius:14px;background:#0b0f0d;color:#e2e8f0;font-family:ui-monospace,Menlo,monospace;font-size:13px;line-height:1.6;overflow:auto;max-height:520px;white-space:pre-wrap;word-break:break-word;border:1.5px solid rgba(74,222,128,.35)}
+.meta{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 16px}
+.pill{font-size:12px;font-weight:700;padding:5px 12px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--muted)}
+.pill.g{border-color:var(--green-line);background:var(--green-soft);color:var(--green-ink)}
+.pill.bad{border-color:#f5c2c7;background:var(--neg-bg);color:var(--neg)}
+.cta{margin-top:26px;display:flex;align-items:center;gap:16px;padding:18px 20px;border-radius:var(--r);border:1.5px solid var(--green-line);background:var(--green-soft);flex-wrap:wrap}
+.cta b{color:var(--ink)}
+.cta span{flex:1;min-width:200px;font-size:14px}
+.toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);background:#0b0b0b;color:#fff;padding:12px 20px;border-radius:999px;font-weight:600;font-size:14px;opacity:0;pointer-events:none;transition:.25s}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:760px}
+@media (max-width:900px){
+  .shell{grid-template-columns:1fr;padding:16px;gap:16px}
+  .grid2{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<header>
+  <img src="/static/regolo-logo-light-bg.png" alt="Regolo">
+  <span class="sep"></span><span class="product">Eval Studio · Multi-Model FinOps &amp; Langfuse CI</span>
+  <a class="trial" href="https://regolo.ai/pricing" target="_blank" rel="noopener"><i class="dot"></i>Free account · 30 day trial</a>
+</header>
+
+<div class="shell">
+  <nav role="tablist" aria-orientation="vertical" aria-label="Wizard steps">
+    <button class="tab" role="tab" id="tab1" aria-controls="p1" aria-selected="true"><span class="num">1</span><span><span class="t">Connect</span><span class="s" id="s1">Regolo &amp; Langfuse</span></span></button>
+    <button class="tab" role="tab" id="tab2" aria-controls="p2" aria-selected="false" disabled><span class="num">2</span><span><span class="t">Models (1 to 6)</span><span class="s" id="s2">Multi-model matrix</span></span></button>
+    <button class="tab" role="tab" id="tab3" aria-controls="p3" aria-selected="false" disabled><span class="num">3</span><span><span class="t">Dataset &amp; Prompts</span><span class="s" id="s3">Upload or built-in</span></span></button>
+    <button class="tab" role="tab" id="tab4" aria-controls="p4" aria-selected="false" disabled><span class="num">4</span><span><span class="t">FinOps &amp; CI Gate</span><span class="s" id="s4">Break-even &amp; export</span></span></button>
+    <div class="promo">
+      <b>No Regolo account yet?</b>
+      <p>Run Gemma 4, Qwen 3.8, and GLM 5.2 in Europe with Zero Data Retention. Start with free credits.</p>
+      <a class="btn primary sm" href="https://regolo.ai/pricing" target="_blank" rel="noopener">Start free trial</a>
+    </div>
+    <a class="oss" href="https://github.com/langfuse/langfuse" target="_blank" rel="noopener noreferrer nofollow">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+      <div><b>Langfuse v4 OSS</b><span>MIT observability &amp; evals</span></div>
+    </a>
+  </nav>
+
+  <main>
+    <!-- Step 1: Connect -->
+    <section class="panel" id="p1" role="tabpanel" aria-labelledby="tab1">
+      <span class="eyebrow"><i class="dot"></i>Step 1 of 4</span>
+      <h1>Connect Regolo &amp; optional Langfuse</h1>
+      <p class="lead">Unlike Langfuse's dashboard (which only displays traces after you write code), this studio benchmarks multiple Regolo models head-to-head on your own dataset, calculates your PAYG vs Core subscription break-even point, and generates your ready-to-commit <code>langfuse</code> CI workflow.</p>
+      <form id="keyform" autocomplete="off">
+        <label class="f" for="key">Regolo API key</label>
+        <div class="field">
+          <input id="key" type="password" placeholder="sk-…" spellcheck="false" autocapitalize="off" required>
+          <button type="button" class="btn ghost sm" id="show" aria-pressed="false">Show</button>
+        </div>
+        <p class="hint">Your key stays in memory in this browser tab, is sent only to this local server and to <code>https://api.regolo.ai/v1</code>, and is never written to disk.</p>
+
+        <details style="margin-top:20px;max-width:680px">
+          <summary style="cursor:pointer;font-weight:700;color:var(--ink)">Optional: stream traces &amp; scores into your Langfuse project</summary>
+          <div style="margin-top:12px;display:grid;gap:10px">
+            <div>
+              <label class="f" for="lfHost">Langfuse Host URL</label>
+              <input id="lfHost" type="text" placeholder="https://cloud.langfuse.com or http://localhost:3000" style="width:100%">
+            </div>
+            <div class="grid2">
+              <div>
+                <label class="f" for="lfPub">Langfuse Public Key</label>
+                <input id="lfPub" type="text" placeholder="pk-lf-…" style="width:100%">
+              </div>
+              <div>
+                <label class="f" for="lfSec">Langfuse Secret Key</label>
+                <input id="lfSec" type="password" placeholder="sk-lf-…" style="width:100%">
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <div class="err" id="err1" role="alert"></div>
+        <div class="actions">
+          <button class="btn primary" id="verify" type="submit"><span class="spin"></span><span id="verifyL">Verify and load all models</span></button>
+          <a href="https://regolo.ai/pricing" target="_blank" rel="noopener">Don't have a key? Get 30 days free</a>
+        </div>
+      </form>
+    </section>
+
+    <!-- Step 2: Multi-Model Selector -->
+    <section class="panel" id="p2" role="tabpanel" aria-labelledby="tab2" hidden>
+      <span class="eyebrow"><i class="dot"></i>Step 2 of 4</span>
+      <h1>Select 1 to 6 Regolo models to benchmark side-by-side</h1>
+      <p class="lead">Check any combination of open-weight models available on your Regolo account. We will run the exact same dataset across every selected model, measure hidden reasoning chatter, and calculate when the flat 39 EUR/month Core plan beats Pay-As-You-Go.</p>
+      <div class="modelbar">
+        <span class="count" id="mcount"></span>
+        <button class="btn ghost sm" type="button" id="pickArticle3">Select article trio (Gemma 4, Qwen 3.8, GLM 5.2)</button>
+      </div>
+      <div class="models" id="models" role="group" aria-label="Models to benchmark"></div>
+
+      <div class="grid2" style="margin-top:22px">
+        <div>
+          <label class="f" for="judgeModel">LLM-as-a-judge model (<code>faithfulness</code>)</label>
+          <select id="judgeModel" style="width:100%"></select>
+        </div>
+        <div>
+          <label class="f" for="useJudge">Evaluation depth</label>
+          <select id="useJudge" style="width:100%">
+            <option value="both" selected>Both: deterministic fact match + LLM faithfulness judge</option>
+            <option value="code_only">Deterministic fact match only (0 judge tokens, fastest)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="err" id="err2" role="alert"></div>
+      <div class="actions">
+        <button class="btn primary" id="to3" type="button">Continue to dataset &amp; prompts</button>
+        <button class="btn ghost" id="back1" type="button">Back</button>
+      </div>
+    </section>
+
+    <!-- Step 3: Dataset & Prompts -->
+    <section class="panel" id="p3" role="tabpanel" aria-labelledby="tab3" hidden>
+      <span class="eyebrow"><i class="dot"></i>Step 3 of 4</span>
+      <h1>Bring your own dataset &amp; customize prompts</h1>
+      <p class="lead">Upload your own <code>.json</code>, <code>.jsonl</code>, or <code>.csv</code> evaluation dataset (with <code>question</code>, <code>context</code>, and <code>expected_output</code> columns), or use the built-in 20-question <code>regolo-docs-qa</code> benchmark suite.</p>
+
+      <div class="grid2">
+        <div>
+          <label class="f" for="dsFile">Upload custom dataset (<code>.json</code>, <code>.jsonl</code>, <code>.csv</code>)</label>
+          <input id="dsFile" type="file" accept=".json,.jsonl,.csv" style="width:100%;padding:9px">
+          <p class="hint" id="dsMeta">Using built-in <code>regolo-docs-qa</code> dataset (20 items). Upload a file to override.</p>
+        </div>
+        <div>
+          <label class="f" for="sampleCount">Number of items &amp; CI faithfulness threshold</label>
+          <div style="display:flex;gap:8px">
+            <select id="sampleCount" style="flex:1">
+              <option value="3">3 items (fast smoke test)</option>
+              <option value="5" selected>5 items (recommended)</option>
+              <option value="10">10 items</option>
+              <option value="20">20 items (full suite)</option>
+            </select>
+            <input id="threshold" type="number" min="0" max="1" step="0.05" value="0.85" style="width:110px" title="CI faithfulness threshold">
+          </div>
+        </div>
+      </div>
+
+      <div class="grid2" style="margin-top:16px">
+        <div>
+          <label class="f" for="sysPrompt">Generator System Prompt</label>
+          <textarea id="sysPrompt" rows="3" style="width:100%">Answer using only the provided documentation. Be concise and include exact numbers and units.</textarea>
+        </div>
+        <div>
+          <label class="f" for="judgePrompt">LLM-as-a-Judge Rubric Prompt</label>
+          <textarea id="judgePrompt" rows="3" style="width:100%">Reply with 1 if the answer uses only facts supported by the context, else 0. Output only 1 or 0.</textarea>
+        </div>
+      </div>
+
+      <details style="margin-top:16px;max-width:760px">
+        <summary style="cursor:pointer;font-weight:700;color:var(--ink)">Optional: prepend a single ad-hoc question &amp; context</summary>
+        <div style="margin-top:12px;display:grid;gap:10px">
+          <input id="custQ" type="text" placeholder="Question (e.g. What is the daily token limit on the Core plan?)" style="width:100%">
+          <textarea id="custCtx" rows="2" placeholder="Retrieved context chunk…" style="width:100%"></textarea>
+          <input id="custExp" type="text" placeholder="Expected fact / substring (e.g. 20 million)" style="width:100%">
+        </div>
+      </details>
+
+      <div class="err" id="err3" role="alert"></div>
+      <div class="actions">
+        <button class="btn primary" id="runEval" type="button">Run multi-model benchmark</button>
+        <button class="btn ghost" id="back2" type="button">Back</button>
+      </div>
+    </section>
+
+    <!-- Step 4: Results -->
+    <section class="panel" id="p4" role="tabpanel" aria-labelledby="tab4" hidden>
+      <div id="working">
+        <span class="eyebrow"><i class="dot"></i>Step 4 of 4</span>
+        <h1>Benchmarking selected models on Regolo</h1>
+        <p class="lead">Running RAG prompts, measuring hidden reasoning tokens, grading faithfulness, and calculating PAYG vs Core break-even…</p>
+        <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="barFill"></i></div>
+        <ol class="steps" id="steps" aria-live="polite">
+          <li data-k="dataset"><span class="mk"></span>Loading evaluation dataset</li>
+          <li data-k="generate"><span class="mk"></span>Running RAG generation across selected Regolo models</li>
+          <li data-k="judge"><span class="mk"></span>Scoring exact_fact_evaluator &amp; faithfulness_judge</li>
+          <li data-k="report"><span class="mk"></span>Computing FinOps break-even &amp; generating Langfuse CI kit</li>
+        </ol>
+        <div class="err" id="err4" role="alert"></div>
+        <div class="actions" id="errActions" hidden><button class="btn primary" id="retry" type="button">Back to configuration</button></div>
+      </div>
+
+      <div id="done" hidden>
+        <span class="eyebrow"><i class="dot"></i>Benchmark complete</span>
+        <h1 id="doneTitle">Multi-model FinOps &amp; evaluation results</h1>
+        <div class="meta" id="meta"></div>
+        <div class="perfcard" id="perf"></div>
+        <div class="seg" id="runseg" role="tablist" aria-label="Model run selector" hidden></div>
+        <div class="seg" role="tablist" aria-label="Result view">
+          <button role="tab" id="rt1" aria-selected="true">Trace &amp; verbosity inspector</button>
+          <button role="tab" id="rt2" aria-selected="false">CI PR report (Markdown)</button>
+          <button role="tab" id="rt3" aria-selected="false">Export Langfuse CI kit (eval_ci.py + GitHub Action)</button>
+        </div>
+        <div id="rv1">
+          <div style="overflow-x:auto">
+            <table class="perf" id="traceTable">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Question &amp; Model Answer</th>
+                  <th>Expected Fact</th>
+                  <th class="n">Fact Match</th>
+                  <th class="n">Faithfulness</th>
+                  <th class="n">Tokens (in/out)</th>
+                  <th class="n">Latency</th>
+                  <th class="n">PAYG / Core</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="actions">
+            <button class="btn primary sm" id="dlJson" type="button">Download full benchmark (.json)</button>
+          </div>
+        </div>
+        <div id="rv2" hidden>
+          <pre class="md" id="md" tabindex="0"></pre>
+          <div class="actions">
+            <button class="btn primary sm" id="cpMd" type="button">Copy PR Markdown</button>
+            <button class="btn ghost sm" id="dlMd" type="button">Download .md</button>
+          </div>
+        </div>
+        <div id="rv3" hidden>
+          <p class="hint" style="margin-bottom:10px">Ready-to-commit script using the official <code>langfuse</code> Python SDK (<code>dataset.run_experiment</code>) + GitHub Actions workflow configured for this model and threshold:</p>
+          <h2>1. <code>eval_ci.py</code> (uses official <code>langfuse</code> SDK)</h2>
+          <pre class="md" id="ciPy" tabindex="0"></pre>
+          <div class="actions" style="margin-top:12px">
+            <button class="btn primary sm" id="cpPy" type="button">Copy eval_ci.py</button>
+            <button class="btn ghost sm" id="dlPy" type="button">Download eval_ci.py</button>
+          </div>
+          <h2>2. <code>.github/workflows/regolo-eval.yml</code></h2>
+          <pre class="md" id="ciYml" tabindex="0"></pre>
+          <div class="actions" style="margin-top:12px">
+            <button class="btn primary sm" id="cpYml" type="button">Copy regolo-eval.yml</button>
+          </div>
+        </div>
+        <div class="cta">
+          <span><b>Running continuous CI evals?</b> The flat Regolo Core plan (39 EUR/mo for 600M tokens, 11.70 EUR/mo first 3 months) cuts per-eval cost down to 0.000045 EUR.</span>
+          <a class="btn primary sm" href="https://regolo.ai/pricing" target="_blank" rel="noopener">View Core plan</a>
+        </div>
+        <div class="actions"><button class="btn ghost" id="again" type="button">Benchmark other models</button></div>
+      </div>
+    </section>
+  </main>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const S = {key: "", models: [], selectedModels: [], judge: "", uploadedDs: null, prices: {}, result: null, unlocked: 1, runIdx: 0};
+const esc = (t) => String(t).replace(/[&<>"']/g, (c) => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
+
+function go(n) {
+  $$("[role=tabpanel]").forEach((p, i) => p.hidden = i + 1 !== n);
+  $$("nav .tab").forEach((t, i) => { t.setAttribute("aria-selected", i + 1 === n); t.classList.toggle("done", i + 1 < S.unlocked && i + 1 !== n); });
+  window.scrollTo({top: 0, behavior: "smooth"});
+}
+function unlock(n) { S.unlocked = Math.max(S.unlocked, n); $$("nav .tab").forEach((t, i) => t.disabled = i + 1 > S.unlocked); }
+$$("nav .tab").forEach((t, i) => t.addEventListener("click", () => go(i + 1)));
+const toast = (m) => { const t = $("#toast"); t.textContent = m; t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 2200); };
+const showErr = (id, m) => { const e = $(id); e.textContent = m || ""; e.classList.toggle("show", !!m); };
+
+async function api(path, body) {
+  const r = await fetch(path, {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(body)});
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.error || `Request failed (${r.status})`);
+  return j;
+}
+
+fetch("/api/dataset").then(r => r.json()).then(d => { S.prices = d.prices || {}; }).catch(() => {});
+
+/* Step 1 */
+$("#show").addEventListener("click", (e) => {
+  const k = $("#key"), on = k.type === "password"; k.type = on ? "text" : "password";
+  e.target.textContent = on ? "Hide" : "Show"; e.target.setAttribute("aria-pressed", on);
+});
+$("#keyform").addEventListener("submit", async (e) => {
+  e.preventDefault(); showErr("#err1");
+  const b = $("#verify"); b.disabled = true; b.classList.add("loading"); $("#verifyL").textContent = "Verifying key…";
+  try {
+    const key = $("#key").value.trim();
+    const j = await api("/api/models", {api_key: key});
+    S.key = key; S.models = j.models; S.prices = j.prices || S.prices;
+    if (!S.selectedModels.length) S.selectedModels = [j.default];
+    S.judge = j.default;
+    $("#s1").textContent = "Key verified";
+    renderModels(); unlock(2); go(2);
+  } catch (err) { showErr("#err1", err.message); }
+  finally { b.disabled = false; b.classList.remove("loading"); $("#verifyL").textContent = "Verify and load all models"; }
+});
+
+/* Step 2: Multi-model checkboxes */
+const FEATURED = new Set(["gemma4-31b", "gemma-4-31b", "qwen3.8-27b", "glm5.2", "glm-5.2"]);
+function syncSelectedModels() {
+  S.selectedModels = $$("#models input:checked").map(i => i.value).slice(0, 6);
+  $("#s2").textContent = S.selectedModels.length ? S.selectedModels.join(", ") : "Pick a model";
+  $("#mcount").textContent = `${S.models.length} models on account · ${S.selectedModels.length} selected`;
+}
+function renderModels() {
+  const pmap = (S.prices && S.prices.models) || {};
+  $("#models").innerHTML = S.models.map((m) => {
+    const rate = pmap[m];
+    const tag = rate ? `€${rate.in}/€${rate.out} 1M` : (FEATURED.has(m) ? "Article model" : "");
+    const checked = S.selectedModels.includes(m) ? "checked" : "";
+    return `<label class="opt"><input type="checkbox" name="model" value="${esc(m)}" ${checked}>
+      <span class="card"><span class="chk"></span><span class="mname">${esc(m)}</span>${tag ? `<span class="tag">${esc(tag)}</span>` : ""}</span></label>`;
+  }).join("");
+  $$("#models input").forEach((i) => i.addEventListener("change", syncSelectedModels));
+  syncSelectedModels();
+
+  const optsHtml = S.models.map(m => `<option value="${esc(m)}">${esc(m)}</option>`).join("");
+  $("#judgeModel").innerHTML = optsHtml;
+  $("#judgeModel").value = S.judge;
+}
+
+$("#pickArticle3").addEventListener("click", () => {
+  const trio = S.models.filter(m => FEATURED.has(m));
+  const picks = trio.length ? trio : S.models.slice(0, 3);
+  $$("#models input").forEach(i => { i.checked = picks.includes(i.value); });
+  syncSelectedModels();
+});
+
+$("#to3").addEventListener("click", () => {
+  showErr("#err2");
+  if (!S.selectedModels.length) { showErr("#err2", "Select at least 1 model to evaluate."); return; }
+  unlock(3); go(3);
+});
+$("#back1").addEventListener("click", () => go(1));
+$("#back2").addEventListener("click", () => go(2));
+
+/* Custom dataset file upload */
+$("#dsFile").addEventListener("change", async (e) => {
+  const f = e.target.files && e.target.files[0];
+  if (!f) { S.uploadedDs = null; $("#dsMeta").textContent = "Using built-in regolo-docs-qa dataset (20 items)."; return; }
+  const text = await f.text();
+  S.uploadedDs = {filename: f.name, content: text};
+  $("#dsMeta").textContent = `Loaded custom dataset: ${f.name} (${text.length.toLocaleString()} bytes)`;
+  $("#s3").textContent = f.name;
+});
+
+/* Step 3 -> Step 4 */
+const ORDER = ["dataset", "generate", "judge", "report"];
+function setStage(stage, pct) {
+  $("#barFill").style.width = `${pct}%`;
+  const idx = ORDER.indexOf(stage);
+  $$("#steps li").forEach((li, i) => {
+    li.classList.toggle("ok", i < idx || stage === "done");
+    li.classList.toggle("on", i === idx && stage !== "done");
+    li.querySelector(".mk").textContent = (i < idx || stage === "done") ? "✓" : "";
+  });
+}
+
+$("#runEval").addEventListener("click", async () => {
+  showErr("#err3"); showErr("#err4");
+  unlock(4); go(4);
+  $("#working").hidden = false; $("#done").hidden = true; $("#errActions").hidden = true;
+  setStage("dataset", 6);
+  try {
+    const payload = {
+      api_key: S.key,
+      models: S.selectedModels,
+      mode: S.selectedModels.length > 1 ? "compare" : ($("#useJudge").value === "code_only" ? "code_only" : "single"),
+      use_judge: $("#useJudge").value !== "code_only",
+      judge_model: $("#judgeModel").value,
+      sample_count: parseInt($("#sampleCount").value, 10) || 5,
+      threshold: parseFloat($("#threshold").value) || 0.85,
+      system_prompt: $("#sysPrompt").value,
+      judge_prompt: $("#judgePrompt").value,
+      uploaded_dataset: S.uploadedDs,
+      langfuse: {
+        host: $("#lfHost").value.trim(),
+        public_key: $("#lfPub").value.trim(),
+        secret_key: $("#lfSec").value.trim(),
+      },
+      custom_item: {
+        question: $("#custQ").value.trim(),
+        context: $("#custCtx").value.trim(),
+        expected_output: $("#custExp").value.trim(),
+      },
+    };
+    const {job_id} = await api("/api/evaluate", payload);
+    while (true) {
+      await new Promise(r => setTimeout(r, 700));
+      const st = await (await fetch(`/api/jobs/${job_id}`)).json();
+      if (st.status === "error") throw new Error(st.error || "Evaluation failed.");
+      setStage(st.stage || "generate", st.progress || 25);
+      if (st.status === "done") {
+        S.result = st.result; S.runIdx = 0;
+        renderResult();
+        break;
+      }
+    }
+  } catch (err) {
+    showErr("#err4", err.message);
+    $("#errActions").hidden = false;
+  }
+});
+
+$("#retry").addEventListener("click", () => go(3));
+$("#again").addEventListener("click", () => go(2));
+
+function renderResult() {
+  $("#working").hidden = true; $("#done").hidden = false;
+  const runs = S.result.runs || [];
+  const cur = runs[S.runIdx] || runs[0];
+  $("#doneTitle").textContent = runs.length > 1 ? `Multi-model benchmark (${runs.length} models)` : `Evaluation report: ${cur.model}`;
+
+  if (runs.length > 1) {
+    $("#runseg").hidden = false;
+    $("#runseg").innerHTML = runs.map((r, idx) =>
+      `<button role="tab" aria-selected="${idx === S.runIdx}" data-i="${idx}">${esc(r.model)} (${(r.avg_faithfulness * 100).toFixed(0)}%)</button>`
+    ).join("");
+    $$("#runseg button").forEach(b => b.onclick = () => { S.runIdx = parseInt(b.dataset.i, 10); renderResult(); });
+  } else {
+    $("#runseg").hidden = true;
+  }
+
+  const gateClass = cur.ci_passed ? "pill g" : "pill bad";
+  const gateText = cur.ci_passed ? `CI Gate PASSED (${(cur.avg_faithfulness * 100).toFixed(1)}% >= ${(cur.threshold * 100).toFixed(0)}%)` : `CI Gate FAILED: RegressionError (${(cur.avg_faithfulness * 100).toFixed(1)}% < ${(cur.threshold * 100).toFixed(0)}%)`;
+  $("#meta").innerHTML = [
+    `<span class="${gateClass}">${esc(gateText)}</span>`,
+    `<span class="pill g">Fact match: ${(cur.avg_exact_fact * 100).toFixed(1)}%</span>`,
+    `<span class="pill">Reasoning chatter: ${cur.reasoning_pct || 0}% of output</span>`,
+    `<span class="pill">Judge: ${esc(cur.judge_model || "deterministic-only")}</span>`,
+    cur.langfuse_sent > 0 ? `<span class="pill g">Langfuse synced: ${cur.langfuse_sent} traces</span>` : `<span class="pill">Local trace inspector</span>`
+  ].join("");
+
+  const rowsSummary = runs.map(r => {
+    const payg = r.total_payg_eur != null ? `€${r.total_payg_eur.toFixed(5)}` : "Tokens only";
+    const core = `€${r.total_core_eur.toFixed(6)}`;
+    const be = r.breakeven_runs_std ? `${r.breakeven_runs_std.toLocaleString()} runs (${r.breakeven_runs_promo.toLocaleString()} promo)` : "Flat pool";
+    return `<tr>
+      <td><b>${esc(r.model)}</b></td>
+      <td class="n">${(r.avg_exact_fact * 100).toFixed(1)}%</td>
+      <td class="n"><b>${(r.avg_faithfulness * 100).toFixed(1)}%</b></td>
+      <td class="n">${r.prompt_tokens} in / ${r.completion_tokens} out${r.reasoning_tokens ? ` <small style="color:var(--warn)">(${r.reasoning_pct}% reasoning)</small>` : ""}</td>
+      <td class="n">${r.total_latency_s.toFixed(2)}s</td>
+      <td class="n">${payg}</td>
+      <td class="n"><span class="delta good">${core}</span></td>
+      <td class="n"><small>${be}</small></td>
+    </tr>`;
+  }).join("");
+
+  $("#perf").innerHTML = `
+    <h2>Multi-Model FinOps &amp; Verbosity Leaderboard (PAYG vs Regolo Core 39 EUR/mo)</h2>
+    <table class="perf">
+      <thead>
+        <tr>
+          <th>Model</th>
+          <th class="n">Exact Fact</th>
+          <th class="n">Faithfulness</th>
+          <th class="n">Tokens &amp; Chatter</th>
+          <th class="n">Total Time</th>
+          <th class="n">PAYG Cost</th>
+          <th class="n">Core Plan Cost</th>
+          <th class="n">Core Break-Even</th>
+        </tr>
+      </thead>
+      <tbody>${rowsSummary}</tbody>
+    </table>
+  `;
+
+  $("#traceTable tbody").innerHTML = cur.traces.map(t => {
+    const payg = t.payg_eur != null ? `€${t.payg_eur.toFixed(5)}` : "n/a";
+    const core = `€${t.core_eur.toFixed(6)}`;
+    const lfLink = t.langfuse_url ? `<br><a href="${esc(t.langfuse_url)}" target="_blank" rel="noopener noreferrer">Open in Langfuse ↗</a>` : "";
+    return `<tr>
+      <td><code>${esc(t.id)}</code><br><small style="color:var(--muted)">${esc(t.category)}</small>${lfLink}</td>
+      <td><b>Q:</b> ${esc(t.question)}<br><span style="color:var(--body)"><b>A:</b> ${esc(t.output)}</span></td>
+      <td><code>${esc(t.expected_output)}</code></td>
+      <td class="n"><span class="pill ${t.exact_fact >= 1 ? "g" : "bad"}">${t.exact_fact.toFixed(1)}</span></td>
+      <td class="n"><span class="pill ${t.faithfulness >= 1 ? "g" : "bad"}">${t.faithfulness.toFixed(1)}</span></td>
+      <td class="n">${t.prompt_tokens} / ${t.completion_tokens}${t.reasoning_tokens ? `<br><small style="color:var(--warn)">${t.reasoning_tokens} reasoning</small>` : ""}</td>
+      <td class="n">${t.latency_s.toFixed(2)}s</td>
+      <td class="n">${payg}<br><small style="color:var(--green-ink)">${core} Core</small></td>
+    </tr>`;
+  }).join("");
+
+  $("#md").textContent = cur.markdown_report;
+  $("#ciPy").textContent = (cur.ci_kit && cur.ci_kit["eval_ci.py"]) || "";
+  $("#ciYml").textContent = (cur.ci_kit && cur.ci_kit["regolo-eval.yml"]) || "";
+}
+
+function showView(idx) {
+  [1, 2, 3].forEach(i => {
+    $(`#rt${i}`).setAttribute("aria-selected", i === idx ? "true" : "false");
+    $(`#rv${i}`).hidden = i !== idx;
+  });
+}
+$("#rt1").onclick = () => showView(1);
+$("#rt2").onclick = () => showView(2);
+$("#rt3").onclick = () => showView(3);
+
+$("#cpMd").onclick = async () => { await navigator.clipboard.writeText($("#md").textContent); toast("Copied PR Markdown report"); };
+$("#cpPy").onclick = async () => { await navigator.clipboard.writeText($("#ciPy").textContent); toast("Copied eval_ci.py"); };
+$("#cpYml").onclick = async () => { await navigator.clipboard.writeText($("#ciYml").textContent); toast("Copied regolo-eval.yml"); };
+$("#dlPy").onclick = () => {
+  const cur = S.result.runs[S.runIdx] || S.result.runs[0];
+  const blob = new Blob([cur.ci_kit["eval_ci.py"]], {type: "text/x-python"});
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "eval_ci.py"; a.click();
+};
+$("#dlMd").onclick = () => {
+  const cur = S.result.runs[S.runIdx] || S.result.runs[0];
+  const blob = new Blob([cur.markdown_report], {type: "text/markdown"});
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `regolo-eval-${cur.model}.md`; a.click();
+};
+$("#dlJson").onclick = () => {
+  const blob = new Blob([JSON.stringify(S.result, null, 2)], {type: "application/json"});
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "regolo-langfuse-eval-traces.json"; a.click();
+};
+</script>
+</body>
+</html>
