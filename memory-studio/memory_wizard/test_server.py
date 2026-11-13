@@ -48,7 +48,7 @@ class MemoryStudioTests(unittest.TestCase):
     def test_routed_consolidation_and_retry(self):
         S.chat = FakeChat(bad_router=False)
         r = S.execute_run("k", "qwen3.5-122b", "claude-to-opencode", "proj", {"files": sample_files()}, True, True, lambda *_: None)
-        self.assertEqual([s["model"] for s in r["stages"]], ["brick-complexity-pro", "qwen3.5-122b"])
+        self.assertEqual([s["model"] for s in r["stages"]], ["brick-v1-beta", "qwen3.5-122b"])
         self.assertFalse(r["router_retry"])
         self.assertIn("wiki/decisions/adr-01-ed25519.md", r["html"])
         self.assertIn("AI_MEMORY_LLM_COMPAT_DISABLE_THINKING", r["html"])

@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Regolo — TUI for akitaonrails/ai-memory + Regolo API (stdlib only).
+"""Regolo Memory Studio TUI on the Regolo API (stdlib only).
 
-Configures and tests `ai-memory`'s real `openai-compat` provider and `Qwen3-Embedding-8B` embedder
-against `https://api.regolo.ai/v1`, and compiles a local project folder into an `ai-memory`-style
-Git-backed `wiki/` tree (`decisions/`, `procedures/`, `sessions/`) plus a Claim-Once Handoff packet
-in `output/<project-id>/wiki/` (zero SVG, zero diagram-design code).
+Tests an example `openai-compat` + `Qwen3-Embedding-8B` configuration for ai-memory against
+`https://api.regolo.ai/v1`, and compiles a local project folder into Markdown wiki pages
+(`decisions/`, `procedures/`, `handoffs/`) plus a handoff brief in `output/<project-id>/wiki/`.
+Inspired by akitaonrails/ai-memory (MIT); independent implementation, not affiliated with it.
 
 Run interactively:
   python3 regolo_memory_tui.py
@@ -39,10 +39,10 @@ WHITE = f"{ESC}38;2;248;250;252m"
 BG_BADGE = f"{ESC}48;2;6;25;16m"
 
 HARNESS_PAIRS = [
-    ("claude-to-opencode", "claude-code -> opencode", "Quit Claude Code mid-task and resume in OpenCode (`ai-memory run opencode`)"),
-    ("opencode-to-codex", "opencode -> codex", "Switch from OpenCode to Codex CLI (`ai-memory run codex`)"),
+    ("claude-to-opencode", "claude-code -> opencode", "Quit Claude Code mid-task and resume in OpenCode"),
+    ("opencode-to-codex", "opencode -> codex", "Switch from OpenCode to Codex CLI"),
     ("claude-to-cursor", "claude-code -> cursor", "Hand off architectural decisions and open tasks to Cursor"),
-    ("bootstrap-wiki", "ai-memory bootstrap", "Compile initial Git-backed wiki/ pages (`decisions/`, `procedures/`, `sessions/`)"),
+    ("bootstrap-wiki", "first wiki bootstrap", "Compile initial wiki pages (`decisions/`, `procedures/`) for a project"),
 ]
 
 NON_CHAT_MODELS = {
@@ -298,6 +298,7 @@ def call_regolo_chat(
         "completion_tokens": usage.get("completion_tokens", 0),
         "total_tokens": usage.get("total_tokens", 0),
         "latency_s": elapsed,
+        "model": data.get("model", model),
     }
 
 
@@ -348,8 +349,9 @@ def write_git_backed_wiki_files(
     wiki_obj: dict,
     handoff_md: str,
     scan_files: list[dict],
+    consolidated_by: str | None = None,
 ) -> list[dict]:
-    """Write real `.md` files with OKF v0.2 frontmatter into `output/<project-id>/wiki/`."""
+    """Write `.md` pages with this app's frontmatter (modeled on ai-memory's kind/tier fields) into `wiki_dir`."""
     pair_code, pair_label, _ = pair_tuple
     today = date.today().isoformat()
     written = []
@@ -359,7 +361,7 @@ def write_git_backed_wiki_files(
         p = wiki_dir / "decisions" / f"{slug}.md"
         body = (
             f"---\nkind: decision\ntier: semantic\nproject: {project_name}\n"
-            f"consolidated_by: {model}\nupdated: {today}\n---\n\n"
+            f"consolidated_by: {consolidated_by or model}\nupdated: {today}\n---\n\n"
             f"# {dec.get('title', slug)}\n\n{dec.get('summary', '')}\n"
         )
         p.write_text(body, encoding="utf-8")
@@ -370,7 +372,7 @@ def write_git_backed_wiki_files(
         p = wiki_dir / "procedures" / f"{slug}.md"
         body = (
             f"---\nkind: procedure\ntier: procedural\nproject: {project_name}\n"
-            f"consolidated_by: {model}\nupdated: {today}\n---\n\n"
+            f"consolidated_by: {consolidated_by or model}\nupdated: {today}\n---\n\n"
             f"# {proc.get('title', slug)}\n\n{proc.get('summary', '')}\n"
         )
         p.write_text(body, encoding="utf-8")
@@ -378,7 +380,7 @@ def write_git_backed_wiki_files(
 
     h_path = wiki_dir / "handoffs" / f"handoff-{pair_code}.md"
     h_body = (
-        f"---\nkind: handoff\nclaim_policy: claim-once\nharness_transition: {pair_label}\n"
+        f"---\nkind: handoff\nharness_transition: {pair_label}\n"
         f"project: {project_name}\nmodel: {model}\ncreated: {today}\n---\n\n"
         f"{handoff_md.strip()}\n\n## Indexed Repository Files\n\n"
         + "\n".join(f"- `{f['path']}` ({f['raw_chars']} -> {f['compact_chars']} chars)" for f in scan_files)
@@ -402,7 +404,7 @@ def consolidate_project_wiki(cfg: RegoloMemoryConfig) -> dict:
         model=model,
         reasoning_effort="none",
         system_prompt=(
-            "You are the ai-memory consolidation worker (`AI_MEMORY_LLM_COMPAT_DISABLE_THINKING=true`). "
+            "You are a wiki consolidation worker for a code repository. "
             "Output ONLY valid JSON with {\"decisions\": [{\"slug\": \"...\", \"title\": \"...\", \"summary\": \"...\"}], "
             "\"procedures\": [{\"slug\": \"...\", \"title\": \"...\", \"summary\": \"...\"}], "
             "\"failed_approaches\": [\"...\"], \"open_questions\": [\"...\"]}."
@@ -418,7 +420,7 @@ def consolidate_project_wiki(cfg: RegoloMemoryConfig) -> dict:
         model=model,
         reasoning_effort="none",
         system_prompt=(
-            "You generate a Claim-Once Cross-Agent Handoff packet (`memory_briefing` + `memory_handoff_list`) for `ai-memory run`. "
+            "You write a handoff brief for the next coding agent that picks up this repository. "
             "Output ONLY Markdown with sections: '## Where We Left Off', '## Failed Approaches (Do Not Repeat)', "
             "'## Locked Architectural Decisions', and '## Open Questions & Next Steps'."
         ),
@@ -451,7 +453,7 @@ def render_header(cfg: RegoloMemoryConfig) -> None:
 
     print(f"\n{GREEN}╭──────────────────────────────────────────────────────────────────────────────────────╮{RESET}")
     print(f"{GREEN}│{RESET} {BG_BADGE}{MINT}{BOLD} ● REGOLO {RESET}                                         {SLATE}akitaonrails/ai-memory · v1.0{RESET} {GREEN}│{RESET}")
-    print(f"{GREEN}│{RESET} {WHITE}{BOLD}Git-Backed Markdown Wiki Consolidator & Cross-Agent Handoff Inspector (EU ZDR){RESET}       {GREEN}│{RESET}")
+    print(f"{GREEN}│{RESET} {WHITE}{BOLD}Markdown Wiki Consolidator & Cross-Agent Handoff Inspector (EU ZDR)  {RESET}       {GREEN}│{RESET}")
     print(f"{GREEN}├──────────────────────────────────────────────────────────────────────────────────────┤{RESET}")
     print(f"{GREEN}│{RESET} {SLATE}Provider :{RESET} {WHITE}openai-compat ({cfg.base_url}){RESET:<19} {SLATE}Status :{RESET} {key_badge:<33}{GREEN}│{RESET}")
     print(f"{GREEN}│{RESET} {SLATE}LLM Model:{RESET} {GREEN}{BOLD}{cfg.llm_model:<34}{RESET} {SLATE}Client :{RESET} {cli_badge:<33}{GREEN}│{RESET}")
@@ -463,7 +465,7 @@ def render_header(cfg: RegoloMemoryConfig) -> None:
 def render_menu() -> None:
     print(f"\n  {MINT}{BOLD}[1]{RESET} {WHITE}Generate Regolo env for ai-memory{RESET} {SLATE}Write openai-compat + Qwen3-Embedding-8B config (disable_thinking=true){RESET}")
     print(f"  {MINT}{BOLD}[2]{RESET} {WHITE}Regolo API & Model Selector{RESET}       {SLATE}Query live GET /v1/models on Regolo & select consolidation model{RESET}")
-    print(f"  {MINT}{BOLD}[3]{RESET} {WHITE}Consolidate Wiki & Handoff{RESET}        {SLATE}Compile repo into output/<project-id>/wiki/ (.md pages + claim-once handoff){RESET}")
+    print(f"  {MINT}{BOLD}[3]{RESET} {WHITE}Consolidate Wiki & Handoff{RESET}        {SLATE}Compile repo into output/<project-id>/wiki/ (.md pages + handoff brief)      {RESET}")
     print(f"  {MINT}{BOLD}[q]{RESET} {SLATE}Quit Regolo{RESET}")
 
 
@@ -483,7 +485,7 @@ def run_demo_mode(cfg: RegoloMemoryConfig, target_dir: Path) -> None:
     res = consolidate_project_wiki(cfg)
     scan = res["scan_info"]
     s1, s2 = res["stage1"], res["stage2"]
-    print(f"\n{GREEN}{BOLD}▶ [Option 3 · Git-Backed Wiki Consolidation & Claim-Once Handoff (Project ID: {res['project_id']})]{RESET}")
+    print(f"\n{GREEN}{BOLD}▶ [Option 3 · Wiki Consolidation & Handoff Brief (Project ID: {res['project_id']})]{RESET}")
     print(
         f"  {GREEN}✓ Sanitized {scan['files_scanned']} observation sources:{RESET} "
         f"{SLATE}{scan['raw_chars']:,} raw chars ->{RESET} {WHITE}{BOLD}{scan['compact_chars']:,} wiki chars (-{scan['reduction_pct']}%){RESET}"
@@ -493,7 +495,7 @@ def run_demo_mode(cfg: RegoloMemoryConfig, target_dir: Path) -> None:
         f"Compiled wiki JSON in {GREEN}{s1['latency_s']}s{RESET} {SLATE}(in={s1['prompt_tokens']} tok, out={s1['completion_tokens']} tok){RESET}"
     )
     print(
-        f"  {GREEN}[Step 2 · {cfg.llm_model} · Claim-Once Handoff]{RESET}  "
+        f"  {GREEN}[Step 2 · {cfg.llm_model} · Handoff Brief]{RESET}  "
         f"Wrote startup packet in {GREEN}{s2['latency_s']}s{RESET} {SLATE}(in={s2['prompt_tokens']} tok, out={s2['completion_tokens']} tok){RESET}"
     )
     print(f"  {GREEN}{BOLD}✓ Wrote {len(res['pages'])} Markdown files in output/{res['project_id']}/wiki/:{RESET}")
@@ -503,7 +505,7 @@ def run_demo_mode(cfg: RegoloMemoryConfig, target_dir: Path) -> None:
 
 def main() -> None:
     try:
-        parser = argparse.ArgumentParser(description="Regolo TUI for akitaonrails/ai-memory")
+        parser = argparse.ArgumentParser(description="Regolo Memory Studio TUI")
         parser.add_argument("--demo", action="store_true")
         parser.add_argument("--project", default=str(Path(__file__).resolve().parent))
         args = parser.parse_args()

@@ -1,9 +1,10 @@
 {
   "currency": "EUR",
   "unit": "per 1M tokens",
-  "source": "Regolo pay-as-you-go prices as coded in ../benchmark.py (October 2026). Edit this file when prices change. Models not listed are shown with tokens only.",
+  "source": "Regolo pay-as-you-go prices from https://regolo.ai/pricing, checked October 26, 2026. brick-v1-beta is free while in beta: re-check the page and edit this file when prices change. Models not listed are shown with tokens only.",
   "models": {
     "brick-complexity-pro": {"in": 0.10, "out": 0.40},
+    "brick-v1-beta": {"in": 0.00, "out": 0.00},
     "qwen3.5-122b": {"in": 1.00, "out": 4.20}
   }
 }

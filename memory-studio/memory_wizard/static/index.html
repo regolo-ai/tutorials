@@ -233,7 +233,7 @@ pre.md{margin:0;padding:20px;border-radius:14px;background:#0b0f0d;color:#e2e8f0
     <section class="panel" id="p3" role="tabpanel" aria-labelledby="tab3" hidden>
       <span class="eyebrow"><i class="dot"></i>Step 3 of 4</span>
       <h1>Pick a project and a handoff template</h1>
-      <p class="lead">Choose the repository folder to analyse, then the cross-agent handoff transition (`ai-memory run`) you want to compile. The app reads the project on your computer, skips everything in .gitignore, and sends the model only a compact skeleton of the main code and config files.</p>
+      <p class="lead">Choose the repository folder to analyse, then the switch between coding agents you want a handoff brief for. The app reads the project on your computer, skips everything in .gitignore, and sends the model only a compact skeleton of the main code and config files.</p>
       <label class="f" for="path">Project folder</label>
       <div class="field wide">
         <input id="path" type="text" placeholder="/Users/you/projects/my-app" spellcheck="false" autocapitalize="off" autocomplete="off">
@@ -256,9 +256,9 @@ pre.md{margin:0;padding:20px;border-radius:14px;background:#0b0f0d;color:#e2e8f0
         <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="barWrap"><i id="barFill"></i></div>
         <ol class="steps" id="steps" aria-live="polite">
           <li data-k="scan"><span class="mk"></span>Reading the project files</li>
-          <li data-k="topology"><span class="mk"></span>Consolidating observations (enable_thinking=false)</li>
-          <li data-k="diagram"><span class="mk"></span>Compiling Git-backed wiki/ pages (OKF v0.2)</li>
-          <li data-k="markdown"><span class="mk"></span>Writing Claim-Once cross-agent handoff packet</li>
+          <li data-k="consolidate"><span class="mk"></span>Consolidating observations (enable_thinking=false)</li>
+          <li data-k="handoff"><span class="mk"></span>Writing the handoff brief for the next agent</li>
+          <li data-k="wiki"><span class="mk"></span>Writing Markdown wiki pages</li>
         </ol>
         <div class="err" id="err4" role="alert"></div>
         <div class="actions" id="errActions" hidden><button class="btn primary" id="retry" type="button">Back to project</button></div>
@@ -278,7 +278,7 @@ pre.md{margin:0;padding:20px;border-radius:14px;background:#0b0f0d;color:#e2e8f0
           <div class="actions"><button class="btn primary sm" id="dlHtml" type="button">Download HTML</button><button id="dlSvg" type="button" hidden></button></div></div>
         <div id="rv2" hidden><pre class="md" id="md" tabindex="0"></pre>
           <div class="actions"><button class="btn primary sm" id="cpMd" type="button">Copy Markdown</button><button class="btn ghost sm" id="dlMd" type="button">Download .md</button></div>
-          <p class="hint">Drop this file in your repository (for example <code>docs/architecture.md</code>) or paste it into an agent's context as project knowledge.</p></div>
+          <p class="hint">Drop this file in your repository (for example under <code>docs/wiki/</code>) or paste it into an agent's context as project knowledge.</p></div>
         <div class="cta"><span><b>Enjoying Regolo?</b> New accounts include a 30 day free trial, no card needed to look around.</span><a class="btn primary sm" href="https://regolo.ai/pricing" target="_blank" rel="noopener">Create free account</a></div>
         <div class="actions"><button class="btn ghost" id="again" type="button">Consolidate another project</button></div>
       </div>
@@ -345,7 +345,7 @@ $("#to3").addEventListener("click", () => { unlock(3); go(3); });
 $("#back1").addEventListener("click", () => go(1));
 
 const MODES = [
-  ["routed", "Regolo routing", "Recommended", "Extraction runs on the router model {router}, fast and cheap. Handoff and wiki pages run on the model you chose."],
+  ["routed", "Regolo routing", "Recommended", "Wiki consolidation runs on {router}, Regolo's router, which picks the model that serves each request. The handoff brief runs on the model you chose."],
   ["single", "Single model", "", "Every step runs on the model you chose."],
   ["compare", "Compare on my repo", "Uses more tokens", "Runs your project twice in parallel: whole files on one model, then the compressed skeleton with routing. Tokens, time and cost side by side."]];
 function renderModes() {
@@ -353,7 +353,7 @@ function renderModes() {
     const off = id !== "single" && !S.routerOk;
     return `<label class="opt mode"><input type="radio" name="mode" value="${id}" ${S.mode === id ? "checked" : ""} ${off ? "disabled" : ""}>
       <span class="card"><span class="h"><span class="radio"></span>${name}${tag ? `<span class="tag">${tag}</span>` : ""}</span>
-      <span class="d">${esc(d.replace("{router}", S.router || "brick-complexity-pro"))}${off ? " Not available for this key." : ""}</span></span></label>`;
+      <span class="d">${esc(d.replace("{router}", S.router || "brick-v1-beta"))}${off ? " Not available for this key." : ""}</span></span></label>`;
   }).join("");
   $$("#modes input").forEach((i) => i.addEventListener("change", () => { S.mode = i.value; }));
 }
@@ -397,7 +397,7 @@ const syncGenerate = () => $("#generate").disabled = !(S.path && S.selected.leng
 $("#back2").addEventListener("click", () => go(2));
 
 /* ---- step 4 ---- */
-const STAGES = ["scan", "consolidate", "triage", "handoff", "reconstruct", "topology", "diagram", "markdown"], CEIL = {scan: 17, consolidate: 50, triage: 50, handoff: 95, reconstruct: 95, topology: 37, diagram: 77, markdown: 97};
+const STAGES = ["scan", "consolidate", "handoff", "wiki"], CEIL = {scan: 17, consolidate: 50, handoff: 93, wiki: 99};
 let timer = null, shown = 0;
 function paint(stage, pct) {
   shown = Math.max(shown, pct); const i = Math.min(STAGES.indexOf(stage), 3);
@@ -435,10 +435,11 @@ const fmtS = (v) => Number(v).toFixed(1) + " s";
 const pctTxt = (p) => p == null ? "n/a" : (p > 0 ? "+" : p < 0 ? "−" : "") + Math.abs(p).toFixed(0) + "%";
 const delta = (p) => `<span class="delta ${p != null && p < 0 ? "good" : ""}">${pctTxt(p)}</span>`;
 const stageTable = (run) => `<table class="perf small"><thead><tr><th>Step</th><th>Model</th><th class="n">Tokens in / out</th><th class="n">Time</th><th class="n">Cost</th></tr></thead><tbody>${
-  run.stages.map((s) => `<tr><td>${esc(s.stage)}</td><td>${esc(s.model)}</td><td class="n">${fmtN(s.prompt_tokens)} / ${fmtN(s.completion_tokens)}</td><td class="n">${fmtS(s.latency_s)}</td><td class="n">${fmtEur(s.cost_eur)}</td></tr>`).join("")}</tbody></table>`;
+  run.stages.map((s) => `<tr><td>${esc(s.stage)}</td><td>${esc(s.model)}${s.served_model && s.served_model !== s.model ? ` → ${esc(s.served_model)}` : ""}</td><td class="n">${fmtN(s.prompt_tokens)} / ${fmtN(s.completion_tokens)}</td><td class="n">${fmtS(s.latency_s)}</td><td class="n">${fmtEur(s.cost_eur)}</td></tr>`).join("")}</tbody></table>`;
 function renderPerf(r) {
   const unpriced = [...new Set(r.runs.flatMap((x) => x.totals.unpriced_models))];
   const priceNote = unpriced.length ? ` No price is set for ${unpriced.map(esc).join(", ")}, so its cost shows as n/a (edit prices.json).` : " Costs use the pay-as-you-go prices in prices.json.";
+  const betaNote = r.runs.some((x) => x.stages.some((s) => s.cost_eur === 0)) ? ` A step priced at €0 is on a model that is free during its beta, so part of the cost change comes from that price, not from routing.` : "";
   if (r.compare) {
     const [a, d] = r.runs.map((x) => x.totals), c = r.compare;
     const row = (name, x, y, f, p) => `<tr><td>${name}</td><td class="n">${f(x)}</td><td class="n">${f(y)}</td><td class="n">${delta(p)}</td></tr>`;
@@ -447,13 +448,13 @@ function renderPerf(r) {
       ${row("Prompt tokens", a.prompt_tokens, d.prompt_tokens, fmtN, c.prompt_tokens_pct)}${row("Total tokens", a.total_tokens, d.total_tokens, fmtN, c.total_tokens_pct)}
       ${row("Time", a.wall_s, d.wall_s, fmtS, c.wall_pct)}${row("Cost", a.cost_eur, d.cost_eur, fmtEur, c.cost_pct)}</tbody></table>
       <details><summary>Per step</summary><h2 style="font-size:13px;margin:12px 0 4px">Baseline</h2>${stageTable(r.runs[0])}<h2 style="font-size:13px;margin:12px 0 4px">Optimized</h2>${stageTable(r.runs[1])}</details>
-      <p class="foot">One run each, started in parallel, on your files. Baseline: the same files uncompressed (first 12 KB of each) with ${esc(r.model)} for every step. Optimized: compressed skeleton, extraction on ${esc(r.router)}, handoff and wiki write-up on ${esc(r.model)}. Token counts and times are measured; they vary between runs.${priceNote}</p>`;
+      <p class="foot">One run each, started in parallel, on your files. Baseline: the same files uncompressed (first 12 KB of each) with ${esc(r.model)} for every step. Optimized: compressed skeleton, wiki consolidation on ${esc(r.router)}, handoff brief on ${esc(r.model)}. Token counts and times are measured; they vary between runs.${priceNote}${betaNote}</p>`;
   } else {
     const run = r.runs[0], t = run.totals, comp = run.compact ? `The model received ${fmtN(run.scan.sent_chars)} of ${fmtN(run.scan.raw_chars)} characters (${pctTxt(-run.scan.reduction_pct)}).` : "";
     $("#perf").innerHTML = `<h2>Cost and speed</h2>
       <div class="tot"><span class="pill g">${fmtN(t.total_tokens)} tokens</span><span class="pill">${fmtN(t.prompt_tokens)} in · ${fmtN(t.completion_tokens)} out</span><span class="pill">${fmtS(t.wall_s)} total</span><span class="pill">${fmtEur(t.cost_eur)}</span></div>
       <details><summary>Per step</summary>${stageTable(run)}</details>
-      <p class="foot">${comp} ${run.routed ? `Extraction ran on ${esc(r.router)}.` : "Every step ran on one model."}${priceNote}</p>`;
+      <p class="foot">${comp} ${run.routed ? `Wiki consolidation ran on ${esc(r.router)}.` : "Every step ran on one model."}${priceNote}${betaNote}</p>`;
   }
 }
 function showRun(i) {
@@ -464,11 +465,8 @@ function showRun(i) {
     `<span class="pill">${r.scope.mode === "git" ? ".gitignore applied (git)" : r.scope.mode === ".gitignore files" ? ".gitignore applied" : "built-in ignore list"}</span>`,
     `<span class="pill">${fmtS(run.totals.wall_s)}</span>`, `<span class="pill">${fmtN(run.totals.total_tokens)} tokens</span>`].join("");
   const notes = [];
-  if (run.router_retry) notes.push(`The ${r.router} component list was unusable, so extraction was repeated on ${r.model}. Both steps are counted in the cost.`);
-  if (run.router_fallback) notes.push(`${r.router} was not available for this key, so extraction ran on ${r.model}.`);
-  if (run.svg_source === "fallback") notes.push("The model's SVG did not follow the requested layout, so Regolo's built-in 4px layout drew the diagram from the extracted components.");
-  if (run.topology_source === "fallback") notes.push("The model did not return a usable component list, so components come from file names. Try a larger model for a more faithful diagram.");
-  if (run.kb_source === "fallback") notes.push("The knowledge base is a plain component table because the model's write-up was unusable.");
+  if (run.router_retry) notes.push(`The ${r.router} wiki consolidation was unusable, so it was repeated on ${r.model}. Both calls are counted in the cost.`);
+  if (run.router_fallback) notes.push(`${r.router} was not available for this key, so consolidation ran on ${r.model}.`);
   $("#fallbackNote").hidden = !notes.length; $("#fallbackNote").textContent = notes.join(" ");
 }
 function showResult(r) {
@@ -481,9 +479,9 @@ function showResult(r) {
 }
 function rview(n) { [1, 2].forEach((i) => { $("#rv" + i).hidden = i !== n; $("#rt" + i).setAttribute("aria-selected", i === n); }); }
 $("#rt1").addEventListener("click", () => rview(1)); $("#rt2").addEventListener("click", () => rview(2));
-$("#dlHtml").addEventListener("click", () => save(S.result.runs[S.runIdx].html, "text/html", `regolo-diagram-${S.result.type.code}-${slug()}.html`));
-$("#dlSvg").addEventListener("click", () => save(S.result.runs[S.runIdx].svg, "image/svg+xml", `regolo-diagram-${S.result.type.code}-${slug()}.svg`));
-$("#dlMd").addEventListener("click", () => save(S.result.runs[S.runIdx].markdown, "text/markdown", `${slug()}-knowledge-base.md`));
+$("#dlHtml").addEventListener("click", () => save(S.result.runs[S.runIdx].html, "text/html", `regolo-memory-${S.result.type.code}-${slug()}.html`));
+$("#dlSvg").addEventListener("click", () => save(S.result.runs[S.runIdx].svg, "image/svg+xml", `regolo-memory-${S.result.type.code}-${slug()}.svg`));
+$("#dlMd").addEventListener("click", () => save(S.result.runs[S.runIdx].markdown, "text/markdown", `${slug()}-wiki-and-handoff.md`));
 $("#cpMd").addEventListener("click", async () => { try { await navigator.clipboard.writeText(S.result.runs[S.runIdx].markdown); toast("Markdown copied"); } catch { toast("Copy failed: select the text and copy it"); } });
 $("#again").addEventListener("click", () => go(3));
 
